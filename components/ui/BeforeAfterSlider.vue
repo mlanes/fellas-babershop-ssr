@@ -42,8 +42,7 @@ const updatePosition = (clientX: number) => {
 
   const rect = containerRef.value.getBoundingClientRect()
   const x = clientX - rect.left
-  const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100))
-  sliderPosition.value = percentage
+  sliderPosition.value = Math.max(0, Math.min(100, (x / rect.width) * 100))
 }
 
 /**

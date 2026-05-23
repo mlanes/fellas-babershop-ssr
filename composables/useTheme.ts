@@ -106,10 +106,7 @@ export function useTheme() {
 
   onMounted(() => {
     initTheme()
-    const cleanup = setupSystemThemeListener()
-
-    // Cleanup on unmount
-    return cleanup
+    return setupSystemThemeListener()
   })
 
   return {

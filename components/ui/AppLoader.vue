@@ -15,14 +15,12 @@ let startTime = 0
 
 // Simulate progress during load
 const updateProgress = () => {
-  const interval = setInterval(() => {
+  return setInterval(() => {
     if (progress.value < 90) {
       progress.value += Math.random() * 15
       if (progress.value > 90) progress.value = 90
     }
   }, 100)
-
-  return interval
 }
 
 const hideLoader = () => {
