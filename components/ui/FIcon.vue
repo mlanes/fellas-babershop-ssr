@@ -27,7 +27,17 @@ const attrs = useAttrs()
 const rootClass = computed(() => ['f-icon', attrs.class as string | undefined])
 
 // Custom icons that aren't in feather-icons
-const customIcons = ['quote', 'see-more', 'checkmark', 'close', 'star-filled', 'email', 'location', 'crown', 'whatsapp']
+const customIcons = [
+  'quote',
+  'see-more',
+  'checkmark',
+  'close',
+  'star-filled',
+  'email',
+  'location',
+  'crown',
+  'whatsapp',
+]
 
 const isCustomIcon = computed(() => customIcons.includes(props.name))
 
@@ -135,13 +145,7 @@ const featherIconSvg = computed(() => {
   </svg>
 
   <!-- Feather Icons -->
-  <span
-    v-else
-    :class="rootClass"
-    role="img"
-    :aria-label="name"
-    v-html="featherIconSvg"
-  />
+  <span v-else :class="rootClass" role="img" :aria-label="name" v-html="featherIconSvg" />
 </template>
 
 <style scoped lang="scss">

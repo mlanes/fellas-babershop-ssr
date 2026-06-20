@@ -34,9 +34,7 @@ test.describe('Accessibility (axe-core)', () => {
     test(`${route} has no critical or serious axe violations`, async ({ page }) => {
       await gotoAndReady(page, route)
       const { violations } = await scan(page)
-      const blocking = violations.filter(
-        (v) => v.impact === 'critical' || v.impact === 'serious',
-      )
+      const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
         // eslint-disable-next-line no-console
         console.log(`axe violations on ${route}:`, formatViolations(blocking))
@@ -57,9 +55,7 @@ test.describe('Accessibility (axe-core)', () => {
     await page.locator('button.header__mobile-toggle').click()
     await page.locator('.header__mobile-menu').waitFor()
     const { violations } = await scan(page)
-    const blocking = violations.filter(
-      (v) => v.impact === 'critical' || v.impact === 'serious',
-    )
+    const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
     if (blocking.length) {
       // eslint-disable-next-line no-console
       console.log('axe violations (mobile menu open):', formatViolations(blocking))

@@ -5,11 +5,13 @@ self-hosted stack that can also host the future fullstack app and any
 side projects.
 
 **Players in the current setup:**
+
 - **Wix** — domain registrar (where `fellasbarber.com` is bought) **and**
   the current DNS nameservers (`ns0.wixdns.net`, `ns1.wixdns.net`)
 - **Netlify** — current host (served `fellasbarber.com` until cutover)
 
 **Target stack:**
+
 - **Wix** — keeps being the registrar (no domain transfer, just nameserver change)
 - **Cloudflare** — new DNS authority + global edge CDN + DDoS protection
 - **Hetzner Cloud** — VPS (Ubuntu 26.04) hosting everything
@@ -46,25 +48,25 @@ What's left = Cloudflare + the actual cutover.
 ### 1.2 SSH key (already done)
 
 The key `~/.ssh/id_ed25519_hetzner` was generated and added in
-*Security → SSH Keys* as `mario-hetzner`.
+_Security → SSH Keys_ as `mario-hetzner`.
 
 ### 1.3 Create the server
 
-*Servers → Add Server*:
+_Servers → Add Server_:
 
-| Field | Choice |
-|---|---|
-| Location | **Falkenstein** (closest to Lisbon) |
-| Image | **Ubuntu 24.04** |
-| Type | **Shared vCPU → CX22** (€4.51/mo: 2 vCPU, 4 GB RAM, 40 GB SSD) |
-| Networking | IPv4 + IPv6 (default) |
-| SSH Keys | tick `mario-hetzner` |
-| Volumes | none |
-| Firewalls | (will create in 1.4) |
-| Backups | optional (~20% surcharge); enable if you want hourly off-box snapshots |
-| Placement Groups | none |
-| Labels | optional, e.g. `role=coolify` |
-| Name | `coolify-1` |
+| Field            | Choice                                                                 |
+| ---------------- | ---------------------------------------------------------------------- |
+| Location         | **Falkenstein** (closest to Lisbon)                                    |
+| Image            | **Ubuntu 24.04**                                                       |
+| Type             | **Shared vCPU → CX22** (€4.51/mo: 2 vCPU, 4 GB RAM, 40 GB SSD)         |
+| Networking       | IPv4 + IPv6 (default)                                                  |
+| SSH Keys         | tick `mario-hetzner`                                                   |
+| Volumes          | none                                                                   |
+| Firewalls        | (will create in 1.4)                                                   |
+| Backups          | optional (~20% surcharge); enable if you want hourly off-box snapshots |
+| Placement Groups | none                                                                   |
+| Labels           | optional, e.g. `role=coolify`                                          |
+| Name             | `coolify-1`                                                            |
 
 → **Create & Buy now**.
 
@@ -72,13 +74,13 @@ Note the IPv4 address; everything below uses `178.105.204.69` as a stand-in.
 
 ### 1.4 Firewall
 
-*Firewalls → New Firewall* — inbound rules only:
+_Firewalls → New Firewall_ — inbound rules only:
 
-| Port | Protocol | Source |
-|---|---|---|
-| 22 | TCP | Any IPv4 + IPv6 (or restrict to your IP if you have a static one) |
-| 80 | TCP | Any |
-| 443 | TCP | Any |
+| Port | Protocol | Source                                                            |
+| ---- | -------- | ----------------------------------------------------------------- |
+| 22   | TCP      | Any IPv4 + IPv6 (or restrict to your IP if you have a static one) |
+| 80   | TCP      | Any                                                               |
+| 443  | TCP      | Any                                                               |
 
 Attach to the `coolify-1` server. Do **not** open 8000 publicly — we'll
 expose Coolify via a real domain (HTTPS) and keep dashboard traffic off
@@ -139,16 +141,17 @@ proxy + auto-HTTPS). When done it prints:
 Coolify is installed and running at http://178.105.204.69:8000
 ```
 
-Open that URL in your browser, create the admin account (this is *your*
+Open that URL in your browser, create the admin account (this is _your_
 private Coolify — no shared anything). Save the credentials.
 
 ### 3.1 Expose Coolify dashboard on a real domain
 
 In Coolify: **Settings → General**
-- *Instance's Domain*: `coolify.fellasbarber.com`
+
+- _Instance's Domain_: `coolify.fellasbarber.com`
 
 Add a Cloudflare DNS record (Phase 4 below) for that subdomain pointing
-at `178.105.204.69`, then in Coolify hit *Save* — it'll issue a Let's Encrypt
+at `178.105.204.69`, then in Coolify hit _Save_ — it'll issue a Let's Encrypt
 cert via Traefik. Now `https://coolify.fellasbarber.com` works.
 
 Once that's working, you can remove port 8000 from the firewall — all
@@ -199,12 +202,12 @@ dig +short NS fellasbarber.com
 In the Cloudflare **DNS** tab, set these records (keep `@` and `www`
 pointing at Netlify for now — we cut those over in Phase 7):
 
-| Type | Name | Content | Proxy |
-|---|---|---|---|
-| A | `coolify` | `178.105.204.69` | 🟠 **Proxied** |
-| A | `preview` | `178.105.204.69` | 🟠 **Proxied** |
-| (existing) A | `@` | (Netlify's IP, imported) | 🟠 Proxied |
-| (existing) A | `www` | (Netlify's IP, imported) | 🟠 Proxied |
+| Type         | Name      | Content                  | Proxy          |
+| ------------ | --------- | ------------------------ | -------------- |
+| A            | `coolify` | `178.105.204.69`         | 🟠 **Proxied** |
+| A            | `preview` | `178.105.204.69`         | 🟠 **Proxied** |
+| (existing) A | `@`       | (Netlify's IP, imported) | 🟠 Proxied     |
+| (existing) A | `www`     | (Netlify's IP, imported) | 🟠 Proxied     |
 
 Proxied (🟠 orange cloud) is what gives you the edge CDN, DDoS
 protection, and hides the VPS IP from public view.
@@ -212,16 +215,19 @@ protection, and hides the VPS IP from public view.
 ### 4.4 SSL / TLS settings
 
 In Cloudflare **SSL/TLS → Overview**:
+
 - Mode: **Full (strict)** — Cloudflare ↔ origin uses the Let's Encrypt
   cert that Coolify provisions. Don't use Flexible (it sends plain HTTP
   to the origin).
 
 In **SSL/TLS → Edge Certificates**:
-- *Always Use HTTPS*: **On**
-- *Automatic HTTPS Rewrites*: **On**
-- *Minimum TLS Version*: 1.2
 
-In **Rules → Page Rules** (or *Caching → Cache Rules*):
+- _Always Use HTTPS_: **On**
+- _Automatic HTTPS Rewrites_: **On**
+- _Minimum TLS Version_: 1.2
+
+In **Rules → Page Rules** (or _Caching → Cache Rules_):
+
 - Optionally cache `/_nuxt/*` aggressively (1 year) — Nuxt asset
   hashing makes this safe.
 
@@ -245,18 +251,18 @@ Nothing for you to do here — this PR/branch includes:
 
 ### 6.1 Connect GitHub
 
-In Coolify: *Sources → New Source → GitHub App* → install the Coolify
+In Coolify: _Sources → New Source → GitHub App_ → install the Coolify
 GitHub app on your `mlanes` account, grant access to
 `fellas-babershop-ssr`.
 
 ### 6.2 Create the project
 
-*Projects → New Project* → name: `fellas-barbershop` → Environment:
+_Projects → New Project_ → name: `fellas-barbershop` → Environment:
 `production`.
 
 ### 6.3 Add the resource
 
-*+ New Resource → Public Repository (or Private via the GitHub app)*:
+_+ New Resource → Public Repository (or Private via the GitHub app)_:
 
 - Repository: `mlanes/fellas-babershop-ssr`
 - Branch: `main`
@@ -266,16 +272,17 @@ GitHub app on your `mlanes` account, grant access to
   after verifying)
 
 Build/start commands — Nixpacks auto-detects these from `package.json`:
+
 - Install: `npm ci`
 - Build: `npm run build`
 - Start: `node .output/server/index.mjs`
 
 ### 6.4 Environment variables
 
-*Environment Variables*:
+_Environment Variables_:
 
-| Key | Value |
-|---|---|
+| Key        | Value        |
+| ---------- | ------------ |
 | `NODE_ENV` | `production` |
 
 That's it — `runtimeConfig.public.siteUrl` is baked into `nuxt.config.ts`.
@@ -289,9 +296,10 @@ Watch the build log. ~3–5 minutes for the first build (`npm ci`
 downloads everything; subsequent deploys are cached).
 
 When it goes green, visit `https://preview.fellasbarber.com`. Verify:
+
 - Page loads, hero video plays
 - Images load (look at the `<img>` `src` attributes — should be
-  `/_ipx/...` URLs, *not* `/.netlify/images?...`)
+  `/_ipx/...` URLs, _not_ `/.netlify/images?...`)
 - Theme toggle works
 - Language switcher works
 - All 5 routes load
@@ -310,6 +318,7 @@ before cutover. Speeds up the switch.
 ### 7.2 Switch the apex
 
 In Cloudflare DNS, change the `@` and `www` A records:
+
 - Old content: Netlify's IPs (or whatever they pointed at)
 - New content: `178.105.204.69` (proxied 🟠)
 
@@ -318,7 +327,8 @@ which fetches from your Hetzner box and caches.
 
 ### 7.3 Add the domain to the Coolify app
 
-In Coolify *Resource → Configuration → Domains*:
+In Coolify _Resource → Configuration → Domains_:
+
 - Add `fellasbarber.com` and `www.fellasbarber.com`
 - Coolify will issue Let's Encrypt certs for both (takes ~30s)
 
@@ -337,8 +347,9 @@ caches at the ISP level can serve old records for a bit.
 
 Wait 24–48h to make sure no stale DNS caches are still resolving to
 Netlify, then in the Netlify dashboard:
-- *Site settings → Domain management* → remove `fellasbarber.com`
-- *Site settings → General* → pause or delete the site
+
+- _Site settings → Domain management_ → remove `fellasbarber.com`
+- _Site settings → General_ → pause or delete the site
 
 Don't delete the Netlify site immediately — keep it for rollback (see
 below).
@@ -370,20 +381,20 @@ Coolify watches the branch, builds, deploys. Same flow as Netlify.
 
 ### Logs / restart / SSH
 
-- Logs: Coolify dashboard → Resource → *Logs* tab
-- Restart: Resource → *Restart* button
-- Shell into the container: Resource → *Terminal*
+- Logs: Coolify dashboard → Resource → _Logs_ tab
+- Restart: Resource → _Restart_ button
+- Shell into the container: Resource → _Terminal_
 - Shell into the VPS itself: `ssh hetzner-coolify`
 
 ### Adding a second project (the future fullstack app)
 
-In Coolify: *New Project → New Resource* — same flow as Phase 6.3.
+In Coolify: _New Project → New Resource_ — same flow as Phase 6.3.
 Pick a different domain (e.g. `app.yourname.com`), Coolify routes it
 via Traefik to the new container on the same VPS.
 
 ### Adding Postgres for the fullstack app
 
-*New Resource → Database → PostgreSQL* → one click. Coolify provides
+_New Resource → Database → PostgreSQL_ → one click. Coolify provides
 the connection string as an env var to whichever app you link it to.
 
 ### OS-level maintenance
@@ -401,7 +412,7 @@ Coolify-managed apps auto-restart when the box comes back up.
 
 ### Backups
 
-- **Hetzner snapshots**: console → server → *Snapshots → Take Snapshot*.
+- **Hetzner snapshots**: console → server → _Snapshots → Take Snapshot_.
   Or enable scheduled Backups (paid, ~€1/mo) when the box hosts
   important data.
 - **Postgres dumps** (when the fullstack app exists): Coolify supports
@@ -412,13 +423,13 @@ Coolify-managed apps auto-restart when the box comes back up.
 
 ## Cost summary
 
-| | €/mo |
-|---|---|
-| Hetzner CX22 | 4.51 |
-| Hetzner Snapshots (optional but recommended) | ~1.00 |
-| Cloudflare Free | 0 |
-| Coolify (self-hosted, open source) | 0 |
-| **Total** | **~5.50** |
+|                                              | €/mo      |
+| -------------------------------------------- | --------- |
+| Hetzner CX22                                 | 4.51      |
+| Hetzner Snapshots (optional but recommended) | ~1.00     |
+| Cloudflare Free                              | 0         |
+| Coolify (self-hosted, open source)           | 0         |
+| **Total**                                    | **~5.50** |
 
 This figure does **not** change as you add more projects — same box
 hosts them all until you outgrow it (resize to CX32 is one click).

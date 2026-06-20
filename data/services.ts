@@ -29,8 +29,7 @@ export const services: Service[] = [
     name: 'Corte e Barba',
     description: 'Corte e barba personalizados',
     icon: 'checkmark',
-    detailedDescription:
-      'Corte de cabelo e barba alinhados para um visual impecável.',
+    detailedDescription: 'Corte de cabelo e barba alinhados para um visual impecável.',
     price: '€22',
     duration: '60min',
   },
@@ -59,8 +58,7 @@ export const services: Service[] = [
     name: 'Barba Simples',
     description: 'Alinhamento básico da barba',
     icon: 'checkmark',
-    detailedDescription:
-      'Alinhamento básico da barba (linha), ideal para manutenção e definição.',
+    detailedDescription: 'Alinhamento básico da barba (linha), ideal para manutenção e definição.',
     price: '€9',
     duration: '30min',
   },
@@ -99,8 +97,7 @@ export const services: Service[] = [
     name: 'Barba com Degrade',
     description: 'Barba com degradê profissional',
     icon: 'checkmark',
-    detailedDescription:
-      'Barba modelada com degradê suave ou marcante, conforme seu estilo.',
+    detailedDescription: 'Barba modelada com degradê suave ou marcante, conforme seu estilo.',
     price: '€11',
     duration: '30min',
   },
@@ -119,8 +116,7 @@ export const services: Service[] = [
     name: 'Contorno do Cabelo',
     description: 'Acabamento e definição capilar',
     icon: 'checkmark',
-    detailedDescription:
-      'Contorno e acabamento do cabelo para um visual limpo e definido.',
+    detailedDescription: 'Contorno e acabamento do cabelo para um visual limpo e definido.',
     price: '€6',
     duration: '30min',
   },
@@ -159,8 +155,7 @@ export const services: Service[] = [
     name: 'Hidratação Capilar',
     description: 'Tratamento nutritivo para cabelo',
     icon: 'checkmark',
-    detailedDescription:
-      'Tratamento nutritivo que recupera o brilho, a maciez e a saúde dos fios.',
+    detailedDescription: 'Tratamento nutritivo que recupera o brilho, a maciez e a saúde dos fios.',
     price: '€11',
     duration: '30min',
   },
@@ -169,8 +164,7 @@ export const services: Service[] = [
     name: 'Hidratação Barba',
     description: 'Hidratação profunda para barba',
     icon: 'checkmark',
-    detailedDescription:
-      'Tratamento de hidratação para deixar a barba mais macia e saudável.',
+    detailedDescription: 'Tratamento de hidratação para deixar a barba mais macia e saudável.',
     price: '€7',
     duration: '30min',
   },
@@ -209,8 +203,7 @@ export const services: Service[] = [
     name: 'Depilação Nariz',
     description: 'Remoção de pelos do nariz',
     icon: 'checkmark',
-    detailedDescription:
-      'Remoção higiênica e discreta dos pelos do nariz.',
+    detailedDescription: 'Remoção higiênica e discreta dos pelos do nariz.',
     price: '€6',
     duration: '30min',
   },
@@ -269,8 +262,7 @@ export const services: Service[] = [
     name: 'Botox',
     description: 'Tratamento capilar botox',
     icon: 'checkmark',
-    detailedDescription:
-      'Tratamento de botox capilar para reconstrução e revitalização dos fios.',
+    detailedDescription: 'Tratamento de botox capilar para reconstrução e revitalização dos fios.',
     price: '€25',
     duration: '30min',
   },

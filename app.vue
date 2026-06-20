@@ -35,9 +35,7 @@ useHead({
     { rel: 'alternate', hreflang: 'fr-FR', href: canonicalUrl },
     { rel: 'alternate', hreflang: 'x-default', href: canonicalUrl },
   ],
-  meta: [
-    { property: 'og:url', content: canonicalUrl },
-  ],
+  meta: [{ property: 'og:url', content: canonicalUrl }],
 })
 
 useStructuredData()

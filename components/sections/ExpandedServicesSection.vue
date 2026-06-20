@@ -444,11 +444,12 @@ onMounted(() => {
     @include desktop {
       width: 180px;
       align-self: stretch;
-      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+      transition:
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.4s ease;
       transform: translateX(100%);
       opacity: 0;
     }
-
   }
 
   @include element('card-logo') {
@@ -480,7 +481,9 @@ onMounted(() => {
 // Services list transitions - slide right (going forward)
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
 }
 
 .slide-right-enter-from {
@@ -496,7 +499,9 @@ onMounted(() => {
 // Services list transitions - slide left (going backward)
 .slide-left-enter-active,
 .slide-left-leave-active {
-  transition: transform 0.4s ease, opacity 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
 }
 
 .slide-left-enter-from {

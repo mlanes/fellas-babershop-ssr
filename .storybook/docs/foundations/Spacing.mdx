@@ -32,28 +32,28 @@ A geometric-ish scale in pixels. Always use the token, never hardcode
 
 ## Radii
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `$radius-sm` | 4px | tight pills, small inputs |
-| `$radius-md` | 8px | most cards, modals, images |
-| `$radius-lg` | 12px | larger cards |
-| `$radius-xl` | 16px | hero surfaces |
+| Token          | Value  | Use                           |
+| -------------- | ------ | ----------------------------- |
+| `$radius-sm`   | 4px    | tight pills, small inputs     |
+| `$radius-md`   | 8px    | most cards, modals, images    |
+| `$radius-lg`   | 12px   | larger cards                  |
+| `$radius-xl`   | 16px   | hero surfaces                 |
 | `$radius-full` | 9999px | pills, dots, circular buttons |
 
 ## Breakpoints
 
-| Mixin | Min width | Notes |
-| --- | --- | --- |
-| `@include tablet` | 768px | covers tablet + desktop |
-| `@include desktop` | 1024px | desktop only |
+| Mixin              | Min width | Notes                   |
+| ------------------ | --------- | ----------------------- |
+| `@include tablet`  | 768px     | covers tablet + desktop |
+| `@include desktop` | 1024px    | desktop only            |
 
 The gallery scrollytelling, for example, only activates at `@include desktop`
 — mobile and tablet get continuous-drift animation instead.
 
 ## Transitions
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `$transition-fast` | 0.15s ease-in-out | hover, micro-interactions |
-| `$transition-base` | 0.3s ease-in-out | most state changes |
-| `$transition-slow` | 0.5s ease-in-out | section fade-ins, big swaps |
+| Token              | Value             | Use                         |
+| ------------------ | ----------------- | --------------------------- |
+| `$transition-fast` | 0.15s ease-in-out | hover, micro-interactions   |
+| `$transition-base` | 0.3s ease-in-out  | most state changes          |
+| `$transition-slow` | 0.5s ease-in-out  | section fade-ins, big swaps |

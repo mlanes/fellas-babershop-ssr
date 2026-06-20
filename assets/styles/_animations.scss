@@ -92,7 +92,8 @@
 
 // Pulse animation
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -124,7 +125,9 @@
 }
 
 .transition-colors {
-  transition: color $transition-base, background-color $transition-base,
+  transition:
+    color $transition-base,
+    background-color $transition-base,
     border-color $transition-base;
 }
 

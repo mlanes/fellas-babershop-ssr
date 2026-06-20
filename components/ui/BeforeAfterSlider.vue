@@ -178,16 +178,8 @@ onUnmounted(() => {
     >
       <div class="before-after-slider__handle-line"></div>
       <div class="before-after-slider__handle-button">
-        <FIcon
-          name="chevron-left"
-          :size="24"
-          class="before-after-slider__handle-icon"
-        />
-        <FIcon
-          name="chevron-right"
-          :size="24"
-          class="before-after-slider__handle-icon"
-        />
+        <FIcon name="chevron-left" :size="24" class="before-after-slider__handle-icon" />
+        <FIcon name="chevron-right" :size="24" class="before-after-slider__handle-icon" />
       </div>
     </div>
   </div>
@@ -277,10 +269,11 @@ onUnmounted(() => {
     width: 6px;
     background: $brand-red-dark;
     transform: translateX(-50%);
-    box-shadow: 0 0 20px rgba($brand-red-dark, 0.9),
-                0 0 40px rgba($brand-red-dark, 0.7),
-                0 0 60px rgba($brand-red-dark, 0.5),
-                0 0 80px rgba($brand-red-dark, 0.3);
+    box-shadow:
+      0 0 20px rgba($brand-red-dark, 0.9),
+      0 0 40px rgba($brand-red-dark, 0.7),
+      0 0 60px rgba($brand-red-dark, 0.5),
+      0 0 80px rgba($brand-red-dark, 0.3);
   }
 
   @include element('handle-button') {
@@ -293,9 +286,10 @@ onUnmounted(() => {
     background: var(--page-background);
     border: 3px solid $brand-red-dark;
     border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba($brand-red-dark, 0.2),
-                0 4px 20px rgba($black, 0.3),
-                0 8px 40px rgba($brand-red-dark, 0.4);
+    box-shadow:
+      0 0 0 4px rgba($brand-red-dark, 0.2),
+      0 4px 20px rgba($black, 0.3),
+      0 8px 40px rgba($brand-red-dark, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -304,13 +298,14 @@ onUnmounted(() => {
 
     &:hover {
       transform: translate(-50%, -50%) scale(1.15);
-      box-shadow: 0 0 0 4px rgba($brand-red-dark, 0.3),
-                  0 6px 25px rgba($black, 0.4),
-                  0 12px 50px rgba($brand-red-dark, 0.6);
+      box-shadow:
+        0 0 0 4px rgba($brand-red-dark, 0.3),
+        0 6px 25px rgba($black, 0.4),
+        0 12px 50px rgba($brand-red-dark, 0.6);
     }
 
     &:active {
-      transform: translate(-50%, -50%) scale(1.0);
+      transform: translate(-50%, -50%) scale(1);
     }
   }
 

@@ -75,7 +75,8 @@ useHead({
   }
 
   @keyframes pulse-blur-shared {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.8;
       transform: translate(-50%, -50%) scale(1);
     }

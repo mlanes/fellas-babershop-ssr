@@ -53,20 +53,20 @@ A marketing/showcase site for a three-location barbershop, prerendered at build 
 
 ## Tech Stack
 
-| Category | Tech |
-|---|---|
-| Framework | Nuxt 3, Vue 3, TypeScript |
-| Server | Nitro (Netlify preset) |
-| State | Pinia |
-| i18n | @nuxtjs/i18n |
-| Images | @nuxt/image (Netlify image service in prod, IPX locally) |
-| Fonts | @fontsource/raleway, @fontsource/bebas-neue (self-hosted) |
-| SEO | @nuxtjs/sitemap, runtime JSON-LD, dynamic canonical/hreflang |
-| PWA | @vite-pwa/nuxt (Workbox) |
-| Styling | SCSS with CSS custom properties for theming, nuxt-svgo for SVGs |
+| Category      | Tech                                                                          |
+| ------------- | ----------------------------------------------------------------------------- |
+| Framework     | Nuxt 3, Vue 3, TypeScript                                                     |
+| Server        | Nitro (Netlify preset)                                                        |
+| State         | Pinia                                                                         |
+| i18n          | @nuxtjs/i18n                                                                  |
+| Images        | @nuxt/image (Netlify image service in prod, IPX locally)                      |
+| Fonts         | @fontsource/raleway, @fontsource/bebas-neue (self-hosted)                     |
+| SEO           | @nuxtjs/sitemap, runtime JSON-LD, dynamic canonical/hreflang                  |
+| PWA           | @vite-pwa/nuxt (Workbox)                                                      |
+| Styling       | SCSS with CSS custom properties for theming, nuxt-svgo for SVGs               |
 | Design system | Storybook 9 (`@storybook-vue/nuxt`) — Foundations docs + component playground |
-| Tests | Playwright (e2e), Lighthouse (`npm run lighthouse`) |
-| Lint/format | ESLint, Prettier |
+| Tests         | Playwright (e2e), Lighthouse (`npm run lighthouse`)                           |
+| Lint/format   | ESLint, Prettier                                                              |
 
 ## Project Structure
 
@@ -152,12 +152,12 @@ VITE_GOOGLE_ANALYTICS_ID=
 
 ### Adding Things
 
-| Want to add | Where |
-|---|---|
-| A service | `data/services.ts` + `i18n/locales/*.json` under `servicesList.<id>` |
+| Want to add           | Where                                                                                                                        |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| A service             | `data/services.ts` + `i18n/locales/*.json` under `servicesList.<id>`                                                         |
 | A barbershop location | `composables/useBarbershops.ts`, drop images in `public/images/barbershops/<id>/`, add `barbershops.units.<id>` translations |
-| A gallery image | Drop in `public/images/gallery/`, append filename to the `galleryFilenames` array in `GalleryScrollSection.vue` |
-| A page | `pages/<name>.vue`, list in `nuxt.config.ts` `routeRules` prerender, add nav entry in `data/navigation.ts` |
+| A gallery image       | Drop in `public/images/gallery/`, append filename to the `galleryFilenames` array in `GalleryScrollSection.vue`              |
+| A page                | `pages/<name>.vue`, list in `nuxt.config.ts` `routeRules` prerender, add nav entry in `data/navigation.ts`                   |
 
 ### Conventions
 
@@ -208,7 +208,7 @@ stable `@nuxtjs/storybook@9.0.1` ships contradictory peer-dep metadata
 (declares `storybook@~9.0.5` but its own bundled deps need `^9.1.x`).
 `legacy-peer-deps` is the standard workaround until a fixed
 `@nuxtjs/storybook` release lands. **`@nuxtjs/storybook` is deliberately
-*not* in the `nuxt.config.ts` modules array** — the Storybook framework
+_not_ in the `nuxt.config.ts` modules array** — the Storybook framework
 (`@storybook-vue/nuxt`) boots Nuxt itself, and registering the module
 during the Nuxt build path crashed `nuxt prepare` on Netlify.
 
@@ -258,11 +258,11 @@ Design system in Figma: **[View Figma Design](https://www.figma.com/design/KcNyr
 
 ### Brand colors
 
-| | Light | Dark |
-|---|---|---|
-| Primary | `#E83752` | `#E83752` |
+|            | Light     | Dark      |
+| ---------- | --------- | --------- |
+| Primary    | `#E83752` | `#E83752` |
 | Background | `#F7F9FC` | `#0A0909` |
-| Text | `#000000` | `#FFFFFF` |
+| Text       | `#000000` | `#FFFFFF` |
 
 ### Typography
 
@@ -277,15 +277,15 @@ Chrome, Firefox, Safari and Edge — latest two stable versions of each.
 
 ## Performance Targets
 
-| Metric | Target |
-|---|---|
-| Lighthouse Performance | ≥ 95 (mobile), 99+ (desktop) |
-| Lighthouse Accessibility | 100 |
-| Lighthouse Best Practices | 100 |
-| Lighthouse SEO | 100 |
-| FCP | < 1.8s |
-| LCP | < 2.6s |
-| CLS | 0 |
+| Metric                    | Target                       |
+| ------------------------- | ---------------------------- |
+| Lighthouse Performance    | ≥ 95 (mobile), 99+ (desktop) |
+| Lighthouse Accessibility  | 100                          |
+| Lighthouse Best Practices | 100                          |
+| Lighthouse SEO            | 100                          |
+| FCP                       | < 1.8s                       |
+| LCP                       | < 2.6s                       |
+| CLS                       | 0                            |
 
 ## Contributing
 

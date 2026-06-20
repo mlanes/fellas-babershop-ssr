@@ -41,7 +41,8 @@ export function useBarbershops() {
       phone: '+351 215 904 241',
       whatsapp: '+351 910 452 767',
       instagram: 'https://www.instagram.com/fellasbarber2.pt',
-      facebook: 'https://www.facebook.com/people/Fellas-Barber-Premium-II/61562815660848/?rdid=nEF4vgUgQpGM7Q6g&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Eky6MhsaA%2F%3Fmibexti',
+      facebook:
+        'https://www.facebook.com/people/Fellas-Barber-Premium-II/61562815660848/?rdid=nEF4vgUgQpGM7Q6g&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1Eky6MhsaA%2F%3Fmibexti',
       scheduleWeekday: `${t('barbershops.schedule.weekdays')}: 10:00 - 20:00`,
       scheduleWeekend: `${t('barbershops.schedule.saturday')} ${t('barbershops.schedule.and')} ${t('barbershops.schedule.holidays')}: 10:00 - 18:00`,
       scheduleSunday: `${t('barbershops.schedule.sunday')}: ${t('barbershops.schedule.closed')}`,

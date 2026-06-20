@@ -124,7 +124,7 @@ const nextTestimonial = () => {
 
         <!-- Right: Featured Testimonial Card -->
         <div class="testimonials__featured">
-					<QuoteIcon class="testimonials__quote-icon" />
+          <QuoteIcon class="testimonials__quote-icon" />
 
           <transition name="testimonial-fade" mode="out-in">
             <div :key="selectedTestimonial" class="testimonials__content">
@@ -134,7 +134,9 @@ const nextTestimonial = () => {
                   {{ getInitials(testimonials[selectedTestimonial].customerName) }}
                 </div>
                 <div class="testimonials__featured-details">
-                  <span class="testimonials__featured-name">{{ testimonials[selectedTestimonial].customerName }}</span>
+                  <span class="testimonials__featured-name">{{
+                    testimonials[selectedTestimonial].customerName
+                  }}</span>
                 </div>
               </div>
 
@@ -379,7 +381,9 @@ const nextTestimonial = () => {
 // Testimonial transition
 .testimonial-fade-enter-active,
 .testimonial-fade-leave-active {
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
 }
 
 .testimonial-fade-enter-from {

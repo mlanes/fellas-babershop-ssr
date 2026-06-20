@@ -38,16 +38,46 @@ type MediaItem = {
 
 // Add new gallery images to public/images/gallery/ and append the filename here.
 const galleryFilenames = [
-  'gallery-01.jpeg', 'gallery-02.jpeg', 'gallery-03.jpeg', 'gallery-04.jpeg',
-  'gallery-05.jpeg', 'gallery-06.jpeg', 'gallery-07.jpeg', 'gallery-08.jpeg',
-  'gallery-09.jpeg', 'gallery-10.jpeg', 'gallery-11.jpeg', 'gallery-12.jpeg',
-  'gallery-13.jpeg', 'gallery-14.jpeg', 'gallery-15.jpeg', 'gallery-16.jpeg',
-  'gallery-17.jpeg', 'gallery-22.jpeg', 'gallery-28.jpeg', 'gallery-29.jpeg',
-  'gallery-30.jpeg', 'gallery-31.jpeg', 'gallery-32.jpeg', 'gallery-33.jpeg',
-  'gallery-34.jpeg', 'gallery-35.jpeg', 'gallery-36.jpeg', 'gallery-37.jpeg',
-  'gallery-38.jpeg', 'gallery-39.jpeg', 'gallery-40.jpeg', 'gallery-41.jpeg',
-  'gallery-42.jpeg', 'gallery-43.jpeg', 'gallery-44.jpeg', 'gallery-45.jpeg',
-  'gallery-46.jpeg', 'gallery-47.jpeg', 'gallery-48.jpeg', 'gallery-49.jpeg',
+  'gallery-01.jpeg',
+  'gallery-02.jpeg',
+  'gallery-03.jpeg',
+  'gallery-04.jpeg',
+  'gallery-05.jpeg',
+  'gallery-06.jpeg',
+  'gallery-07.jpeg',
+  'gallery-08.jpeg',
+  'gallery-09.jpeg',
+  'gallery-10.jpeg',
+  'gallery-11.jpeg',
+  'gallery-12.jpeg',
+  'gallery-13.jpeg',
+  'gallery-14.jpeg',
+  'gallery-15.jpeg',
+  'gallery-16.jpeg',
+  'gallery-17.jpeg',
+  'gallery-22.jpeg',
+  'gallery-28.jpeg',
+  'gallery-29.jpeg',
+  'gallery-30.jpeg',
+  'gallery-31.jpeg',
+  'gallery-32.jpeg',
+  'gallery-33.jpeg',
+  'gallery-34.jpeg',
+  'gallery-35.jpeg',
+  'gallery-36.jpeg',
+  'gallery-37.jpeg',
+  'gallery-38.jpeg',
+  'gallery-39.jpeg',
+  'gallery-40.jpeg',
+  'gallery-41.jpeg',
+  'gallery-42.jpeg',
+  'gallery-43.jpeg',
+  'gallery-44.jpeg',
+  'gallery-45.jpeg',
+  'gallery-46.jpeg',
+  'gallery-47.jpeg',
+  'gallery-48.jpeg',
+  'gallery-49.jpeg',
 ]
 
 const videoExtensions = /\.(mp4|webm)$/i
@@ -360,7 +390,12 @@ onUnmounted(() => {
       left: 50%;
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba($brand-red-dark, 1) 0%, rgba($brand-red-dark, 0.8) 30%, transparent 70%);
+      background: radial-gradient(
+        circle,
+        rgba($brand-red-dark, 1) 0%,
+        rgba($brand-red-dark, 0.8) 30%,
+        transparent 70%
+      );
       -webkit-filter: blur(80px);
       filter: blur(80px);
       z-index: -1;
@@ -454,7 +489,8 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
     transform: translate(-50%, -50%) translateZ(0) scale(1);
   }

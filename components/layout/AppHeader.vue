@@ -148,12 +148,21 @@ onUnmounted(() => {
   <header
     ref="headerRef"
     class="header"
-    :class="{ 'header--scrolled': isScrolled, 'header--menu-open': isMobileMenuOpen, 'header--hidden': !isHeaderVisible }"
+    :class="{
+      'header--scrolled': isScrolled,
+      'header--menu-open': isMobileMenuOpen,
+      'header--hidden': !isHeaderVisible,
+    }"
   >
     <div class="header__container container">
       <!-- Logo and Navigation grouped together -->
       <div class="header__left">
-        <a href="#home" class="header__logo" aria-label="Fellas Barbers Home" @click.prevent="handleNavClick('#home')">
+        <a
+          href="#home"
+          class="header__logo"
+          aria-label="Fellas Barbers Home"
+          @click.prevent="handleNavClick('#home')"
+        >
           <FLogo size="md" />
         </a>
 
@@ -253,7 +262,10 @@ onUnmounted(() => {
   background-color: rgba(0, 0, 0, 0.3);
   -webkit-backdrop-filter: saturate(180%) blur(10px);
   backdrop-filter: saturate(180%) blur(10px);
-  transition: transform 0.2s ease, background-color $transition-base, box-shadow $transition-base;
+  transition:
+    transform 0.2s ease,
+    background-color $transition-base,
+    box-shadow $transition-base;
   // Force hardware acceleration for iOS
   transform: translateY(0) translateZ(0);
   -webkit-transform: translateY(0) translateZ(0);
@@ -474,19 +486,19 @@ onUnmounted(() => {
   }
 
   @include element('mobile-menu') {
-		  position: fixed;
-			top: $header-height;
-			left: 0;
-			right: 0;
-			z-index: 999;
-			background-color: var(--page-background);
-			padding: $spacing-2xl;
-			transition: all $transition-base;
-			height: calc(100vh - $header-height);
-			overflow-y: auto;
-			// Force hardware acceleration for iOS
-			transform: translateZ(0);
-			-webkit-transform: translateZ(0);
+    position: fixed;
+    top: $header-height;
+    left: 0;
+    right: 0;
+    z-index: 999;
+    background-color: var(--page-background);
+    padding: $spacing-2xl;
+    transition: all $transition-base;
+    height: calc(100vh - $header-height);
+    overflow-y: auto;
+    // Force hardware acceleration for iOS
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
 
     @include desktop {
       display: none;
@@ -528,7 +540,9 @@ onUnmounted(() => {
 // Mobile menu transitions
 .mobile-menu-enter-active,
 .mobile-menu-leave-active {
-  transition: transform $transition-base, opacity $transition-base;
+  transition:
+    transform $transition-base,
+    opacity $transition-base;
 }
 
 .mobile-menu-enter-from {

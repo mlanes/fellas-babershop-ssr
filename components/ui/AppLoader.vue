@@ -67,10 +67,7 @@ onMounted(() => {
       <div class="app-loader__content">
         <FellasLogo class="app-loader__logo" />
         <div class="app-loader__progress-container">
-          <div
-            class="app-loader__progress-bar"
-            :style="{ width: `${progress}%` }"
-          ></div>
+          <div class="app-loader__progress-bar" :style="{ width: `${progress}%` }"></div>
         </div>
       </div>
     </div>
@@ -119,7 +116,7 @@ onMounted(() => {
     width: 160px;
     height: auto;
     filter: drop-shadow(0px 0px 0px rgba(247, 247, 247, 0))
-            drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
+      drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
 
     // Target all paths in the logo
     :deep(path) {
@@ -178,7 +175,8 @@ onMounted(() => {
     stroke-dashoffset: 0;
     stroke-width: 0.5;
   }
-  60%, 90% {
+  60%,
+  90% {
     fill-opacity: 1;
     stroke-dasharray: 150 0;
     stroke-dashoffset: 0;
@@ -194,29 +192,32 @@ onMounted(() => {
 
 // Glow effect animation
 @keyframes logo-glow {
-  0%, 20% {
+  0%,
+  20% {
     filter: drop-shadow(0px 0px 0px rgba($brand-red-dark, 0))
-            drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
+      drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
   }
-  40%, 50% {
+  40%,
+  50% {
     filter: drop-shadow(0px 0px 50px rgba($brand-red-dark, 0.9))
-            drop-shadow(0px 0px 30px rgba($brand-red-dark, 0.7))
-            drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.95));
+      drop-shadow(0px 0px 30px rgba($brand-red-dark, 0.7))
+      drop-shadow(0px 4px 20px rgba(0, 0, 0, 0.95));
   }
   75% {
     filter: drop-shadow(0px 0px 0px rgba($brand-red-dark, 0))
-            drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
+      drop-shadow(0px 0px 0px rgba(0, 0, 0, 0));
   }
   100% {
     filter: drop-shadow(0px 0px 40px rgba($brand-red-dark, 0.7))
-            drop-shadow(0px 0px 20px rgba($brand-red-dark, 0.5))
-            drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.5));
+      drop-shadow(0px 0px 20px rgba($brand-red-dark, 0.5))
+      drop-shadow(0px 4px 15px rgba(0, 0, 0, 0.5));
   }
 }
 
 // Background composition pulse animation
 @keyframes bg-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.8;
     transform: scale(1);
   }

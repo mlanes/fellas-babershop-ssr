@@ -106,7 +106,10 @@ onMounted(() => {
       <div class="hero__content">
         <FLogo size="lg" class="hero__logo" />
 
-        <h1 class="hero__title text-h1">{{ t('hero.title') }} <span class="hero__title hero__title--premium">{{ t('hero.premium') }}</span></h1>
+        <h1 class="hero__title text-h1">
+          {{ t('hero.title') }}
+          <span class="hero__title hero__title--premium">{{ t('hero.premium') }}</span>
+        </h1>
 
         <p class="hero__tagline text-h5">{{ t('hero.tagline') }}</p>
 
@@ -115,21 +118,13 @@ onMounted(() => {
         </p>
 
         <!-- Mobile/Tablet Book Button -->
-        <FButton
-          variant="primary"
-          size="md"
-          class="hero__book-btn"
-          @click="handleBookingClick"
-        >
+        <FButton variant="primary" size="md" class="hero__book-btn" @click="handleBookingClick">
           <FIcon name="calendar" :size="18" />
           {{ t('common.book') }}
         </FButton>
       </div>
 
-      <button
-        class="hero__scroll-indicator"
-        @click="handleScrollClick"
-      >
+      <button class="hero__scroll-indicator" @click="handleScrollClick">
         <FIcon name="see-more" :size="28" />
         <span class="hero__scroll-text">{{ t('hero.seeMore') }}</span>
       </button>
@@ -150,7 +145,9 @@ onMounted(() => {
   background: var(--page-background);
   color: var(--text-color-primary);
   overflow: hidden;
-  transition: background-color $transition-base, color $transition-base;
+  transition:
+    background-color $transition-base,
+    color $transition-base;
 
   @include element('video') {
     position: absolute;
@@ -255,7 +252,10 @@ onMounted(() => {
       background: none;
       -webkit-text-fill-color: var(--text-color-primary);
       letter-spacing: 0.2em;
-      transition: color $transition-base, background $transition-base, -webkit-text-fill-color $transition-base;
+      transition:
+        color $transition-base,
+        background $transition-base,
+        -webkit-text-fill-color $transition-base;
     }
   }
 
@@ -281,7 +281,9 @@ onMounted(() => {
   @include element('book-btn') {
     margin-top: $spacing-md;
     opacity: 0;
-    animation: slide-up $transition-base forwards, pulse-shadow 2s ease-in-out infinite;
+    animation:
+      slide-up $transition-base forwards,
+      pulse-shadow 2s ease-in-out infinite;
     animation-delay: 1s, 1.5s;
 
     // Hide on desktop, show only on mobile and tablet
@@ -305,7 +307,9 @@ onMounted(() => {
     border-radius: $radius-full;
     transition: all $transition-base;
     opacity: 0;
-    animation: fade-in $transition-base forwards, pulse 2s ease-in-out infinite;
+    animation:
+      fade-in $transition-base forwards,
+      pulse 2s ease-in-out infinite;
     animation-delay: 1s;
     flex-direction: column;
     align-items: center;
@@ -351,7 +355,8 @@ onMounted(() => {
 
 // Pulse shadow animation for the book button
 @keyframes pulse-shadow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px 5px rgba($brand-red-dark, 0.8);
     transform: scale(1);
   }

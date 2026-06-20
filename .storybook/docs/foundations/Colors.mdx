@@ -16,17 +16,26 @@ below — they don't hardcode hex.
 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', margin: '1rem 0' }}>
   <div style={{ flex: '1 1 180px', minWidth: 180 }}>
     <div style={{ background: '#E83752', height: 96, borderRadius: 8 }} />
-    <strong>Primary</strong><br />
+    <strong>Primary</strong>
+    <br />
     <code>#E83752</code>
   </div>
   <div style={{ flex: '1 1 180px', minWidth: 180 }}>
     <div style={{ background: '#D4203B', height: 96, borderRadius: 8 }} />
-    <strong>Primary Dark</strong><br />
+    <strong>Primary Dark</strong>
+    <br />
     <code>#D4203B</code>
   </div>
   <div style={{ flex: '1 1 180px', minWidth: 180 }}>
-    <div style={{ background: 'linear-gradient(135deg, #E83752, #D4203B)', height: 96, borderRadius: 8 }} />
-    <strong>Brand Gradient</strong><br />
+    <div
+      style={{
+        background: 'linear-gradient(135deg, #E83752, #D4203B)',
+        height: 96,
+        borderRadius: 8,
+      }}
+    />
+    <strong>Brand Gradient</strong>
+    <br />
     <code>$gradient-brand-light-red</code>
   </div>
 </div>
@@ -35,24 +44,24 @@ below — they don't hardcode hex.
 
 Surface and text tokens that flip per `data-theme="light|dark"`.
 
-| Token | Light | Dark |
-| --- | --- | --- |
-| `--page-background` | near-white | near-black |
-| `--page-color` | near-black | near-white |
-| `--text-color-primary` | near-black | near-white |
-| `--text-color-secondary` | gray-700 | gray-300 |
-| `--surface-background` | white | dark gray |
-| `--surface-border` | gray-200 | gray-700 |
+| Token                    | Light      | Dark       |
+| ------------------------ | ---------- | ---------- |
+| `--page-background`      | near-white | near-black |
+| `--page-color`           | near-black | near-white |
+| `--text-color-primary`   | near-black | near-white |
+| `--text-color-secondary` | gray-700   | gray-300   |
+| `--surface-background`   | white      | dark gray  |
+| `--surface-border`       | gray-200   | gray-700   |
 
 Toggle the **Theme** toolbar above (paintbrush icon) to see every
 component swap palettes.
 
 ## Status
 
-| Token | Use |
-| --- | --- |
+| Token                    | Use                 |
+| ------------------------ | ------------------- |
 | `--status-color-success` | confirmation states |
-| `--status-color-error` | error states |
+| `--status-color-error`   | error states        |
 
 ## When to add a new color
 

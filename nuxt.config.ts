@@ -63,18 +63,32 @@ export default defineNuxtConfig({
       title: 'Fellas Barbers - A Sua Barbearia de Confiança',
       meta: [
         { name: 'theme-color', content: '#e63946' },
-        { name: 'description', content: 'Fellas Barbers - Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional. Ambiente moderno e serviço de excelência. Agende já!' },
-        { name: 'keywords', content: 'barbearia lisboa, barbeiro lisboa, corte masculino lisboa, barba lisboa, barbearia premium portugal, fellas barbers, grooming masculino, fade haircut, undercut, beard trim, barbearia tradicional, men\'s grooming lisboa, hair styling lisboa, aparar barba, corte degradê' },
+        {
+          name: 'description',
+          content:
+            'Fellas Barbers - Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional. Ambiente moderno e serviço de excelência. Agende já!',
+        },
+        {
+          name: 'keywords',
+          content:
+            "barbearia lisboa, barbeiro lisboa, corte masculino lisboa, barba lisboa, barbearia premium portugal, fellas barbers, grooming masculino, fade haircut, undercut, beard trim, barbearia tradicional, men's grooming lisboa, hair styling lisboa, aparar barba, corte degradê",
+        },
         // Open Graph
         { property: 'og:site_name', content: 'Fellas Barbers' },
         { property: 'og:title', content: 'Fellas Barbers - A Sua Barbearia de Confiança' },
-        { property: 'og:description', content: 'Serviços profissionais de barbeiro com qualidade premium em Lisboa, Portugal.' },
+        {
+          property: 'og:description',
+          content: 'Serviços profissionais de barbeiro com qualidade premium em Lisboa, Portugal.',
+        },
         { property: 'og:image', content: 'https://fellasbarber.com/og-image.jpg' },
         { property: 'og:type', content: 'website' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'Fellas Barbers' },
-        { name: 'twitter:description', content: 'A sua barbearia de confiança em Lisboa, Portugal.' },
+        {
+          name: 'twitter:description',
+          content: 'A sua barbearia de confiança em Lisboa, Portugal.',
+        },
         { name: 'twitter:image', content: 'https://fellasbarber.com/og-image.jpg' },
       ],
       link: [
@@ -178,11 +192,17 @@ export default defineNuxtConfig({
 
   pwa: {
     registerType: 'autoUpdate',
-    includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'favicon-32x32.png', 'favicon-16x16.png'],
+    includeAssets: [
+      'favicon.svg',
+      'apple-touch-icon.png',
+      'favicon-32x32.png',
+      'favicon-16x16.png',
+    ],
     manifest: {
       name: 'Fellas Barbers',
       short_name: 'Fellas',
-      description: 'Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional.',
+      description:
+        'Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional.',
       theme_color: '#e63946',
       background_color: '#ffffff',
       display: 'standalone',

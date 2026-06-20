@@ -11,9 +11,7 @@ const meta = {
   component: FLanguageSelector,
   tags: ['autodocs'],
   // The dropdown opens downward — give it room.
-  decorators: [
-    () => ({ template: '<div style="min-height:280px;padding:1rem"><story /></div>' }),
-  ],
+  decorators: [() => ({ template: '<div style="min-height:280px;padding:1rem"><story /></div>' })],
 } satisfies Meta<typeof FLanguageSelector>
 
 export default meta

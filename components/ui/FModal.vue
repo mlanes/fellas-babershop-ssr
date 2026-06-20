@@ -20,7 +20,7 @@ const props = withDefaults(
     /** Click on the dark backdrop closes the modal. */
     closeOnBackdrop?: boolean
   }>(),
-  { ariaLabel: 'Dialog', closeOnBackdrop: true },
+  { ariaLabel: 'Dialog', closeOnBackdrop: true }
 )
 
 const emit = defineEmits<{
@@ -66,7 +66,7 @@ watch(
       previouslyFocused?.focus()
       previouslyFocused = null
     }
-  },
+  }
 )
 
 onUnmounted(() => {

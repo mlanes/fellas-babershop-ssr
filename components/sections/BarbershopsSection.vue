@@ -8,18 +8,18 @@ import { useBarbershops } from '~/composables/useBarbershops'
 const { t } = useI18n()
 const { barbershops } = useBarbershops()
 
-const shopIds = computed(() => barbershops.value.map(s => s.id))
+const shopIds = computed(() => barbershops.value.map((s) => s.id))
 
 const currentImageIndex = ref<Record<string, number>>(
-  Object.fromEntries(shopIds.value.map(id => [id, 0]))
+  Object.fromEntries(shopIds.value.map((id) => [id, 0]))
 )
 
 const isTransitioning = ref<Record<string, boolean>>(
-  Object.fromEntries(shopIds.value.map(id => [id, false]))
+  Object.fromEntries(shopIds.value.map((id) => [id, false]))
 )
 
 const intervals = ref<Record<string, ReturnType<typeof setInterval> | null>>(
-  Object.fromEntries(shopIds.value.map(id => [id, null]))
+  Object.fromEntries(shopIds.value.map((id) => [id, null]))
 )
 
 const startAutoPlay = (shopId: string, totalImages: number) => {
@@ -55,7 +55,8 @@ const prevImage = (shopId: string, totalImages: number) => {
   if (isTransitioning.value[shopId]) return
 
   isTransitioning.value[shopId] = true
-  currentImageIndex.value[shopId] = (currentImageIndex.value[shopId] - 1 + totalImages) % totalImages
+  currentImageIndex.value[shopId] =
+    (currentImageIndex.value[shopId] - 1 + totalImages) % totalImages
 
   setTimeout(() => {
     isTransitioning.value[shopId] = false
@@ -79,14 +80,14 @@ const goToImage = (shopId: string, index: number, totalImages: number) => {
 
 // Start auto-play on mount
 onMounted(() => {
-  barbershops.value.forEach(shop => {
+  barbershops.value.forEach((shop) => {
     startAutoPlay(shop.id, shop.images.length)
   })
 })
 
 onUnmounted(() => {
   // Clean up intervals
-  Object.values(intervals.value).forEach(interval => {
+  Object.values(intervals.value).forEach((interval) => {
     if (interval) clearInterval(interval)
   })
 })
@@ -104,11 +105,7 @@ onUnmounted(() => {
 
       <!-- Barbershop Cards -->
       <div class="barbershops-section__grid">
-        <article
-          v-for="shop in barbershops"
-          :key="shop.id"
-          class="barbershop-card"
-        >
+        <article v-for="shop in barbershops" :key="shop.id" class="barbershop-card">
           <!-- Image Carousel -->
           <div class="barbershop-card__carousel">
             <div
@@ -146,11 +143,7 @@ onUnmounted(() => {
             </button>
 
             <!-- Dots Indicator -->
-            <div
-              class="barbershop-card__dots"
-              role="tablist"
-              :aria-label="`${shop.name} photos`"
-            >
+            <div class="barbershop-card__dots" role="tablist" :aria-label="`${shop.name} photos`">
               <button
                 v-for="(_, index) in shop.images"
                 :key="index"
@@ -180,22 +173,37 @@ onUnmounted(() => {
               <FIcon name="calendar" :size="20" class="barbershop-card__icon" />
               <div class="barbershop-card__schedule-times">
                 <div class="barbershop-card__schedule-item">
-                  <span class="barbershop-card__schedule-day">{{ shop.scheduleWeekday.split(':')[0] }}</span>
-                  <span class="barbershop-card__schedule-time">{{ shop.scheduleWeekday.split(':').slice(1).join(':').trim() }}</span>
+                  <span class="barbershop-card__schedule-day">{{
+                    shop.scheduleWeekday.split(':')[0]
+                  }}</span>
+                  <span class="barbershop-card__schedule-time">{{
+                    shop.scheduleWeekday.split(':').slice(1).join(':').trim()
+                  }}</span>
                 </div>
                 <div class="barbershop-card__schedule-item">
-                  <span class="barbershop-card__schedule-day">{{ shop.scheduleWeekend.split(':')[0] }}</span>
-                  <span class="barbershop-card__schedule-time">{{ shop.scheduleWeekend.split(':').slice(1).join(':').trim() }}</span>
+                  <span class="barbershop-card__schedule-day">{{
+                    shop.scheduleWeekend.split(':')[0]
+                  }}</span>
+                  <span class="barbershop-card__schedule-time">{{
+                    shop.scheduleWeekend.split(':').slice(1).join(':').trim()
+                  }}</span>
                 </div>
                 <div class="barbershop-card__schedule-item">
-                  <span class="barbershop-card__schedule-day">{{ shop.scheduleSunday.split(':')[0] }}</span>
-                  <span class="barbershop-card__schedule-time">{{ shop.scheduleSunday.split(':').slice(1).join(':').trim() }}</span>
+                  <span class="barbershop-card__schedule-day">{{
+                    shop.scheduleSunday.split(':')[0]
+                  }}</span>
+                  <span class="barbershop-card__schedule-time">{{
+                    shop.scheduleSunday.split(':').slice(1).join(':').trim()
+                  }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Contact Buttons -->
-            <div v-if="shop.phone || shop.whatsapp || shop.instagram || shop.facebook" class="barbershop-card__contacts">
+            <div
+              v-if="shop.phone || shop.whatsapp || shop.instagram || shop.facebook"
+              class="barbershop-card__contacts"
+            >
               <a
                 v-if="shop.phone"
                 :href="`tel:${shop.phone}`"
@@ -298,7 +306,8 @@ onUnmounted(() => {
   }
 
   @keyframes pulse-blur-bottom {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.8;
       transform: translate(-50%, 50%) scale(1);
     }
@@ -428,7 +437,9 @@ onUnmounted(() => {
     background-clip: content-box;
     border: none;
     cursor: pointer;
-    transition: background $transition-fast, transform $transition-fast;
+    transition:
+      background $transition-fast,
+      transform $transition-fast;
 
     &:hover {
       background: rgba($white, 0.8);
@@ -553,15 +564,22 @@ onUnmounted(() => {
     }
 
     @include modifier('whatsapp') {
-      background: #25D366;
+      background: #25d366;
 
       &:hover {
-        box-shadow: 0 4px 12px rgba(#25D366, 0.3);
+        box-shadow: 0 4px 12px rgba(#25d366, 0.3);
       }
     }
 
     @include modifier('instagram') {
-      background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      background: linear-gradient(
+        45deg,
+        #f09433 0%,
+        #e6683c 25%,
+        #dc2743 50%,
+        #cc2366 75%,
+        #bc1888 100%
+      );
 
       &:hover {
         box-shadow: 0 4px 12px rgba(#dc2743, 0.4);
@@ -569,10 +587,10 @@ onUnmounted(() => {
     }
 
     @include modifier('facebook') {
-      background: #1877F2;
+      background: #1877f2;
 
       &:hover {
-        box-shadow: 0 4px 12px rgba(#1877F2, 0.4);
+        box-shadow: 0 4px 12px rgba(#1877f2, 0.4);
       }
     }
 

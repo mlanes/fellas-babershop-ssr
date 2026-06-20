@@ -37,12 +37,7 @@ const preview: Preview = {
       // Sidebar order: introduction first, then foundations (Colors →
       // Typography → Spacing), then the components, alphabetical within.
       storySort: {
-        order: [
-          'Introduction',
-          'Foundations',
-          ['Colors', 'Typography', 'Spacing'],
-          'Components',
-        ],
+        order: ['Introduction', 'Foundations', ['Colors', 'Typography', 'Spacing'], 'Components'],
       },
     },
   },

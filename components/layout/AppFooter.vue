@@ -65,19 +65,41 @@ const scrollToTop = () => {
         <div v-for="shop in barbershops" :key="shop.id" class="footer__column">
           <h3 class="footer__heading text-h6">{{ shop.name }}</h3>
           <div class="footer__contacts">
-            <a v-if="shop.phone" :href="`tel:${shop.phone.replace(/\s/g, '')}`" class="footer__contact">
+            <a
+              v-if="shop.phone"
+              :href="`tel:${shop.phone.replace(/\s/g, '')}`"
+              class="footer__contact"
+            >
               <FIcon name="phone" :size="20" />
               <span>{{ shop.phone }}</span>
             </a>
-            <a v-if="shop.whatsapp" :href="`https://wa.me/${shop.whatsapp.replace(/[\s+]/g, '')}`" target="_blank" rel="noopener noreferrer" class="footer__contact">
+            <a
+              v-if="shop.whatsapp"
+              :href="`https://wa.me/${shop.whatsapp.replace(/[\s+]/g, '')}`"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer__contact"
+            >
               <FIcon name="whatsapp" :size="20" />
               <span>{{ shop.whatsapp }}</span>
             </a>
-            <a v-if="shop.instagram" :href="shop.instagram" target="_blank" rel="noopener noreferrer" class="footer__contact">
+            <a
+              v-if="shop.instagram"
+              :href="shop.instagram"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer__contact"
+            >
               <FIcon name="instagram" :size="20" />
               <span>Instagram</span>
             </a>
-            <a v-if="shop.facebook" :href="shop.facebook" target="_blank" rel="noopener noreferrer" class="footer__contact">
+            <a
+              v-if="shop.facebook"
+              :href="shop.facebook"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="footer__contact"
+            >
               <FIcon name="facebook" :size="20" />
               <span>Facebook</span>
             </a>
@@ -92,11 +114,7 @@ const scrollToTop = () => {
         </p>
 
         <!-- Go to Top Button -->
-        <button
-          class="footer__go-to-top"
-          aria-label="Go to top"
-          @click="scrollToTop"
-        >
+        <button class="footer__go-to-top" aria-label="Go to top" @click="scrollToTop">
           <FIcon name="arrow-up" :size="24" />
         </button>
       </div>
@@ -112,7 +130,9 @@ const scrollToTop = () => {
   background-color: var(--footer-background);
   color: var(--text-color-primary);
   padding: $spacing-5xl 0 $spacing-2xl;
-  transition: background-color $transition-base, color $transition-base;
+  transition:
+    background-color $transition-base,
+    color $transition-base;
 
   @include element('container') {
     @include container;
@@ -147,15 +167,15 @@ const scrollToTop = () => {
     transition: color $transition-base;
 
     // Make SVG adapt to theme
-    :deep(path[fill="#F7F9FC"]) {
+    :deep(path[fill='#F7F9FC']) {
       fill: var(--text-color-primary);
     }
 
-    :deep(path[stroke="#F7F9FC"]) {
+    :deep(path[stroke='#F7F9FC']) {
       stroke: var(--text-color-primary);
     }
 
-    :deep(path[fill="#121111"]) {
+    :deep(path[fill='#121111']) {
       fill: var(--text-color-primary);
     }
   }

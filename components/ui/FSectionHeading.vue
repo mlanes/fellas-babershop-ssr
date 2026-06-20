@@ -19,7 +19,7 @@ withDefaults(
     /** Alignment of the whole block. */
     align?: 'left' | 'center'
   }>(),
-  { level: 'h2', align: 'center' },
+  { level: 'h2', align: 'center' }
 )
 </script>
 
@@ -33,10 +33,7 @@ withDefaults(
       <slot name="heading">{{ heading }}</slot>
     </component>
 
-    <p
-      v-if="subtitle || $slots.subtitle"
-      class="f-section-heading__subtitle text-body-lg"
-    >
+    <p v-if="subtitle || $slots.subtitle" class="f-section-heading__subtitle text-body-lg">
       <slot name="subtitle">{{ subtitle }}</slot>
     </p>
   </div>

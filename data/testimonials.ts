@@ -39,7 +39,8 @@ export const testimonials: Testimonial[] = [
   {
     customerName: 'Wessel Vroon',
     rating: 5,
-    testimonialText: 'Stumbled upon this shop. Gave me a quick and fresh haircut 5/5 would recommend!',
+    testimonialText:
+      'Stumbled upon this shop. Gave me a quick and fresh haircut 5/5 would recommend!',
     date: '1 week ago',
   },
   {

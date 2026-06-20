@@ -9,9 +9,11 @@ export function useSmoothScroll() {
     if (!element) return
 
     // Emit custom event to notify that programmatic scroll is starting
-    window.dispatchEvent(new CustomEvent('programmatic-scroll-start', {
-      detail: { target }
-    }))
+    window.dispatchEvent(
+      new CustomEvent('programmatic-scroll-start', {
+        detail: { target },
+      })
+    )
 
     const top = element.getBoundingClientRect().top + window.pageYOffset - offset
     window.scrollTo({ top, behavior: 'smooth' })

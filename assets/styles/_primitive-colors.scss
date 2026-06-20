@@ -14,29 +14,31 @@
   // === BRAND COLORS ===
   --primitive-primary: oklch(63.27% 0.21 19.69deg); // #E83752 (brand red)
   --primitive-primary-dark: oklch(56.77% 0.19 19.3deg); // #D4203B
-  --primitive-primary-darker: oklch(48% 0.18 19deg); // ~#B41E32 — reserved for light-theme text on near-white surfaces (WCAG AA on $primitive-gray-100)
+  --primitive-primary-darker: oklch(
+    48% 0.18 19deg
+  ); // ~#B41E32 — reserved for light-theme text on near-white surfaces (WCAG AA on $primitive-gray-100)
   --primitive-primary-light: oklch(71.61% 0.18 19.5deg); // #FA5770
 
   // === NEUTRAL COLORS ===
   --primitive-black: oklch(7.5% 0.001 300deg); // #121111
   --primitive-black-dark: oklch(4.5% 0.001 300deg); // #0A0909
-  --primitive-black-light: oklch(12.0% 0.002 300deg); // #1C1B1B
+  --primitive-black-light: oklch(12% 0.002 300deg); // #1C1B1B
   --primitive-black-red-tint: oklch(15% 0.012 20deg); // Dark with subtle red tint for footer
 
   --primitive-white: oklch(97.5% 0.002 270deg); // #F7F9FC
-  --primitive-white-dark: oklch(91.0% 0.005 5deg); // #E3D8D8
-  --primitive-white-light: oklch(95.0% 0.004 10deg); // #F0E8E8
+  --primitive-white-dark: oklch(91% 0.005 5deg); // #E3D8D8
+  --primitive-white-light: oklch(95% 0.004 10deg); // #F0E8E8
 
   // === GRAY SCALE ===
   --primitive-gray-900: oklch(10.2% 0.003 280deg); // #141414
-  --primitive-gray-800: oklch(20.0% 0.004 280deg); // #2C2C2C
-  --primitive-gray-700: oklch(30.0% 0.005 280deg); // #444444
-  --primitive-gray-600: oklch(40.0% 0.007 280deg); // #5C5C5C
-  --primitive-gray-500: oklch(50.0% 0.009 280deg); // #747474
-  --primitive-gray-400: oklch(60.0% 0.011 280deg); // #8C8C8C
-  --primitive-gray-300: oklch(70.0% 0.012 280deg); // #A3A3A3
-  --primitive-gray-200: oklch(80.0% 0.008 280deg); // #CCCCCC
-  --primitive-gray-100: oklch(94.0% 0.003 280deg); // #EFEFEF - Light grey, subtle background
+  --primitive-gray-800: oklch(20% 0.004 280deg); // #2C2C2C
+  --primitive-gray-700: oklch(30% 0.005 280deg); // #444444
+  --primitive-gray-600: oklch(40% 0.007 280deg); // #5C5C5C
+  --primitive-gray-500: oklch(50% 0.009 280deg); // #747474
+  --primitive-gray-400: oklch(60% 0.011 280deg); // #8C8C8C
+  --primitive-gray-300: oklch(70% 0.012 280deg); // #A3A3A3
+  --primitive-gray-200: oklch(80% 0.008 280deg); // #CCCCCC
+  --primitive-gray-100: oklch(94% 0.003 280deg); // #EFEFEF - Light grey, subtle background
 
   // === GRADIENTS ===
   --primary-gradient: linear-gradient(
@@ -64,17 +66,17 @@
   );
 
   // === STATUS COLORS ===
-  --primitive-red: oklch(63.0% 0.25 20deg); // #F03D3D
-  --primitive-red-dark: oklch(56.0% 0.22 20deg); // #d03333
-  --primitive-red-light: oklch(67.0% 0.20 20deg); // #f05454
+  --primitive-red: oklch(63% 0.25 20deg); // #F03D3D
+  --primitive-red-dark: oklch(56% 0.22 20deg); // #d03333
+  --primitive-red-light: oklch(67% 0.2 20deg); // #f05454
 
-  --primitive-green: oklch(72.0% 0.21 145deg); // #0BB07B
-  --primitive-green-dark: oklch(66.0% 0.20 137deg); // #28bb49
-  --primitive-green-light: oklch(79.0% 0.19 145deg); // #50e170
+  --primitive-green: oklch(72% 0.21 145deg); // #0BB07B
+  --primitive-green-dark: oklch(66% 0.2 137deg); // #28bb49
+  --primitive-green-light: oklch(79% 0.19 145deg); // #50e170
 
-  --primitive-yellow: oklch(83.0% 0.14 95deg); // #FFCE52
-  --primitive-yellow-dark: oklch(76.0% 0.13 95deg); // #d9b043
-  --primitive-yellow-light: oklch(85.0% 0.13 95deg); // #ffd76b
+  --primitive-yellow: oklch(83% 0.14 95deg); // #FFCE52
+  --primitive-yellow-dark: oklch(76% 0.13 95deg); // #d9b043
+  --primitive-yellow-light: oklch(85% 0.13 95deg); // #ffd76b
 
   // === FULL COLORS ===
   --primitive-full-white: white;

@@ -23,14 +23,7 @@ const { services } = useTranslatedServices()
 const sectionRef = ref<HTMLElement | null>(null)
 
 // Service images
-const serviceImages = [
-  serviceImg1,
-  serviceImg2,
-  serviceImg3,
-  galleryImg,
-  serviceImg5,
-  serviceImg6,
-]
+const serviceImages = [serviceImg1, serviceImg2, serviceImg3, galleryImg, serviceImg5, serviceImg6]
 
 const handleViewServices = () => {
   scrollTo('#expanded-services')
@@ -68,39 +61,100 @@ onMounted(() => {
             </div>
           </div>
 
-          <FButton
-            variant="primary"
-            size="md"
-            class="services__button"
-            @click="handleViewServices"
-          >
+          <FButton variant="primary" size="md" class="services__button" @click="handleViewServices">
             {{ t('services.viewPricing') }}
           </FButton>
         </div>
 
         <div class="services__images">
           <div class="services__image-row">
-            <div class="services__image-container services__image-container--large services__image-container--1">
-              <NuxtImg :src="serviceImages[0]" alt="Fellas Barbers professional haircut service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--large services__image-container--1"
+            >
+              <NuxtImg
+                :src="serviceImages[0]"
+                alt="Fellas Barbers professional haircut service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
-            <div class="services__image-container services__image-container--small services__image-container--2">
-              <NuxtImg :src="serviceImages[1]" alt="Fellas Barbers beard trim and grooming service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--small services__image-container--2"
+            >
+              <NuxtImg
+                :src="serviceImages[1]"
+                alt="Fellas Barbers beard trim and grooming service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
           </div>
           <div class="services__image-row">
-            <div class="services__image-container services__image-container--small services__image-container--3">
-              <NuxtImg :src="serviceImages[2]" alt="Fellas Barbers hair styling service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--small services__image-container--3"
+            >
+              <NuxtImg
+                :src="serviceImages[2]"
+                alt="Fellas Barbers hair styling service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
-            <div class="services__image-container services__image-container--large services__image-container--4">
-              <NuxtImg :src="serviceImages[3]" alt="Fellas Barbers premium grooming service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--large services__image-container--4"
+            >
+              <NuxtImg
+                :src="serviceImages[3]"
+                alt="Fellas Barbers premium grooming service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
           </div>
           <div class="services__image-row">
-            <div class="services__image-container services__image-container--large services__image-container--5">
-              <NuxtImg :src="serviceImages[4]" alt="Fellas Barbers fade haircut service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--large services__image-container--5"
+            >
+              <NuxtImg
+                :src="serviceImages[4]"
+                alt="Fellas Barbers fade haircut service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
-            <div class="services__image-container services__image-container--small services__image-container--6">
-              <NuxtImg :src="serviceImages[5]" alt="Fellas Barbers premium barbershop service" class="services__image" width="800" height="480" loading="lazy" decoding="async" sizes="sm:50vw md:33vw lg:25vw" />
+            <div
+              class="services__image-container services__image-container--small services__image-container--6"
+            >
+              <NuxtImg
+                :src="serviceImages[5]"
+                alt="Fellas Barbers premium barbershop service"
+                class="services__image"
+                width="800"
+                height="480"
+                loading="lazy"
+                decoding="async"
+                sizes="sm:50vw md:33vw lg:25vw"
+              />
             </div>
           </div>
         </div>
@@ -233,7 +287,9 @@ onMounted(() => {
     justify-content: center;
     color: var(--text-color-secondary);
     overflow: hidden;
-    transition: background $transition-base, color $transition-base;
+    transition:
+      background $transition-base,
+      color $transition-base;
     animation: float 8s ease-in-out infinite;
 
     &:hover {
@@ -326,7 +382,8 @@ onMounted(() => {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0px, 0px);
   }
   25% {

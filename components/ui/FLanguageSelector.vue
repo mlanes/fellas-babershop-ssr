@@ -133,7 +133,11 @@ onUnmounted(() => {
         <button
           v-for="(lang, index) in languages"
           :key="lang.code"
-          :ref="(el) => { if (el) optionRefs[index] = el as HTMLButtonElement }"
+          :ref="
+            (el) => {
+              if (el) optionRefs[index] = el as HTMLButtonElement
+            }
+          "
           class="language-selector__option"
           :class="{ 'language-selector__option--active': lang.code === locale }"
           type="button"
@@ -256,7 +260,9 @@ onUnmounted(() => {
 // Dropdown transitions
 .dropdown-enter-active,
 .dropdown-leave-active {
-  transition: opacity $transition-fast, transform $transition-fast;
+  transition:
+    opacity $transition-fast,
+    transform $transition-fast;
 }
 
 .dropdown-enter-from,

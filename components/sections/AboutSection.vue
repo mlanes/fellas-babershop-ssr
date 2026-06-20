@@ -36,7 +36,9 @@ onMounted(() => {
             {{ t('about.description') }}
           </p>
 
-          <FButton variant="primary" size="md" @click="handleLearnMoreClick">{{ t('about.learnMore') }}</FButton>
+          <FButton variant="primary" size="md" @click="handleLearnMoreClick">{{
+            t('about.learnMore')
+          }}</FButton>
         </div>
 
         <div class="about__badge">
@@ -159,7 +161,8 @@ onMounted(() => {
   }
 
   @keyframes pulse-blur-about {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 0.8;
       transform: translate(-50%, -50%) scale(1);
     }
@@ -186,22 +189,22 @@ onMounted(() => {
     }
 
     // Change text stroke to match theme
-    :deep(path[stroke="#F7F9FC"]) {
+    :deep(path[stroke='#F7F9FC']) {
       stroke: var(--text-color-primary);
     }
 
     // Change text fill to match theme (but not the center white circle)
-    :deep(path[fill="#F7F9FC"]:not([data-figma-bg-blur-radius])) {
+    :deep(path[fill='#F7F9FC']:not([data-figma-bg-blur-radius])) {
       fill: var(--text-color-primary);
     }
 
     // Center white circle background - inverted (dark in light mode, light in dark mode)
-    :deep(path[data-figma-bg-blur-radius][fill="#F7F9FC"]) {
+    :deep(path[data-figma-bg-blur-radius][fill='#F7F9FC']) {
       fill: var(--text-color-primary);
     }
 
     // Center logo (comb/scissors) - inverted color for contrast
-    :deep(path[fill="#121111"]) {
+    :deep(path[fill='#121111']) {
       fill: var(--page-background);
       animation: none;
     }

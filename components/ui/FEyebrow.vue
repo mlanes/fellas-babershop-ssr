@@ -10,7 +10,7 @@ withDefaults(
     /** Render as a block (own line) or inline. */
     as?: 'p' | 'span'
   }>(),
-  { align: 'center', as: 'p' },
+  { align: 'center', as: 'p' }
 )
 </script>
 

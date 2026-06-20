@@ -68,7 +68,7 @@ test.describe('Language selector', () => {
 
     for (const label of ['Português', 'English', 'Español', 'Français']) {
       await expect(dropdown.locator('.language-selector__option', { hasText: label })).toHaveCount(
-        1,
+        1
       )
     }
   })
@@ -93,7 +93,7 @@ test.describe('Language selector', () => {
           const cookies = await context.cookies()
           return cookies.find((c) => c.name === 'i18n_redirected')?.value
         },
-        { timeout: 10_000 },
+        { timeout: 10_000 }
       )
       .toBe('en')
   })

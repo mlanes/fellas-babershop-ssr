@@ -30,7 +30,9 @@ body {
 
 // Apply transition only when theme toggle button is clicked
 html.theme-transitioning body {
-  transition: background-color variables.$transition-base, color variables.$transition-base;
+  transition:
+    background-color variables.$transition-base,
+    color variables.$transition-base;
 }
 
 // Remove default list styles

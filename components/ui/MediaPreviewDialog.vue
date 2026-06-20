@@ -24,16 +24,12 @@ watch(
     if (props.mediaType !== 'video' || !videoRef.value) return
     if (isOpen) videoRef.value.play()
     else videoRef.value.pause()
-  },
+  }
 )
 </script>
 
 <template>
-  <FModal
-    :open="isOpen"
-    aria-label="Media preview"
-    @close="emit('close')"
-  >
+  <FModal :open="isOpen" aria-label="Media preview" @close="emit('close')">
     <div class="media-preview-dialog__media-wrapper">
       <video
         v-if="mediaType === 'video'"
