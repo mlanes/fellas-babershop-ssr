@@ -524,11 +524,11 @@ onUnmounted(() => {
     transition: color $transition-base;
 
     &:hover {
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
     }
 
     @include modifier('active') {
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
     }
   }
 
