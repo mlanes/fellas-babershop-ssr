@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { gotoAndReady, localeCookie, openLanguageMenu } from './helpers'
+import { gotoAndReady, localeCookie, openLanguageMenu, pageHydrated } from './helpers'
 
 /**
  * Automated WCAG 2.1 A/AA accessibility scan via axe-core.
@@ -66,6 +66,7 @@ test.describe('Accessibility (axe-core)', () => {
       await page.setViewportSize({ width: 390, height: 844 })
       await gotoAndReady(page, '/')
       expect(await paintedTheme(page)).toBe(theme)
+      await pageHydrated(page)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
       await pageSettled(page)
@@ -193,9 +194,7 @@ async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
  * invisible and reads half-faded text as a contrast violation.
  */
 async function pageSettled(page: Page): Promise<void> {
-  // AppLoader takes its overlay out of the DOM once the app has mounted and
-  // the page has loaded.
-  await expect(page.locator('.app-loader')).toHaveCount(0, { timeout: 15000 })
+  await pageHydrated(page)
   await expect.poll(() => unfinishedFades(page), { timeout: 15000 }).toBe(0)
 }
 
@@ -210,7 +209,13 @@ async function unfinishedFades(page: Page): Promise<number> {
     () =>
       document.getAnimations().filter((animation) => {
         const effect = animation.effect
-        if (animation.playState === 'finished' || !(effect instanceof KeyframeEffect)) return false
+        if (!(effect instanceof KeyframeEffect)) return false
+        // A finished transition leaves the list once its last frame is painted.
+        // WebKit was measured listing one as finished with its element still at
+        // 54% opacity, so a listed one counts. A finished animation that keeps
+        // its end state stays listed for good, and does not.
+        const painted = animation.playState === 'finished' && !(animation instanceof CSSTransition)
+        if (painted) return false
         if (effect.getComputedTiming().endTime === Infinity) return false
         return effect
           .getKeyframes()

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoAndReady, localeCookie, openLanguageMenu } from './helpers'
+import { gotoAndReady, localeCookie, openLanguageMenu, pageHydrated } from './helpers'
 
 test.describe('Theme toggle', () => {
   test.use({ colorScheme: 'light' })
@@ -43,6 +43,7 @@ test.describe('Mobile menu', () => {
 
   test('opens and closes', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const toggle = page.locator('button.header__mobile-toggle')
     await expect(toggle).toBeVisible()
     await expect(page.locator('.header__mobile-menu')).toHaveCount(0)
@@ -60,7 +61,11 @@ test.describe('Mobile menu', () => {
 test.describe('Language selector', () => {
   test('dropdown lists all 4 locales', async ({ page }) => {
     await gotoAndReady(page, '/')
-    const dropdown = await openLanguageMenu(page)
+    // Once the page has hydrated, one click must be enough.
+    await pageHydrated(page)
+    await page.locator('.language-selector__button:visible').click()
+    const dropdown = page.locator('.language-selector__dropdown:visible')
+    await expect(dropdown).toBeVisible()
     await expect(dropdown.locator('.language-selector__option')).toHaveCount(4)
 
     for (const label of ['Português', 'English', 'Español', 'Français']) {
