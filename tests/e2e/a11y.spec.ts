@@ -38,17 +38,15 @@ function formatViolations(violations: Awaited<ReturnType<typeof scan>>['violatio
 }
 
 test.describe('Accessibility (axe-core)', () => {
-  // The scans ask for reduced motion: axe scrolls sections into view as it
-  // works, which starts their fade-ins, and text caught mid-fade reads as a
-  // contrast violation.
   for (const theme of themes) {
     for (const route of routes) {
       test(`${route} has no critical or serious axe violations in ${theme} theme`, async ({
         page,
       }) => {
-        await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
+        await page.emulateMedia({ colorScheme: theme })
         await gotoAndReady(page, route)
         expect(await paintedTheme(page)).toBe(theme)
+        await pageSettled(page)
         const { violations } = await scan(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
@@ -66,12 +64,13 @@ test.describe('Accessibility (axe-core)', () => {
       await context.addCookies([
         { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
       ])
-      await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
+      await page.emulateMedia({ colorScheme: theme })
       await page.setViewportSize({ width: 390, height: 844 })
       await gotoAndReady(page, '/')
       expect(await paintedTheme(page)).toBe(theme)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
+      await pageSettled(page)
       const { violations } = await scan(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
@@ -111,6 +110,7 @@ test.describe('Accessibility (axe-core)', () => {
       test(`${name} keeps 4.5:1 contrast while hovered in ${theme} theme`, async ({ page }) => {
         await page.emulateMedia({ colorScheme: theme })
         await gotoAndReady(page, route)
+        expect(await paintedTheme(page)).toBe(theme)
         await hoverUntilSettled(page, page.locator(selector).first())
 
         expect(await textContrast(page, selector)).toBeGreaterThanOrEqual(4.5)
@@ -121,6 +121,7 @@ test.describe('Accessibility (axe-core)', () => {
     test(`selected language option meets 4.5:1 contrast in ${theme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme })
       await gotoAndReady(page, '/')
+      expect(await paintedTheme(page)).toBe(theme)
       const selected = page.locator('.language-selector__option--active')
       // A click before hydration is ignored, so click until the dropdown opens.
       await expect(async () => {
@@ -182,10 +183,50 @@ async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
     )
     await target.hover()
     await expect
-      .poll(() => target.evaluate((element) => element.getAnimations().length), { timeout: 1500 })
-      .toBe(0)
-    expect(await target.evaluate((element) => element.matches(':hover'))).toBe(true)
+      .poll(
+        () =>
+          target.evaluate(
+            (element) => element.matches(':hover') && element.getAnimations().length === 0
+          ),
+        { timeout: 1500 }
+      )
+      .toBe(true)
   }).toPass()
+}
+
+/**
+ * Waits until Vue has mounted and every entrance animation has ended. The
+ * sections fade in on timers from page load; axe skips text that is still
+ * invisible and reads half-faded text as a contrast violation.
+ */
+async function pageSettled(page: Page): Promise<void> {
+  // AppLoader takes its overlay out of the DOM once the app has mounted and
+  // the page has loaded.
+  await expect(page.locator('.app-loader')).toHaveCount(0, { timeout: 15000 })
+  await expect.poll(() => unfinishedFades(page), { timeout: 15000 }).toBe(0)
+}
+
+/**
+ * Counts the animations and transitions still changing an element's opacity
+ * or colour. Endless ones (pulses, drifts) are left out, and so is anything
+ * that only moves an element: WebKit leaves some transform transitions
+ * pending forever.
+ */
+async function unfinishedFades(page: Page): Promise<number> {
+  return await page.evaluate(
+    () =>
+      document.getAnimations().filter((animation) => {
+        const effect = animation.effect
+        if (animation.playState === 'finished' || !(effect instanceof KeyframeEffect)) return false
+        if (effect.getComputedTiming().endTime === Infinity) return false
+        return effect
+          .getKeyframes()
+          .some(
+            (keyframe) =>
+              'opacity' in keyframe || 'color' in keyframe || 'backgroundColor' in keyframe
+          )
+      }).length
+  )
 }
 
 async function textAndBackdropLuminance(
