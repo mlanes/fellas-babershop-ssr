@@ -380,7 +380,7 @@ onUnmounted(() => {
     }
 
     &:hover {
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
 
       &::before {
         opacity: 0;
@@ -392,7 +392,7 @@ onUnmounted(() => {
     }
 
     @include modifier('active') {
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
 
       &::before {
         opacity: 0;
