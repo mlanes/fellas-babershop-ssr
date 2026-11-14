@@ -6,8 +6,8 @@ import { gotoAndReady, localeCookie, openLanguageMenu, pageHydrated } from './he
  * Automated WCAG 2.1 A/AA accessibility scan via axe-core.
  *
  * Asserts that no axe violations marked `critical` or `serious` exist
- * on the page. `moderate` and `minor` violations are logged for review
- * but don't fail the build — keeping the bar at "must-fix" stops the
+ * on the page. `moderate` and `minor` violations are not reported and
+ * don't fail the build — keeping the bar at "must-fix" stops the
  * suite turning into a perpetual noise generator.
  */
 const routes = ['/', '/services', '/gallery', '/contacts', '/score']

@@ -6,6 +6,7 @@ test.describe('Theme toggle', () => {
 
   test('sets an explicit data-theme on first click', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
 
     const themeButton = page.locator('button.header__theme-toggle:visible')
     await themeButton.click()
@@ -15,6 +16,7 @@ test.describe('Theme toggle', () => {
 
   test('toggling twice yields opposite themes', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const themeButton = page.locator('button.header__theme-toggle:visible')
 
     await themeButton.click()
@@ -28,6 +30,7 @@ test.describe('Theme toggle', () => {
 
   test('theme choice persists across reload', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const themeButton = page.locator('button.header__theme-toggle:visible')
     await themeButton.click()
     const chosen = await page.locator('html').getAttribute('data-theme')

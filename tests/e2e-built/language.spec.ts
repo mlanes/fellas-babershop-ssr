@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from '@playwright/test'
-import { gotoAndReady, localeCookie, openLanguageMenu } from '../e2e/helpers'
+import { gotoAndReady, localeCookie, pageHydrated } from '../e2e/helpers'
 
 /**
  * Asserts the page has settled in a language: the `<html lang>` and the first
@@ -11,10 +11,17 @@ async function expectLanguage(page: Page, lang: string, homeLabel: string) {
   await expect(page.locator('.footer__link').first()).toHaveText(homeLabel)
 }
 
-/** Reads the `<html lang>` of the page as built, before any script has run. */
-async function builtLanguage(page: Page): Promise<string | undefined> {
-  const html = await (await page.request.get('/')).text()
-  return /<html[^>]*\blang="([^"]*)"/.exec(html)?.[1]
+/**
+ * Reads the `<html lang>` of the home page as built, before any script has run.
+ *
+ * @throws if the home page does not load or its HTML states no language
+ */
+async function builtLanguage(page: Page): Promise<string> {
+  const response = await page.request.get('/')
+  if (!response.ok()) throw new Error(`built home page answered ${response.status()}`)
+  const lang = /<html[^>]*\blang="([^"]*)"/.exec(await response.text())?.[1]
+  if (!lang) throw new Error('built home page has no lang attribute')
+  return lang
 }
 
 /**
@@ -61,7 +68,11 @@ test.describe('Language on the built site, English browser', () => {
     await gotoAndReady(page, '/')
     await expectLanguage(page, 'en-US', 'Home')
 
-    const dropdown = await openLanguageMenu(page)
+    // One click, not the retrying helper: a first click lost after hydration
+    // on the built site has to fail here.
+    await pageHydrated(page)
+    await page.locator('.language-selector__button:visible').click()
+    const dropdown = page.locator('.language-selector__dropdown:visible')
     await dropdown.locator('.language-selector__option', { hasText: 'Español' }).click()
     await expectLanguage(page, 'es-ES', 'Inicio')
 
