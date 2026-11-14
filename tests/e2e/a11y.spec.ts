@@ -63,25 +63,11 @@ test.describe('Accessibility (axe-core)', () => {
     expect(blocking).toEqual([])
   })
 
-  // axe reports the desktop nav links as "incomplete" (their ::before overlay
-  // hides the background from it), so the contrast is measured here instead.
-  test('active desktop nav link meets 4.5:1 contrast on the scrolled header in light theme', async ({
-    page,
-  }) => {
-    await page.emulateMedia({ colorScheme: 'light' })
-    await page.setViewportSize({ width: 1440, height: 900 })
-    await gotoAndReady(page, '/')
-    await page.evaluate(() => window.scrollTo(0, 400))
-    await page.locator('.header--scrolled').waitFor({ state: 'attached' })
-
-    await expect
-      .poll(() => textContrast(page, '.header__nav-link--active'))
-      .toBeGreaterThanOrEqual(4.5)
-  })
-
-  // axe reports these as "incomplete" too: the page number is too short for it
-  // to judge, and the card button has a pseudo-element.
+  // axe reports these as "incomplete", so the contrast is measured here instead:
+  // the nav links and the card button have a pseudo-element, and the page
+  // number is too short for it to judge.
   const brandRedText = [
+    { name: 'active desktop nav link', selector: '.header__nav-link--active' },
     {
       name: 'services pagination current page',
       selector: '.expanded-services__pagination--desktop .expanded-services__pagination-current',
@@ -105,12 +91,15 @@ type Rgb = [number, number, number]
 /**
  * Measures the WCAG contrast ratio of an element's text colour against the
  * background colours of the element and its ancestors, stacked from the page up.
- * Background images, gradients and pseudo-elements are not taken into account.
+ * Not taken into account: background images, gradients, pseudo-elements,
+ * opacity, and whatever page content shows through a translucent fixed
+ * ancestor such as the header.
  *
  * @param page - the page holding the element
  * @param selector - CSS selector; the first match is measured
  * @returns the contrast ratio, from 1 (none) to 21 (black on white)
- * @throws if the selector matches nothing or the stacked background is not opaque
+ * @throws if the selector matches nothing, the browser cannot parse one of the
+ *   colours, or the stacked background is not opaque
  */
 async function textContrast(page: Page, selector: string): Promise<number> {
   await page.locator(selector).first().waitFor({ state: 'attached' })
@@ -122,6 +111,8 @@ async function textContrast(page: Page, selector: string): Promise<number> {
       const ctx = canvas.getContext('2d')
       if (!ctx) throw new Error('2d canvas unavailable')
       for (const layer of layers) {
+        // An unparseable fillStyle is ignored silently and would repaint the previous layer.
+        if (!CSS.supports('color', layer)) throw new Error(`cannot parse colour: ${layer}`)
         ctx.fillStyle = layer
         ctx.fillRect(0, 0, 1, 1)
       }
