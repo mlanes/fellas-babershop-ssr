@@ -27,8 +27,18 @@ test.describe('SEO meta', () => {
     expect(body.toLowerCase()).toContain('user-agent')
   })
 
-  test('robots.txt points at the sitemap on the production domain', async ({ request }) => {
+  test('robots.txt points only at the sitemap on the production domain', async ({ request }) => {
     const response = await request.get('/robots.txt')
-    expect(await response.text()).toContain('Sitemap: https://fellasbarber.com/sitemap.xml')
+    const sitemapLines = (await response.text())
+      .split('\n')
+      .filter((line) => /^sitemap:/i.test(line))
+    expect(sitemapLines).toEqual(['Sitemap: https://fellasbarber.com/sitemap.xml'])
+  })
+
+  // The dev server lists its own localhost URLs unless asked for the canonical ones.
+  test('sitemap.xml lists the home page on the production domain', async ({ request }) => {
+    const response = await request.get('/sitemap.xml?canonical')
+    expect(response.status()).toBe(200)
+    expect(await response.text()).toContain('<loc>https://fellasbarber.com/</loc>')
   })
 })
