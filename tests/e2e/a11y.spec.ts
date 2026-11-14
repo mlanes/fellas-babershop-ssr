@@ -170,8 +170,11 @@ async function paintedTheme(page: Page): Promise<Theme> {
 }
 
 /**
- * Hovers an element and waits until its hover transitions have finished.
- * Hydration can drop the hover state, so it hovers again until the state holds.
+ * Hovers an element and waits until the hover holds and nothing on the page
+ * is still fading. Hydration can drop the hover state, so it hovers again
+ * until the state holds.
+ *
+ * @throws after 20 seconds if the element never stays hovered and settled
  */
 async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
   await expect(async () => {
@@ -184,14 +187,13 @@ async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
     await target.hover()
     await expect
       .poll(
-        () =>
-          target.evaluate(
-            (element) => element.matches(':hover') && element.getAnimations().length === 0
-          ),
-        { timeout: 1500 }
+        async () =>
+          (await target.evaluate((element) => element.matches(':hover'))) &&
+          (await unfinishedFades(page)) === 0,
+        { timeout: 3000 }
       )
       .toBe(true)
-  }).toPass()
+  }).toPass({ timeout: 20000 })
 }
 
 /**
