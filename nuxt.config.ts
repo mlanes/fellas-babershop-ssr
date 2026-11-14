@@ -22,6 +22,10 @@ export default defineNuxtConfig({
     },
   },
 
+  site: {
+    url: 'https://fellasbarber.com',
+  },
+
   sitemap: {
     // Coming-soon routes are noindex placeholders — keep them out of the sitemap.
     exclude: ['/services', '/gallery', '/contacts', '/score'],
