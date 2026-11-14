@@ -16,10 +16,8 @@ export default defineNuxtConfig({
     '@nuxtjs/sitemap',
   ],
 
-  runtimeConfig: {
-    public: {
-      siteUrl: 'https://fellasbarber.com',
-    },
+  site: {
+    url: 'https://fellasbarber.com',
   },
 
   sitemap: {

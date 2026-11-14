@@ -285,7 +285,7 @@ _Environment Variables_:
 | ---------- | ------------ |
 | `NODE_ENV` | `production` |
 
-That's it — `runtimeConfig.public.siteUrl` is baked into `nuxt.config.ts`.
+That's it — the site URL (`site.url`) is baked into `nuxt.config.ts`.
 
 ### 6.5 First deploy
 
