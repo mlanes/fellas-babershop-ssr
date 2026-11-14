@@ -18,9 +18,6 @@ const currentPage = ref(1)
 const itemsPerPage = 10
 const slideDirection = ref<'left' | 'right'>('right')
 
-// No service images assigned — all cards show the logo fallback
-const getServiceImage = (_serviceId: string | undefined) => undefined
-
 const totalPages = computed(() => Math.ceil(services.value.length / itemsPerPage))
 
 const paginatedServices = computed(() => {
@@ -315,7 +312,7 @@ onMounted(() => {
   }
 
   @include element('pagination-current') {
-    color: $brand-red-dark;
+    color: var(--brand-color-accent);
   }
 
   @include element('pagination-separator') {
