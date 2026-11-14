@@ -11,6 +11,7 @@ import { gotoAndReady } from './helpers'
  * suite turning into a perpetual noise generator.
  */
 const routes = ['/', '/services', '/gallery', '/contacts', '/score']
+const themes = ['light', 'dark'] as const
 
 async function scan(page: Parameters<typeof gotoAndReady>[0]) {
   return await new AxeBuilder({ page })
@@ -30,38 +31,44 @@ function formatViolations(violations: Awaited<ReturnType<typeof scan>>['violatio
 }
 
 test.describe('Accessibility (axe-core)', () => {
-  for (const route of routes) {
-    test(`${route} has no critical or serious axe violations`, async ({ page }) => {
-      await gotoAndReady(page, route)
+  for (const theme of themes) {
+    for (const route of routes) {
+      test(`${route} has no critical or serious axe violations in ${theme} theme`, async ({
+        page,
+      }) => {
+        await page.emulateMedia({ colorScheme: theme })
+        await gotoAndReady(page, route)
+        const { violations } = await scan(page)
+        const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
+        if (blocking.length) {
+          // eslint-disable-next-line no-console
+          console.log(`axe violations on ${route} (${theme}):`, formatViolations(blocking))
+        }
+        expect(blocking).toEqual([])
+      })
+    }
+
+    test(`home with mobile menu open has no critical or serious axe violations in ${theme} theme`, async ({
+      page,
+      context,
+    }) => {
+      await context.addCookies([
+        { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
+      ])
+      await page.emulateMedia({ colorScheme: theme })
+      await page.setViewportSize({ width: 390, height: 844 })
+      await gotoAndReady(page, '/')
+      await page.locator('button.header__mobile-toggle').click()
+      await page.locator('.header__mobile-menu').waitFor()
       const { violations } = await scan(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
         // eslint-disable-next-line no-console
-        console.log(`axe violations on ${route}:`, formatViolations(blocking))
+        console.log(`axe violations (mobile menu open, ${theme}):`, formatViolations(blocking))
       }
       expect(blocking).toEqual([])
     })
   }
-
-  test('home with mobile menu open has no critical or serious axe violations', async ({
-    page,
-    context,
-  }) => {
-    await context.addCookies([
-      { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
-    ])
-    await page.setViewportSize({ width: 390, height: 844 })
-    await gotoAndReady(page, '/')
-    await page.locator('button.header__mobile-toggle').click()
-    await page.locator('.header__mobile-menu').waitFor()
-    const { violations } = await scan(page)
-    const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
-    if (blocking.length) {
-      // eslint-disable-next-line no-console
-      console.log('axe violations (mobile menu open):', formatViolations(blocking))
-    }
-    expect(blocking).toEqual([])
-  })
 
   // axe reports these as "incomplete", so the contrast is measured here instead:
   // the nav links and the card button have a pseudo-element, and the page
