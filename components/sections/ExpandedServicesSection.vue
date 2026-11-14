@@ -315,7 +315,7 @@ onMounted(() => {
   }
 
   @include element('pagination-current') {
-    color: $brand-red-dark;
+    color: var(--brand-color-accent);
   }
 
   @include element('pagination-separator') {

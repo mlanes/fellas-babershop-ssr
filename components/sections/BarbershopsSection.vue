@@ -656,7 +656,7 @@ onUnmounted(() => {
 
     &--secondary {
       background: transparent;
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
       border: 2px solid $brand-red-dark;
 
       &:hover {

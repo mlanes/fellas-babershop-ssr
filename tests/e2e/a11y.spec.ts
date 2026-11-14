@@ -73,21 +73,49 @@ test.describe('Accessibility (axe-core)', () => {
     await gotoAndReady(page, '/')
     await page.evaluate(() => window.scrollTo(0, 400))
     await page.locator('.header--scrolled').waitFor({ state: 'attached' })
-    await page.locator('.header__nav-link--active').waitFor({ state: 'attached' })
 
-    await expect.poll(() => activeNavLinkContrast(page)).toBeGreaterThanOrEqual(4.5)
+    await expect
+      .poll(() => textContrast(page, '.header__nav-link--active'))
+      .toBeGreaterThanOrEqual(4.5)
   })
+
+  // axe reports these as "incomplete" too: the page number is too short for it
+  // to judge, and the card button has a pseudo-element.
+  const brandRedText = [
+    {
+      name: 'services pagination current page',
+      selector: '.expanded-services__pagination--desktop .expanded-services__pagination-current',
+    },
+    { name: 'barbershop card map link', selector: '.barbershop-card__button--secondary' },
+  ]
+
+  for (const { name, selector } of brandRedText) {
+    test(`${name} meets 4.5:1 contrast in light theme`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: 'light' })
+      await page.setViewportSize({ width: 1440, height: 900 })
+      await gotoAndReady(page, '/')
+
+      await expect.poll(() => textContrast(page, selector)).toBeGreaterThanOrEqual(4.5)
+    })
+  }
 })
 
 type Rgb = [number, number, number]
 
 /**
- * Measures the WCAG contrast ratio of the active desktop nav link against the
- * header background composited over the page background.
+ * Measures the WCAG contrast ratio of an element's text colour against the
+ * background colours of the element and its ancestors, stacked from the page up.
+ * Background images, gradients and pseudo-elements are not taken into account.
+ *
+ * @param page - the page holding the element
+ * @param selector - CSS selector; the first match is measured
+ * @returns the contrast ratio, from 1 (none) to 21 (black on white)
+ * @throws if the selector matches nothing or the stacked background is not opaque
  */
-async function activeNavLinkContrast(page: Page): Promise<number> {
-  const { text, backdrop } = await page.evaluate(() => {
-    const flatten = (...layers: string[]): [number, number, number] => {
+async function textContrast(page: Page, selector: string): Promise<number> {
+  await page.locator(selector).first().waitFor({ state: 'attached' })
+  const { text, backdrop } = await page.evaluate((target) => {
+    const flatten = (layers: string[]): [number, number, number] => {
       const canvas = document.createElement('canvas')
       canvas.width = 1
       canvas.height = 1
@@ -98,20 +126,20 @@ async function activeNavLinkContrast(page: Page): Promise<number> {
         ctx.fillRect(0, 0, 1, 1)
       }
       const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
-      if (a !== 255) throw new Error(`backdrop is not opaque: ${layers.join(' over ')}`)
+      if (a !== 255) throw new Error(`backdrop is not opaque: ${layers.join(' under ')}`)
       return [r, g, b]
     }
-    const colorOf = (selector: string, property: 'color' | 'backgroundColor'): string => {
-      const element = document.querySelector(selector)
-      if (!element) throw new Error(`${selector} not found`)
-      return getComputedStyle(element)[property]
+    const element = document.querySelector(target)
+    if (!element) throw new Error(`${target} not found`)
+    const backgrounds: string[] = []
+    for (let node: Element | null = element; node; node = node.parentElement) {
+      backgrounds.unshift(getComputedStyle(node).backgroundColor)
     }
-    const pageBackground = colorOf('body', 'backgroundColor')
     return {
-      text: flatten(pageBackground, colorOf('.header__nav-link--active', 'color')),
-      backdrop: flatten(pageBackground, colorOf('.header', 'backgroundColor')),
+      text: flatten([...backgrounds, getComputedStyle(element).color]),
+      backdrop: flatten(backgrounds),
     }
-  })
+  }, selector)
   const [lighter, darker] = [relativeLuminance(text), relativeLuminance(backdrop)].sort(
     (a, b) => b - a
   )
