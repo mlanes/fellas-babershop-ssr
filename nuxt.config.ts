@@ -95,55 +95,6 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
       ],
-      style: [
-        {
-          // Inline loader styles - renders immediately before any JS
-          innerHTML: `
-            #__nuxt-loader {
-              position: fixed;
-              top: 0;
-              left: 0;
-              width: 100%;
-              height: 100%;
-              background-color: var(--page-background, #0A0909);
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              z-index: 9999;
-              transition: opacity 0.3s ease;
-            }
-            #__nuxt-loader.fade-out {
-              opacity: 0;
-              pointer-events: none;
-            }
-            #__nuxt-loader-content {
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              gap: 32px;
-            }
-            #__nuxt-loader-progress {
-              width: 200px;
-              height: 2px;
-              background-color: rgba(10, 9, 9, 0.2);
-              border-radius: 9999px;
-              overflow: hidden;
-            }
-            #__nuxt-loader-bar {
-              height: 100%;
-              width: 0%;
-              background: linear-gradient(90deg, #e63946 0%, #8b0000 100%);
-              border-radius: 9999px;
-              animation: loader-progress 2s ease-out forwards;
-            }
-            @keyframes loader-progress {
-              0% { width: 0%; }
-              50% { width: 70%; }
-              100% { width: 90%; }
-            }
-          `,
-        },
-      ],
       script: [
         {
           innerHTML: `

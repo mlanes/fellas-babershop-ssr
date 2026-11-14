@@ -157,11 +157,12 @@ defineEmits<{
 
   @include modifier('outline') {
     background-color: transparent;
-    border: 2px solid $brand-red-dark;
-    color: $brand-red-dark;
+    border: 2px solid var(--brand-color-accent);
+    color: var(--brand-color-accent);
 
     &:hover:not(:disabled) {
-      background-color: $brand-red-dark;
+      background-color: var(--brand-color-tertiary);
+      border-color: var(--brand-color-tertiary);
       color: $white;
       transform: translateY(-2px);
     }
