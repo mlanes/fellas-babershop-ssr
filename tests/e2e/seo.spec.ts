@@ -26,4 +26,9 @@ test.describe('SEO meta', () => {
     const body = await response.text()
     expect(body.toLowerCase()).toContain('user-agent')
   })
+
+  test('robots.txt points at the sitemap on the production domain', async ({ request }) => {
+    const response = await request.get('/robots.txt')
+    expect(await response.text()).toContain('Sitemap: https://fellasbarber.com/sitemap.xml')
+  })
 })

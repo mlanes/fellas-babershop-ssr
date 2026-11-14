@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://fellasbarbershop.pt/sitemap.xml
+Sitemap: https://fellasbarber.com/sitemap.xml
