@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { gotoAndReady } from './helpers'
+import { gotoAndReady, localeCookie, openLanguageMenu } from './helpers'
 
 /**
  * Automated WCAG 2.1 A/AA accessibility scan via axe-core.
@@ -61,9 +61,7 @@ test.describe('Accessibility (axe-core)', () => {
       page,
       context,
     }) => {
-      await context.addCookies([
-        { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
-      ])
+      await context.addCookies([{ name: localeCookie, value: 'pt', url: 'http://localhost:3000' }])
       await page.emulateMedia({ colorScheme: theme })
       await page.setViewportSize({ width: 390, height: 844 })
       await gotoAndReady(page, '/')
@@ -122,14 +120,7 @@ test.describe('Accessibility (axe-core)', () => {
       await page.emulateMedia({ colorScheme: theme })
       await gotoAndReady(page, '/')
       expect(await paintedTheme(page)).toBe(theme)
-      const selected = page.locator('.language-selector__option--active')
-      // A click before hydration is ignored, so click until the dropdown opens.
-      await expect(async () => {
-        if ((await selected.count()) === 0) {
-          await page.locator('.language-selector__button:visible').first().click()
-        }
-        await expect(selected).toBeVisible({ timeout: 1000 })
-      }).toPass()
+      await openLanguageMenu(page)
 
       await expect
         .poll(() => textContrast(page, '.language-selector__option--active'))

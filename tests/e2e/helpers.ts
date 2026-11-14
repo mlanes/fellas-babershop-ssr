@@ -1,5 +1,7 @@
-import { readFileSync } from 'node:fs'
-import { type Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
+
+/** The cookie the site stores the visitor's chosen language in. */
+export const localeCookie = 'i18n_redirected'
 
 export async function gotoAndReady(page: Page, path: string) {
   await page.addInitScript(() => {
@@ -10,21 +12,22 @@ export async function gotoAndReady(page: Page, path: string) {
   await page.goto(path, { waitUntil: 'domcontentloaded' })
 }
 
-export type SiteLocale = 'pt' | 'en' | 'es' | 'fr'
-
 /**
- * Returns the "Home" navigation label in a locale, read from its translation
- * file, so a spec can tell which language a page is showing.
+ * Opens the language dropdown in whichever header bar is visible.
+ * A click before the page has hydrated is ignored, so it clicks until the
+ * dropdown is open.
  *
- * @param locale - one of the site's four locales
- * @returns the label as written in `i18n/locales/<locale>.json`
- * @throws if the file is missing or has no `nav.home` entry
+ * @param page - a page that has the site header on it
+ * @returns the open dropdown, to look options up in
+ * @throws after 20 seconds if the dropdown never opens
  */
-export function homeLabel(locale: SiteLocale): string {
-  const messages: { nav?: { home?: string } } = JSON.parse(
-    readFileSync(`i18n/locales/${locale}.json`, 'utf8')
-  )
-  const label = messages.nav?.home
-  if (!label) throw new Error(`nav.home is missing from the ${locale} translations`)
-  return label
+export async function openLanguageMenu(page: Page): Promise<Locator> {
+  const dropdown = page.locator('.language-selector__dropdown:visible')
+  await expect(async () => {
+    if ((await dropdown.count()) === 0) {
+      await page.locator('.language-selector__button:visible').first().click({ timeout: 2000 })
+    }
+    await expect(dropdown).toBeVisible({ timeout: 1000 })
+  }).toPass({ timeout: 20_000 })
+  return dropdown
 }

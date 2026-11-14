@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoAndReady } from './helpers'
+import { gotoAndReady, localeCookie, openLanguageMenu } from './helpers'
 
 test.describe('Theme toggle', () => {
   test.use({ colorScheme: 'light' })
@@ -60,10 +60,7 @@ test.describe('Mobile menu', () => {
 test.describe('Language selector', () => {
   test('dropdown lists all 4 locales', async ({ page }) => {
     await gotoAndReady(page, '/')
-    await page.locator('.language-selector__button:visible').click()
-
-    const dropdown = page.locator('.language-selector__dropdown:visible')
-    await expect(dropdown).toBeVisible()
+    const dropdown = await openLanguageMenu(page)
     await expect(dropdown.locator('.language-selector__option')).toHaveCount(4)
 
     for (const label of ['Português', 'English', 'Español', 'Français']) {
@@ -74,15 +71,10 @@ test.describe('Language selector', () => {
   })
 
   test('selecting English updates cookie and html lang', async ({ page, context }) => {
-    await context.addCookies([
-      { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
-    ])
+    await context.addCookies([{ name: localeCookie, value: 'pt', url: 'http://localhost:3000' }])
     await gotoAndReady(page, '/')
     await expect(page.locator('html')).toHaveAttribute('lang', /^pt/)
-
-    await page.locator('.language-selector__button:visible').click()
-    const dropdown = page.locator('.language-selector__dropdown:visible')
-    await expect(dropdown).toBeVisible()
+    const dropdown = await openLanguageMenu(page)
     await dropdown.locator('.language-selector__option', { hasText: 'English' }).click()
 
     await expect(page.locator('html')).toHaveAttribute('lang', /^en/, { timeout: 10_000 })
@@ -91,7 +83,7 @@ test.describe('Language selector', () => {
       .poll(
         async () => {
           const cookies = await context.cookies()
-          return cookies.find((c) => c.name === 'i18n_redirected')?.value
+          return cookies.find((c) => c.name === localeCookie)?.value
         },
         { timeout: 10_000 }
       )
