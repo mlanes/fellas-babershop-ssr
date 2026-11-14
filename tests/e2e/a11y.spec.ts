@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright'
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Locator, type Page } from '@playwright/test'
 import { gotoAndReady } from './helpers'
 
 /**
@@ -12,9 +12,16 @@ import { gotoAndReady } from './helpers'
  */
 const routes = ['/', '/services', '/gallery', '/contacts', '/score']
 const themes = ['light', 'dark'] as const
+const hoveredText = [
+  { name: 'coming-soon back button', route: '/services', selector: '.coming-soon__back' },
+  { name: 'footer nav link', route: '/', selector: '.footer__link' },
+  { name: 'footer contact link', route: '/', selector: '.footer__contact' },
+]
 
 async function scan(page: Parameters<typeof gotoAndReady>[0]) {
+  // The dev server injects a DevTools badge that is not part of the site.
   return await new AxeBuilder({ page })
+    .exclude('nuxt-devtools-frame')
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze()
 }
@@ -39,6 +46,7 @@ test.describe('Accessibility (axe-core)', () => {
         await page.emulateMedia({ colorScheme: theme })
         await gotoAndReady(page, route)
         expect(await paintedTheme(page)).toBe(theme)
+        await pageSettled(page)
         const { violations } = await scan(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
@@ -62,6 +70,7 @@ test.describe('Accessibility (axe-core)', () => {
       expect(await paintedTheme(page)).toBe(theme)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
+      await pageSettled(page)
       const { violations } = await scan(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
@@ -97,21 +106,34 @@ test.describe('Accessibility (axe-core)', () => {
     }
 
     // axe never scans hover states.
-    test(`coming-soon back button keeps 4.5:1 contrast while hovered in ${theme} theme`, async ({
-      page,
-    }) => {
+    for (const { name, route, selector } of hoveredText) {
+      test(`${name} keeps 4.5:1 contrast while hovered in ${theme} theme`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: theme })
+        await gotoAndReady(page, route)
+        expect(await paintedTheme(page)).toBe(theme)
+        await hoverUntilSettled(page, page.locator(selector).first())
+
+        expect(await textContrast(page, selector)).toBeGreaterThanOrEqual(4.5)
+      })
+    }
+
+    // axe scans pages with the dropdown closed.
+    test(`selected language option meets 4.5:1 contrast in ${theme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: theme })
-      await gotoAndReady(page, '/services')
-      const button = page.locator('.coming-soon__back')
-      // The 2px lift ending marks the hover transition as finished. Hydration can
-      // drop the hover state, so hover again until it holds.
+      await gotoAndReady(page, '/')
+      expect(await paintedTheme(page)).toBe(theme)
+      const selected = page.locator('.language-selector__option--active')
+      // A click before hydration is ignored, so click until the dropdown opens.
       await expect(async () => {
-        await page.mouse.move(0, 0)
-        await button.hover()
-        await expect(button).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, -2)', { timeout: 1000 })
+        if ((await selected.count()) === 0) {
+          await page.locator('.language-selector__button:visible').first().click()
+        }
+        await expect(selected).toBeVisible({ timeout: 1000 })
       }).toPass()
 
-      expect(await textContrast(page, '.coming-soon__back')).toBeGreaterThanOrEqual(4.5)
+      await expect
+        .poll(() => textContrast(page, '.language-selector__option--active'))
+        .toBeGreaterThanOrEqual(4.5)
     })
   }
 })
@@ -145,6 +167,68 @@ async function textContrast(page: Page, selector: string): Promise<number> {
 async function paintedTheme(page: Page): Promise<Theme> {
   const { text, backdrop } = await textAndBackdropLuminance(page, 'body')
   return backdrop < text ? 'dark' : 'light'
+}
+
+/**
+ * Hovers an element and waits until the hover holds and nothing on the page
+ * is still fading. Hydration can drop the hover state, so it hovers again
+ * until the state holds.
+ *
+ * @throws after 20 seconds if the element never stays hovered and settled
+ */
+async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
+  await expect(async () => {
+    await page.mouse.move(0, 0)
+    // At a viewport edge the fixed header or the dev server's DevTools badge
+    // covers the element and takes the pointer.
+    await target.evaluate((element) =>
+      element.scrollIntoView({ block: 'center', behavior: 'instant' })
+    )
+    await target.hover()
+    await expect
+      .poll(
+        async () =>
+          (await target.evaluate((element) => element.matches(':hover'))) &&
+          (await unfinishedFades(page)) === 0,
+        { timeout: 3000 }
+      )
+      .toBe(true)
+  }).toPass({ timeout: 20000 })
+}
+
+/**
+ * Waits until Vue has mounted and every entrance animation has ended. The
+ * sections fade in on timers from page load; axe skips text that is still
+ * invisible and reads half-faded text as a contrast violation.
+ */
+async function pageSettled(page: Page): Promise<void> {
+  // AppLoader takes its overlay out of the DOM once the app has mounted and
+  // the page has loaded.
+  await expect(page.locator('.app-loader')).toHaveCount(0, { timeout: 15000 })
+  await expect.poll(() => unfinishedFades(page), { timeout: 15000 }).toBe(0)
+}
+
+/**
+ * Counts the animations and transitions still changing an element's opacity
+ * or colour. Endless ones (pulses, drifts) are left out, and so is anything
+ * that only moves an element: WebKit leaves some transform transitions
+ * pending forever.
+ */
+async function unfinishedFades(page: Page): Promise<number> {
+  return await page.evaluate(
+    () =>
+      document.getAnimations().filter((animation) => {
+        const effect = animation.effect
+        if (animation.playState === 'finished' || !(effect instanceof KeyframeEffect)) return false
+        if (effect.getComputedTiming().endTime === Infinity) return false
+        return effect
+          .getKeyframes()
+          .some(
+            (keyframe) =>
+              'opacity' in keyframe || 'color' in keyframe || 'backgroundColor' in keyframe
+          )
+      }).length
+  )
 }
 
 async function textAndBackdropLuminance(

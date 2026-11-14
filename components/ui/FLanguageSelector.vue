@@ -239,7 +239,7 @@ onUnmounted(() => {
 
     @include modifier('active') {
       background-color: color-mix(in srgb, $brand-red-dark 10%, transparent);
-      color: $brand-red-dark;
+      color: var(--brand-color-accent);
     }
   }
 
@@ -253,7 +253,7 @@ onUnmounted(() => {
   }
 
   @include element('option-check') {
-    color: $brand-red-dark;
+    color: var(--brand-color-accent);
   }
 }
 
