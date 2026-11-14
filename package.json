@@ -16,6 +16,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
+    "test:e2e:built": "playwright test -c playwright.built.config.ts",
+    "test:e2e:all": "npm run test:e2e && npm run test:e2e:built",
     "test:e2e:ui": "playwright test --ui",
     "lighthouse": "lighthouse https://fellasbarber.com/ --output=html --output-path=.lighthouse/report.html --view",
     "storybook": "storybook dev -p 6006",
