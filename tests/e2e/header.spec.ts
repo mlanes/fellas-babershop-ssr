@@ -1,11 +1,12 @@
 import { expect, test } from '@playwright/test'
-import { gotoAndReady } from './helpers'
+import { gotoAndReady, localeCookie, openLanguageMenu, pageHydrated } from './helpers'
 
 test.describe('Theme toggle', () => {
   test.use({ colorScheme: 'light' })
 
   test('sets an explicit data-theme on first click', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
 
     const themeButton = page.locator('button.header__theme-toggle:visible')
     await themeButton.click()
@@ -15,6 +16,7 @@ test.describe('Theme toggle', () => {
 
   test('toggling twice yields opposite themes', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const themeButton = page.locator('button.header__theme-toggle:visible')
 
     await themeButton.click()
@@ -28,6 +30,7 @@ test.describe('Theme toggle', () => {
 
   test('theme choice persists across reload', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const themeButton = page.locator('button.header__theme-toggle:visible')
     await themeButton.click()
     const chosen = await page.locator('html').getAttribute('data-theme')
@@ -43,6 +46,7 @@ test.describe('Mobile menu', () => {
 
   test('opens and closes', async ({ page }) => {
     await gotoAndReady(page, '/')
+    await pageHydrated(page)
     const toggle = page.locator('button.header__mobile-toggle')
     await expect(toggle).toBeVisible()
     await expect(page.locator('.header__mobile-menu')).toHaveCount(0)
@@ -60,8 +64,9 @@ test.describe('Mobile menu', () => {
 test.describe('Language selector', () => {
   test('dropdown lists all 4 locales', async ({ page }) => {
     await gotoAndReady(page, '/')
+    // Once the page has hydrated, one click must be enough.
+    await pageHydrated(page)
     await page.locator('.language-selector__button:visible').click()
-
     const dropdown = page.locator('.language-selector__dropdown:visible')
     await expect(dropdown).toBeVisible()
     await expect(dropdown.locator('.language-selector__option')).toHaveCount(4)
@@ -74,15 +79,10 @@ test.describe('Language selector', () => {
   })
 
   test('selecting English updates cookie and html lang', async ({ page, context }) => {
-    await context.addCookies([
-      { name: 'i18n_redirected', value: 'pt', url: 'http://localhost:3000' },
-    ])
+    await context.addCookies([{ name: localeCookie, value: 'pt', url: 'http://localhost:3000' }])
     await gotoAndReady(page, '/')
     await expect(page.locator('html')).toHaveAttribute('lang', /^pt/)
-
-    await page.locator('.language-selector__button:visible').click()
-    const dropdown = page.locator('.language-selector__dropdown:visible')
-    await expect(dropdown).toBeVisible()
+    const dropdown = await openLanguageMenu(page)
     await dropdown.locator('.language-selector__option', { hasText: 'English' }).click()
 
     await expect(page.locator('html')).toHaveAttribute('lang', /^en/, { timeout: 10_000 })
@@ -91,7 +91,7 @@ test.describe('Language selector', () => {
       .poll(
         async () => {
           const cookies = await context.cookies()
-          return cookies.find((c) => c.name === 'i18n_redirected')?.value
+          return cookies.find((c) => c.name === localeCookie)?.value
         },
         { timeout: 10_000 }
       )
