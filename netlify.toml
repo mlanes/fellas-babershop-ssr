@@ -7,3 +7,11 @@
 
 # Nuxt 3 SSR with Nitro Netlify preset
 # Netlify automatically handles the server functions
+
+# The Netlify subdomain serves a full copy of the site; send it to the real
+# domain. Deploy previews use other hostnames and are not matched.
+[[redirects]]
+  from = "https://fellasbaber.netlify.app/*"
+  to = "https://fellasbarber.com/:splat"
+  status = 301
+  force = true
