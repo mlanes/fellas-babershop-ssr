@@ -83,7 +83,7 @@ const { t } = useLocale()
     display: inline-flex;
     align-items: center;
     padding: $spacing-md $spacing-2xl;
-    background: var(--brand-color-accent);
+    background: var(--brand-color-tertiary);
     color: $white;
     font-weight: 600;
     letter-spacing: 0.03em;
