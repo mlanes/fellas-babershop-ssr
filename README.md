@@ -121,7 +121,7 @@ npm run dev   # http://localhost:3000
 
 ```bash
 npm run dev          # Dev server with HMR
-npm run build        # Production build (Netlify SSR preset)
+npm run build        # Production build (Netlify preset on Netlify, Node server elsewhere)
 npm run generate     # Static prerender to ./dist
 npm run preview      # Preview production build locally
 npm run lint         # ESLint
@@ -224,7 +224,7 @@ npm run test:e2e:built                     # built, prerendered site (see below)
 npm run test:e2e:all                       # both of the above; run this before a pull request
 ```
 
-`test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/` against it. Anything decided during that build-time render, such as the page's language, can only be checked there.
+`test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/` against it. Anything decided during that build-time render, such as the page's language, can only be checked there. Stop `npm run dev` before running it: the build clears files the dev server is using, which makes it log errors and restart.
 
 The spec files (`tests/e2e/*.spec.ts`) cover home page rendering, per-route 200s + titles, theme toggle, mobile menu, language switching, and SEO meta presence.
 
