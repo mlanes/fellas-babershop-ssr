@@ -188,18 +188,19 @@ onMounted(() => {
       max-width: 400px;
     }
 
-    // Change text stroke to match theme
-    :deep(path[stroke='#F7F9FC']) {
+    // Change text stroke to match theme. These match case-insensitively: SVGO
+    // rewrites the case of colour values when it optimises the file.
+    :deep(path[stroke='#F7F9FC' i]) {
       stroke: var(--text-color-primary);
     }
 
     // Change text fill to match theme (but not the center white circle)
-    :deep(path[fill='#F7F9FC']:not([data-figma-bg-blur-radius])) {
+    :deep(path[fill='#F7F9FC' i]:not([data-figma-bg-blur-radius])) {
       fill: var(--text-color-primary);
     }
 
     // Center white circle background - inverted (dark in light mode, light in dark mode)
-    :deep(path[data-figma-bg-blur-radius][fill='#F7F9FC']) {
+    :deep(path[data-figma-bg-blur-radius][fill='#F7F9FC' i]) {
       fill: var(--text-color-primary);
     }
 

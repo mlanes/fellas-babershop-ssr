@@ -166,12 +166,13 @@ const scrollToTop = () => {
     margin-bottom: $spacing-sm;
     transition: color $transition-base;
 
-    // Make SVG adapt to theme
-    :deep(path[fill='#F7F9FC']) {
+    // Make SVG adapt to theme. Matched case-insensitively: SVGO rewrites the
+    // case of colour values when it optimises the file.
+    :deep(path[fill='#F7F9FC' i]) {
       fill: var(--text-color-primary);
     }
 
-    :deep(path[stroke='#F7F9FC']) {
+    :deep(path[stroke='#F7F9FC' i]) {
       stroke: var(--text-color-primary);
     }
 
