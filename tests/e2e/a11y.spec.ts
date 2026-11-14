@@ -38,6 +38,7 @@ test.describe('Accessibility (axe-core)', () => {
       }) => {
         await page.emulateMedia({ colorScheme: theme })
         await gotoAndReady(page, route)
+        expect(await paintedTheme(page)).toBe(theme)
         const { violations } = await scan(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
@@ -58,6 +59,7 @@ test.describe('Accessibility (axe-core)', () => {
       await page.emulateMedia({ colorScheme: theme })
       await page.setViewportSize({ width: 390, height: 844 })
       await gotoAndReady(page, '/')
+      expect(await paintedTheme(page)).toBe(theme)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
       const { violations } = await scan(page)
@@ -82,25 +84,47 @@ test.describe('Accessibility (axe-core)', () => {
     { name: 'barbershop card map link', selector: '.barbershop-card__button--secondary' },
   ]
 
-  for (const { name, selector } of brandRedText) {
-    test(`${name} meets 4.5:1 contrast in light theme`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: 'light' })
-      await page.setViewportSize({ width: 1440, height: 900 })
-      await gotoAndReady(page, '/')
+  for (const theme of themes) {
+    for (const { name, selector } of brandRedText) {
+      test(`${name} meets 4.5:1 contrast in ${theme} theme`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: theme })
+        await page.setViewportSize({ width: 1440, height: 900 })
+        await gotoAndReady(page, '/')
+        expect(await paintedTheme(page)).toBe(theme)
 
-      await expect.poll(() => textContrast(page, selector)).toBeGreaterThanOrEqual(4.5)
+        await expect.poll(() => textContrast(page, selector)).toBeGreaterThanOrEqual(4.5)
+      })
+    }
+
+    // axe never scans hover states.
+    test(`coming-soon back button keeps 4.5:1 contrast while hovered in ${theme} theme`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: theme })
+      await gotoAndReady(page, '/services')
+      const button = page.locator('.coming-soon__back')
+      // The 2px lift ending marks the hover transition as finished. Hydration can
+      // drop the hover state, so hover again until it holds.
+      await expect(async () => {
+        await page.mouse.move(0, 0)
+        await button.hover()
+        await expect(button).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, -2)', { timeout: 1000 })
+      }).toPass()
+
+      expect(await textContrast(page, '.coming-soon__back')).toBeGreaterThanOrEqual(4.5)
     })
   }
 })
 
 type Rgb = [number, number, number]
+type Theme = (typeof themes)[number]
 
 /**
  * Measures the WCAG contrast ratio of an element's text colour against the
  * background colours of the element and its ancestors, stacked from the page up.
- * Not taken into account: background images, gradients, pseudo-elements,
- * opacity, and whatever page content shows through a translucent fixed
- * ancestor such as the header.
+ * The element's own opacity is applied. Not taken into account: background
+ * images, gradients, pseudo-elements, the opacity of ancestors, and whatever
+ * page content shows through a translucent fixed ancestor such as the header.
  *
  * @param page - the page holding the element
  * @param selector - CSS selector; the first match is measured
@@ -109,8 +133,26 @@ type Rgb = [number, number, number]
  *   colours, or the stacked background is not opaque
  */
 async function textContrast(page: Page, selector: string): Promise<number> {
+  const { text, backdrop } = await textAndBackdropLuminance(page, selector)
+  const [lighter, darker] = [text, backdrop].sort((a, b) => b - a)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+/**
+ * Reports which theme the page is actually painted in, judged by whether the
+ * body background is darker than the body text.
+ */
+async function paintedTheme(page: Page): Promise<Theme> {
+  const { text, backdrop } = await textAndBackdropLuminance(page, 'body')
+  return backdrop < text ? 'dark' : 'light'
+}
+
+async function textAndBackdropLuminance(
+  page: Page,
+  selector: string
+): Promise<{ text: number; backdrop: number }> {
   await page.locator(selector).first().waitFor({ state: 'attached' })
-  const { text, backdrop } = await page.evaluate((target) => {
+  const { text, backdrop, behind, opacity } = await page.evaluate((target) => {
     const flatten = (layers: string[]): [number, number, number] => {
       const canvas = document.createElement('canvas')
       canvas.width = 1
@@ -129,19 +171,27 @@ async function textContrast(page: Page, selector: string): Promise<number> {
     }
     const element = document.querySelector(target)
     if (!element) throw new Error(`${target} not found`)
-    const backgrounds: string[] = []
-    for (let node: Element | null = element; node; node = node.parentElement) {
-      backgrounds.unshift(getComputedStyle(node).backgroundColor)
+    const ancestors: string[] = []
+    for (let node = element.parentElement; node; node = node.parentElement) {
+      ancestors.unshift(getComputedStyle(node).backgroundColor)
     }
+    const style = getComputedStyle(element)
+    const own = [...ancestors, style.backgroundColor]
+    const opacity = Number(style.opacity)
     return {
-      text: flatten([...backgrounds, getComputedStyle(element).color]),
-      backdrop: flatten(backgrounds),
+      text: flatten([...own, style.color]),
+      backdrop: flatten(own),
+      behind: opacity < 1 ? flatten(ancestors) : null,
+      opacity,
     }
   }, selector)
-  const [lighter, darker] = [relativeLuminance(text), relativeLuminance(backdrop)].sort(
-    (a, b) => b - a
-  )
-  return (lighter + 0.05) / (darker + 0.05)
+  const mix = (front: number, back: number) => front * opacity + back * (1 - opacity)
+  const seeThrough = (rgb: Rgb): Rgb =>
+    behind ? [mix(rgb[0], behind[0]), mix(rgb[1], behind[1]), mix(rgb[2], behind[2])] : rgb
+  return {
+    text: relativeLuminance(seeThrough(text)),
+    backdrop: relativeLuminance(seeThrough(backdrop)),
+  }
 }
 
 function relativeLuminance(rgb: Rgb): number {
