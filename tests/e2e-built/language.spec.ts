@@ -11,6 +11,22 @@ async function expectLanguage(page: Page, lang: string, homeLabel: string) {
   await expect(page.locator('.footer__link').first()).toHaveText(homeLabel)
 }
 
+/** Reads the `<html lang>` of the page as built, before any script has run. */
+async function builtLanguage(page: Page): Promise<string | undefined> {
+  const html = await (await page.request.get('/')).text()
+  return /<html[^>]*\blang="([^"]*)"/.exec(html)?.[1]
+}
+
+/**
+ * Asserts the page switched to a language after loading. It first checks the
+ * build did not already render that language, because then the page would
+ * match without the site having honoured anything.
+ */
+async function expectSwitchTo(page: Page, lang: string, homeLabel: string) {
+  expect(await builtLanguage(page)).not.toBe(lang)
+  await expectLanguage(page, lang, homeLabel)
+}
+
 async function savedLocale(context: BrowserContext, baseURL: string): Promise<string | undefined> {
   const cookies = await context.cookies(baseURL)
   return cookies.find((cookie) => cookie.name === localeCookie)?.value
@@ -24,7 +40,15 @@ test.describe('Language on the built site, English browser', () => {
     await context.addCookies([{ name: localeCookie, value: 'es', url: baseURL }])
     await gotoAndReady(page, '/')
 
-    await expectLanguage(page, 'es-ES', 'Inicio')
+    await expectSwitchTo(page, 'es-ES', 'Inicio')
+    expect(await savedLocale(context, baseURL)).toBe('es')
+
+    // A second load shows whether anything overwrote the choice after the
+    // first. The pause gives a late write the time to happen; a reload straight
+    // away would cancel it.
+    await page.waitForTimeout(1500)
+    await page.reload({ waitUntil: 'domcontentloaded' })
+    await expectSwitchTo(page, 'es-ES', 'Inicio')
     expect(await savedLocale(context, baseURL)).toBe('es')
   })
 
@@ -42,7 +66,7 @@ test.describe('Language on the built site, English browser', () => {
     await expectLanguage(page, 'es-ES', 'Inicio')
 
     await page.reload({ waitUntil: 'domcontentloaded' })
-    await expectLanguage(page, 'es-ES', 'Inicio')
+    await expectSwitchTo(page, 'es-ES', 'Inicio')
     expect(await savedLocale(context, baseURL)).toBe('es')
   })
 })
@@ -52,6 +76,6 @@ test.describe('Language on the built site, Portuguese browser', () => {
 
   test('a first visit is shown in Portuguese', async ({ page }) => {
     await gotoAndReady(page, '/')
-    await expectLanguage(page, 'pt-PT', 'Início')
+    await expectSwitchTo(page, 'pt-PT', 'Início')
   })
 })

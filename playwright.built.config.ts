@@ -28,7 +28,9 @@ export default defineConfig({
   webServer: {
     command: 'npm run build && node .output/server/index.mjs',
     url: baseURL,
-    env: { PORT: String(port) },
+    // The preset is pinned because the command starts the Node server output;
+    // a NITRO_PRESET or NETLIFY variable in the shell would build something else.
+    env: { PORT: String(port), NITRO_PRESET: 'node-server' },
     // Never reuse: a server left running would serve an older build.
     reuseExistingServer: false,
     timeout: 240_000,
