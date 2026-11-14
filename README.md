@@ -220,7 +220,11 @@ End-to-end coverage with Playwright across Chromium, Firefox, WebKit, Mobile Chr
 npm run test:e2e -- --project=chromium     # single browser
 npm run test:e2e                           # all 5 projects
 npm run test:e2e:ui                        # interactive UI mode
+npm run test:e2e:built                     # built, prerendered site (see below)
+npm run test:e2e:all                       # both of the above; run this before a pull request
 ```
+
+`test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/` against it. Anything decided during that build-time render, such as the page's language, can only be checked there.
 
 The spec files (`tests/e2e/*.spec.ts`) cover home page rendering, per-route 200s + titles, theme toggle, mobile menu, language switching, and SEO meta presence.
 
