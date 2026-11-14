@@ -218,7 +218,7 @@ End-to-end coverage with Playwright across Chromium, Firefox, WebKit, Mobile Chr
 
 ```bash
 npm run test:e2e -- --project=chromium     # single browser
-npm run test:e2e                           # all 5 projects (90 tests)
+npm run test:e2e                           # all 5 projects
 npm run test:e2e:ui                        # interactive UI mode
 ```
 
