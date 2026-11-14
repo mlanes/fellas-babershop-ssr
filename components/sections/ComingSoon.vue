@@ -90,13 +90,10 @@ const { t } = useLocale()
     text-transform: uppercase;
     text-decoration: none;
     border-radius: $radius-full;
-    transition:
-      transform $transition-fast,
-      opacity $transition-fast;
+    transition: transform $transition-fast;
 
     &:hover {
       transform: translateY(-2px);
-      opacity: 0.92;
     }
 
     &:focus-visible {
