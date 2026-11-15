@@ -1,3 +1,22 @@
+import { defaultLocale, fallbackLocale, localeCookie, locales, localizedPath } from './data/locales'
+import { moveToVisitorLanguage, type VisitorLanguageSettings } from './utils/moveToVisitorLanguage'
+
+const siteUrl = 'https://fellasbarber.com'
+
+// A page added under pages/ goes in one of these two lists, or it is not built.
+const comingSoonPages = ['/services', '/gallery', '/contacts', '/score']
+const pages = ['/', ...comingSoonPages]
+
+const inEveryLanguage = (paths: string[]) =>
+  paths.flatMap((path) => locales.map(({ code }) => localizedPath(path, code)))
+
+const visitorLanguageSettings: VisitorLanguageSettings = {
+  codes: locales.map(({ code }) => code),
+  defaultLocale,
+  fallbackLocale,
+  cookie: localeCookie,
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -17,12 +36,19 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: 'https://fellasbarber.com',
+    url: siteUrl,
+    // Netlify serves every page at an address ending in a slash and redirects
+    // the form without one, so the addresses given to search engines end in
+    // one too. The i18n module has the same setting below.
+    trailingSlash: true,
   },
 
   sitemap: {
     // Coming-soon routes are noindex placeholders — keep them out of the sitemap.
-    exclude: ['/services', '/gallery', '/contacts', '/score'],
+    exclude: inEveryLanguage(comingSoonPages),
+    // One sitemap at /sitemap.xml, which robots.txt names. Left on, the module
+    // splits it into one per language behind an index at another address.
+    autoI18n: false,
   },
 
   image: {
@@ -78,7 +104,7 @@ export default defineNuxtConfig({
           property: 'og:description',
           content: 'Serviços profissionais de barbeiro com qualidade premium em Lisboa, Portugal.',
         },
-        { property: 'og:image', content: 'https://fellasbarber.com/og-image.jpg' },
+        { property: 'og:image', content: `${siteUrl}/og-image.jpg` },
         { property: 'og:type', content: 'website' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
@@ -87,7 +113,7 @@ export default defineNuxtConfig({
           name: 'twitter:description',
           content: 'A sua barbearia de confiança em Lisboa, Portugal.',
         },
-        { name: 'twitter:image', content: 'https://fellasbarber.com/og-image.jpg' },
+        { name: 'twitter:image', content: `${siteUrl}/og-image.jpg` },
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
@@ -96,6 +122,11 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
       ],
       script: [
+        {
+          // First in the head: a visitor who belongs on another language's
+          // home page is sent there before anything of this one is drawn.
+          innerHTML: `(${moveToVisitorLanguage.toString()})(${JSON.stringify(visitorLanguageSettings)})`,
+        },
         {
           innerHTML: `
             const THEME_STORAGE_KEY = 'fellas-theme-preference';
@@ -112,31 +143,25 @@ export default defineNuxtConfig({
     },
   },
 
-  routeRules: {
-    '/': { prerender: true },
-    '/services': { prerender: true },
-    '/gallery': { prerender: true },
-    '/contacts': { prerender: true },
-    '/score': { prerender: true },
-  },
+  routeRules: Object.fromEntries(inEveryLanguage(pages).map((path) => [path, { prerender: true }])),
 
   i18n: {
-    locales: [
-      { code: 'pt', file: 'pt.json', name: 'Português' },
-      { code: 'en', file: 'en.json', name: 'English' },
-      { code: 'es', file: 'es.json', name: 'Español' },
-      { code: 'fr', file: 'fr.json', name: 'Français' },
-    ],
-    defaultLocale: 'pt',
-    lazy: true,
+    locales: locales.map(({ code, language, name }) => ({
+      code,
+      language,
+      name,
+      file: `${code}.json`,
+    })),
+    defaultLocale,
     langDir: 'locales',
-    strategy: 'no_prefix',
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'i18n_redirected',
-      redirectOn: 'root',
-      fallbackLocale: 'en',
-    },
+    strategy: 'prefix_except_default',
+    baseUrl: siteUrl,
+    trailingSlash: true,
+    // The module would decide the language while the pages are prerendered,
+    // with no visitor to ask, and freeze its answer into `/`. It also saves the
+    // language last shown as if it had been picked. The visitor's language is
+    // settled in the browser by utils/moveToVisitorLanguage.ts.
+    detectBrowserLanguage: false,
   },
 
   pwa: {
@@ -177,7 +202,34 @@ export default defineNuxtConfig({
     workbox: {
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
       globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}'],
+      // Every address has its own prerendered page, in its own language. By
+      // default the worker answers each page request with its copy of the home
+      // page, and the app then keeps that copy's language at another address.
+      navigateFallback: null,
       runtimeCaching: [
+        {
+          urlPattern: ({ request }) => request.mode === 'navigate',
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'pages-cache',
+            expiration: {
+              maxEntries: 40,
+              maxAgeSeconds: 60 * 60 * 24 * 30,
+            },
+          },
+        },
+        {
+          // The translations a page loads when the app starts.
+          urlPattern: /\/_i18n\//,
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'translations-cache',
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24 * 30,
+            },
+          },
+        },
         {
           urlPattern: /\.(?:woff|woff2)$/,
           handler: 'CacheFirst',

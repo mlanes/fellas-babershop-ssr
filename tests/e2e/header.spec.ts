@@ -79,7 +79,6 @@ test.describe('Language selector', () => {
   })
 
   test('selecting English updates cookie and html lang', async ({ page, context }) => {
-    await context.addCookies([{ name: localeCookie, value: 'pt', url: 'http://localhost:3000' }])
     await gotoAndReady(page, '/')
     await expect(page.locator('html')).toHaveAttribute('lang', /^pt/)
     const dropdown = await openLanguageMenu(page)

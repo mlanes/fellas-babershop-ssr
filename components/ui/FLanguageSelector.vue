@@ -1,32 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, type ComponentPublicInstance } from 'vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import { useLocale, type Locale } from '~/composables/useLocale'
 
-const { locale, setLocale } = useLocale()
+const { locale, locales: languages, setLocale } = useLocale()
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 const buttonRef = ref<HTMLButtonElement | null>(null)
 const optionRefs = ref<HTMLButtonElement[]>([])
 
-const languages = [
-  { code: 'pt' as Locale, label: 'Português', flag: '🇵🇹' },
-  { code: 'en' as Locale, label: 'English', flag: '🇬🇧' },
-  { code: 'es' as Locale, label: 'Español', flag: '🇪🇸' },
-  { code: 'fr' as Locale, label: 'Français', flag: '🇫🇷' },
-]
+const setOptionRef = (el: Element | ComponentPublicInstance | null, index: number) => {
+  if (el instanceof HTMLButtonElement) optionRefs.value[index] = el
+}
 
 const currentLanguage = computed(() => {
   return languages.find((lang) => lang.code === locale.value) || languages[0]
 })
 
-const getCurrentLanguageCode = computed(() => {
-  const code = locale.value
-  if (code === 'pt') return 'PT'
-  if (code === 'es') return 'ES'
-  if (code === 'fr') return 'FR'
-  return code.toUpperCase()
-})
+const getCurrentLanguageCode = computed(() => locale.value.toUpperCase())
 
 const focusOption = (index: number) => {
   const target = optionRefs.value[index]
@@ -50,9 +41,9 @@ const toggleDropdown = () => {
   else openDropdown()
 }
 
-const selectLanguage = (code: Locale) => {
-  setLocale(code)
+const selectLanguage = async (code: Locale) => {
   closeDropdown()
+  await setLocale(code)
 }
 
 const handleButtonKeydown = (event: KeyboardEvent) => {
@@ -88,7 +79,8 @@ const handleOptionKeydown = (event: KeyboardEvent, index: number) => {
 }
 
 const handleClickOutside = (event: MouseEvent) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+  const clicked = event.target
+  if (dropdownRef.value && clicked instanceof Node && !dropdownRef.value.contains(clicked)) {
     isOpen.value = false
   }
 }
@@ -112,7 +104,7 @@ onUnmounted(() => {
       ref="buttonRef"
       class="language-selector__button"
       type="button"
-      :title="currentLanguage.label"
+      :title="currentLanguage.name"
       :aria-expanded="isOpen"
       aria-haspopup="listbox"
       @click="toggleDropdown"
@@ -133,11 +125,7 @@ onUnmounted(() => {
         <button
           v-for="(lang, index) in languages"
           :key="lang.code"
-          :ref="
-            (el) => {
-              if (el) optionRefs[index] = el as HTMLButtonElement
-            }
-          "
+          :ref="(el) => setOptionRef(el, index)"
           class="language-selector__option"
           :class="{ 'language-selector__option--active': lang.code === locale }"
           type="button"
@@ -147,7 +135,7 @@ onUnmounted(() => {
           @keydown="handleOptionKeydown($event, index)"
         >
           <span class="language-selector__option-flag" aria-hidden="true">{{ lang.flag }}</span>
-          <span class="language-selector__option-label">{{ lang.label }}</span>
+          <span class="language-selector__option-label">{{ lang.name }}</span>
           <FIcon
             v-if="lang.code === locale"
             name="check"

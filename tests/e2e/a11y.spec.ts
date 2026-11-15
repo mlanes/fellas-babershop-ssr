@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { gotoAndReady, localeCookie, openLanguageMenu, pageHydrated } from './helpers'
+import { gotoAndReady, openLanguageMenu, pageHydrated } from './helpers'
 
 /**
  * Automated WCAG 2.1 A/AA accessibility scan via axe-core.
@@ -110,9 +110,7 @@ test.describe('Accessibility (axe-core)', () => {
 
     test(`home with mobile menu open has no critical or serious axe violations in ${theme} theme`, async ({
       page,
-      context,
     }) => {
-      await context.addCookies([{ name: localeCookie, value: 'pt', url: 'http://localhost:3000' }])
       await page.emulateMedia({ colorScheme: theme })
       await page.setViewportSize({ width: 390, height: 844 })
       await gotoAndReady(page, '/')
