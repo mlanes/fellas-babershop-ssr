@@ -1,16 +1,18 @@
+import { locales } from '~/data/locales'
+
 /**
  * Adds the business's structured data to the page head for search engines:
- * the organisation, the website and each barbershop location. The website and
- * the locations name the language being read and its home page's address.
+ * the organisation, the website and each barbershop location, which are the
+ * same on every page, and the page itself with its language and address.
  */
 export function useStructuredData() {
   const siteUrl = useSiteConfig().url
   const logoUrl = `${siteUrl}/og-image.jpg`
-  const { localeProperties } = useI18n()
-  const localePath = useLocalePath()
+  const { locale, localeProperties } = useI18n()
+  const switchLocalePath = useSwitchLocalePath()
 
-  const homeUrl = computed(() => {
-    const path = localePath('/')
+  const pageUrl = computed(() => {
+    const path = switchLocalePath(locale.value)
     return path === '/' ? siteUrl : `${siteUrl}${path}`
   })
 
@@ -65,17 +67,24 @@ export function useStructuredData() {
             {
               '@type': 'WebSite',
               '@id': `${siteUrl}/#website`,
-              url: homeUrl.value,
+              url: siteUrl,
               name: 'Fellas Barbers',
-              inLanguage: localeProperties.value.language,
+              inLanguage: locales.map(({ language }) => language),
               publisher: { '@id': `${siteUrl}/#organization` },
+            },
+            {
+              '@type': 'WebPage',
+              '@id': `${pageUrl.value}#webpage`,
+              url: pageUrl.value,
+              inLanguage: localeProperties.value.language,
+              isPartOf: { '@id': `${siteUrl}/#website` },
             },
             ...locations.map((loc) => ({
               '@type': 'BarberShop',
               '@id': `${siteUrl}/#location-${loc.id}`,
               name: loc.name,
               image: logoUrl,
-              url: homeUrl.value,
+              url: siteUrl,
               ...(loc.phone ? { telephone: loc.phone } : {}),
               address: {
                 '@type': 'PostalAddress',

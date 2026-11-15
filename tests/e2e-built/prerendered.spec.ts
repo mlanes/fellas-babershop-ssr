@@ -28,6 +28,12 @@ async function builtHtml(
   return await response.text()
 }
 
+/** Reads a meta tag's text from a page's HTML, by its `name` or `property`. */
+function metaContent(html: string, name: string): string | undefined {
+  const content = new RegExp(`<meta (?:name|property)="${name}" content="([^"]*)"`).exec(html)?.[1]
+  return content?.replaceAll('&#39;', "'").replaceAll('&quot;', '"').replaceAll('&amp;', '&')
+}
+
 const langOf = (html: string) => /<html[^>]*\blang="([^"]*)"/.exec(html)?.[1]
 const pathOf = (prefix: string, page: string) => (page === '/' ? prefix || '/' : `${prefix}${page}`)
 // Every address but the Portuguese home page's ends in a slash, as Netlify serves it.
@@ -114,18 +120,109 @@ test('the sitemap gives each home page its sister pages', async ({ request }) =>
   }
 })
 
-test.describe('The business details given to search engines', () => {
-  for (const { prefix, lang } of languages) {
-    test(`on ${pathOf(prefix, '/')} name ${lang} and that page's address`, async ({ request }) => {
-      const html = await builtHtml(request, pathOf(prefix, '/'))
-      const json = /<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/s.exec(html)?.[1]
-      if (!json) throw new Error('no structured data on the page')
-      const graph: { '@type': string; inLanguage?: string; url?: string }[] =
-        JSON.parse(json)['@graph']
-      const website = graph.find((item) => item['@type'] === 'WebSite')
+test.describe('What a search result and a shared link show, before any script runs', () => {
+  const homePages = [
+    {
+      path: '/',
+      title: 'Fellas Barbers - A Sua Barbearia de Confiança',
+      descriptionStart: 'Fellas Barbers - Barbearia premium em Lisboa.',
+    },
+    {
+      path: '/en',
+      title: 'Fellas Barbers - Your Trusted Barbershop in Lisbon',
+      descriptionStart: 'Fellas Barbers - Premium barbershop in Lisbon.',
+    },
+    {
+      path: '/es',
+      title: 'Fellas Barbers - Tu Barbería de Confianza en Lisboa',
+      descriptionStart: 'Fellas Barbers - Barbería premium en Lisboa.',
+    },
+    {
+      path: '/fr',
+      title: 'Fellas Barbers - Votre Barbier de Confiance à Lisbonne',
+      descriptionStart: 'Fellas Barbers - Barbier haut de gamme à Lisbonne.',
+    },
+  ]
 
-      expect(website?.inLanguage).toBe(lang)
-      expect(website?.url).toBe(prefix ? `${siteAddress}${prefix}/` : siteAddress)
+  for (const { path, title, descriptionStart } of homePages) {
+    test(`${path} has one title and one description, in its language`, async ({ request }) => {
+      const html = await builtHtml(request, path)
+
+      expect(html).toContain(`<title>${title}</title>`)
+      expect(metaContent(html, 'og:title')).toBe(title)
+      expect(metaContent(html, 'twitter:title')).toBe(title)
+
+      const description = metaContent(html, 'description')
+      expect(description).toContain(descriptionStart)
+      expect(metaContent(html, 'og:description')).toBe(description)
+      expect(metaContent(html, 'twitter:description')).toBe(description)
+    })
+  }
+
+  // A page with its own title shows it in the tab and in a shared link alike.
+  const comingSoon = [
+    { path: '/services', title: 'Serviços — Fellas Barbers' },
+    { path: '/fr/services', title: 'Services — Fellas Barbers' },
+    { path: '/es/gallery', title: 'Galería — Fellas Barbers' },
+    { path: '/en/contacts', title: 'Contacts — Fellas Barbers' },
+  ]
+
+  for (const { path, title } of comingSoon) {
+    test(`${path} is titled "${title}" everywhere`, async ({ request }) => {
+      const html = await builtHtml(request, path)
+
+      expect(html).toContain(`<title>${title}</title>`)
+      expect(metaContent(html, 'og:title')).toBe(title)
+      expect(metaContent(html, 'twitter:title')).toBe(title)
+    })
+  }
+})
+
+test.describe('The business details given to search engines', () => {
+  interface Entry {
+    '@type': string
+    '@id'?: string
+    inLanguage?: string | string[]
+    url?: string
+    isPartOf?: { '@id': string }
+  }
+
+  /** Reads the structured data out of a page's HTML. */
+  function entriesOf(html: string): Entry[] {
+    const json = /<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/s.exec(html)?.[1]
+    if (!json) throw new Error('no structured data on the page')
+    return JSON.parse(json)['@graph']
+  }
+
+  const pagesToDescribe = [
+    { path: '/', lang: 'pt-PT', address: siteAddress },
+    { path: '/en', lang: 'en-US', address: `${siteAddress}/en/` },
+    { path: '/es', lang: 'es-ES', address: `${siteAddress}/es/` },
+    { path: '/fr/services', lang: 'fr-FR', address: `${siteAddress}/fr/services/` },
+  ]
+
+  for (const { path, lang, address } of pagesToDescribe) {
+    test(`${path} is described as a page in ${lang} at its own address`, async ({ request }) => {
+      const page = entriesOf(await builtHtml(request, path)).find(
+        (entry) => entry['@type'] === 'WebPage'
+      )
+
+      expect(page?.inLanguage).toBe(lang)
+      expect(page?.url).toBe(address)
+      expect(page?.isPartOf).toEqual({ '@id': `${siteAddress}/#website` })
+    })
+
+    // One site and one set of shops, the same on every page: an entry that
+    // changed its address from page to page would read as conflicting facts.
+    test(`${path} describes the site and the shops as it does everywhere`, async ({ request }) => {
+      const entries = entriesOf(await builtHtml(request, path))
+      const website = entries.find((entry) => entry['@type'] === 'WebSite')
+      const shops = entries.filter((entry) => entry['@type'] === 'BarberShop')
+
+      expect(website?.url).toBe(siteAddress)
+      expect(website?.inLanguage).toEqual(['pt-PT', 'en-US', 'es-ES', 'fr-FR'])
+      expect(shops.length).toBeGreaterThan(0)
+      for (const shop of shops) expect(shop.url).toBe(siteAddress)
     })
   }
 })

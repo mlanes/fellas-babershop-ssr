@@ -404,13 +404,14 @@ const homePageTexts = [
     path: '/fr',
     title: 'Fellas Barbers - Votre Barbier de Confiance à Lisbonne',
     description:
-      "Fellas Barbers - Barbier haut de gamme à Lisbonne. Coupes homme, barbe, coiffage et soins professionnels. Cadre moderne et service d'excellence. Réservez maintenant !",
+      // French puts a narrow no-break space before the exclamation mark.
+      "Fellas Barbers - Barbier haut de gamme à Lisbonne. Coupes homme, barbe, coiffage et soins professionnels. Cadre moderne et service d'excellence. Réservez maintenant\u202F!",
   },
 ]
 
 test.describe('The home page is titled and described in its own language', () => {
   for (const { path, title, description } of homePageTexts) {
-    test(`${path}`, async ({ page }) => {
+    test(`${path} carries its language's title and description`, async ({ page }) => {
       await page.goto(path, { waitUntil: 'domcontentloaded' })
 
       await expect(page).toHaveTitle(title)
@@ -448,7 +449,7 @@ test.describe('Each page names its sister pages for search engines', () => {
   const address = (path: string) => (path === '/' ? siteAddress : `${siteAddress}${path}/`)
 
   for (const { path, sisters } of pages) {
-    test(`${path}`, async ({ page }) => {
+    test(`${path} names its own address and the three others`, async ({ page }) => {
       await page.goto(path, { waitUntil: 'domcontentloaded' })
 
       for (const [lang, sisterPath] of Object.entries(sisters)) {

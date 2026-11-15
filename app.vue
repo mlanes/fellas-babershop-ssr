@@ -17,7 +17,8 @@ useHead(() => ({
 }))
 
 // One title and one description per language, for the browser tab, search
-// results and shared links alike. A page with its own title sets it itself.
+// results and shared links alike. A page with a title of its own replaces the
+// three titles together through usePageTitle.
 useSeoMeta({
   title: () => t('seo.title'),
   description: () => t('seo.description'),
