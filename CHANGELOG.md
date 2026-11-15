@@ -11,6 +11,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 ### Maintenance
 
 - The accessibility scans stop the page's rotating content first. The earlier approach, repeating a scan that a rotation had disturbed, could give up on a slow machine.
+- Removed code and a dependency that nothing used: two scroll helpers, one type, and a direct `chrome-launcher` entry that Lighthouse already brings.
 
 ## 1.1.1 - 2026-11-15
 

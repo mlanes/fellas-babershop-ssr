@@ -63,9 +63,8 @@ Thumbs.db
 *.temp
 .cache
 
-# Claude Code and Specify
+# Claude Code, and the original site spec
 .claude/
-.specify/
 specs/
 CLAUDE.md
 
