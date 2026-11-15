@@ -26,6 +26,58 @@ async function scan(page: Parameters<typeof gotoAndReady>[0]) {
     .analyze()
 }
 
+/**
+ * Scans the page with axe at a moment when no text is fading. The home page
+ * swaps testimonials on a timer, and for a few frames between the old one
+ * fading out and the new one fading in nothing is listed as fading; a scan
+ * that starts there reads the new text half-faded. A scan during which a fade
+ * started on text is thrown away and run again.
+ *
+ * @returns the violations of the first undisturbed scan, and how many scans
+ *   were thrown away before it
+ * @throws if a fade started during each of five scans in a row, or the page
+ *   does not settle within 15 seconds
+ */
+async function scanWhileStill(page: Page) {
+  await pageSettled(page)
+  for (let discardedScans = 0; discardedScans < 5; discardedScans++) {
+    const fadesBefore = await textFadesStarted(page)
+    // Waits out a fade that began just before the count was read.
+    await pageSettled(page)
+    const { violations } = await scan(page)
+    if ((await textFadesStarted(page)) === fadesBefore) return { violations, discardedScans }
+  }
+  throw new Error('a fade started on text during each of five axe scans in a row')
+}
+
+/**
+ * Counts the opacity, colour and background-colour transitions that have
+ * started on elements with text anywhere inside them.
+ *
+ * @returns the number started since the first call on this page
+ */
+async function textFadesStarted(page: Page): Promise<number> {
+  return await page.evaluate(() => {
+    const root = document.documentElement
+    if (root.dataset.textFadesStarted === undefined) {
+      root.dataset.textFadesStarted = '0'
+      document.addEventListener(
+        'transitionrun',
+        (event) => {
+          const fades = ['opacity', 'color', 'background-color'].includes(event.propertyName)
+          const holdsText =
+            event.target instanceof Element && (event.target.textContent ?? '').trim() !== ''
+          if (fades && holdsText) {
+            root.dataset.textFadesStarted = String(Number(root.dataset.textFadesStarted) + 1)
+          }
+        },
+        true
+      )
+    }
+    return Number(root.dataset.textFadesStarted)
+  })
+}
+
 function formatViolations(violations: Awaited<ReturnType<typeof scan>>['violations']) {
   return violations.map((v) => ({
     id: v.id,
@@ -46,8 +98,7 @@ test.describe('Accessibility (axe-core)', () => {
         await page.emulateMedia({ colorScheme: theme })
         await gotoAndReady(page, route)
         expect(await paintedTheme(page)).toBe(theme)
-        await pageSettled(page)
-        const { violations } = await scan(page)
+        const { violations } = await scanWhileStill(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
           // eslint-disable-next-line no-console
@@ -69,8 +120,7 @@ test.describe('Accessibility (axe-core)', () => {
       await pageHydrated(page)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
-      await pageSettled(page)
-      const { violations } = await scan(page)
+      const { violations } = await scanWhileStill(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
         // eslint-disable-next-line no-console
@@ -79,6 +129,26 @@ test.describe('Accessibility (axe-core)', () => {
       expect(blocking).toEqual([])
     })
   }
+
+  test('a testimonial that rotates during the scan is not reported', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'light' })
+    await gotoAndReady(page, '/')
+    // Shows the next testimonial at the moment axe arrives in the page.
+    await page.evaluate(() => {
+      const next = document.querySelector('.testimonials__nav-button--active')
+      if (!(next instanceof HTMLElement)) throw new Error('no next-testimonial button')
+      const clickOnceAxeLoads = () => {
+        if ('axe' in window) next.click()
+        else requestAnimationFrame(clickOnceAxeLoads)
+      }
+      clickOnceAxeLoads()
+    })
+
+    const { violations, discardedScans } = await scanWhileStill(page)
+
+    expect(discardedScans).toBeGreaterThan(0)
+    expect(violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')).toEqual([])
+  })
 
   // axe reports these as "incomplete", so the contrast is measured here instead:
   // the nav links and the card button have a pseudo-element, and the page
