@@ -8,6 +8,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+## 1.1.1 - 2026-11-15
+
 ### Added
 
 - The home page's title and description are in the page's language, in the browser tab, in search results and when a link is shared.
