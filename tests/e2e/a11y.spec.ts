@@ -27,54 +27,21 @@ async function scan(page: Parameters<typeof gotoAndReady>[0]) {
 }
 
 /**
- * Scans the page with axe at a moment when no text is fading. The home page
- * swaps testimonials on a timer, and for a few frames between the old one
- * fading out and the new one fading in nothing is listed as fading; a scan
- * that starts there reads the new text half-faded. A scan during which a fade
- * started on text is thrown away and run again.
+ * Stops the page's slow repeating timers before it loads. The home page swaps
+ * testimonials and barbershop photos every five seconds, and a scan that
+ * catches a swap reads half-faded text as a contrast violation. The clock is
+ * the one thing here that is not the site's own, so it is the thing to control.
+ * Quick timers, such as the loader's progress bar, keep running.
  *
- * @returns the violations of the first undisturbed scan, and how many scans
- *   were thrown away before it
- * @throws if a fade started during each of five scans in a row, or the page
- *   does not settle within 15 seconds
+ * Call it before the page is opened.
  */
-async function scanWhileStill(page: Page) {
-  await pageSettled(page)
-  for (let discardedScans = 0; discardedScans < 5; discardedScans++) {
-    const fadesBefore = await textFadesStarted(page)
-    // Waits out a fade that began just before the count was read.
-    await pageSettled(page)
-    const { violations } = await scan(page)
-    if ((await textFadesStarted(page)) === fadesBefore) return { violations, discardedScans }
-  }
-  throw new Error('a fade started on text during each of five axe scans in a row')
-}
-
-/**
- * Counts the opacity, colour and background-colour transitions that have
- * started on elements with text anywhere inside them.
- *
- * @returns the number started since the first call on this page
- */
-async function textFadesStarted(page: Page): Promise<number> {
-  return await page.evaluate(() => {
-    const root = document.documentElement
-    if (root.dataset.textFadesStarted === undefined) {
-      root.dataset.textFadesStarted = '0'
-      document.addEventListener(
-        'transitionrun',
-        (event) => {
-          const fades = ['opacity', 'color', 'background-color'].includes(event.propertyName)
-          const holdsText =
-            event.target instanceof Element && (event.target.textContent ?? '').trim() !== ''
-          if (fades && holdsText) {
-            root.dataset.textFadesStarted = String(Number(root.dataset.textFadesStarted) + 1)
-          }
-        },
-        true
-      )
-    }
-    return Number(root.dataset.textFadesStarted)
+async function stopSlowTimers(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const startInterval = window.setInterval.bind(window)
+    Object.defineProperty(window, 'setInterval', {
+      value: (handler: TimerHandler, timeout?: number, ...rest: unknown[]) =>
+        timeout !== undefined && timeout >= 1000 ? 0 : startInterval(handler, timeout, ...rest),
+    })
   })
 }
 
@@ -96,9 +63,11 @@ test.describe('Accessibility (axe-core)', () => {
         page,
       }) => {
         await page.emulateMedia({ colorScheme: theme })
+        await stopSlowTimers(page)
         await gotoAndReady(page, route)
         expect(await paintedTheme(page)).toBe(theme)
-        const { violations } = await scanWhileStill(page)
+        await pageSettled(page)
+        const { violations } = await scan(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
           // eslint-disable-next-line no-console
@@ -113,12 +82,14 @@ test.describe('Accessibility (axe-core)', () => {
     }) => {
       await page.emulateMedia({ colorScheme: theme })
       await page.setViewportSize({ width: 390, height: 844 })
+      await stopSlowTimers(page)
       await gotoAndReady(page, '/')
       expect(await paintedTheme(page)).toBe(theme)
       await pageHydrated(page)
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
-      const { violations } = await scanWhileStill(page)
+      await pageSettled(page)
+      const { violations } = await scan(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
         // eslint-disable-next-line no-console
@@ -128,24 +99,18 @@ test.describe('Accessibility (axe-core)', () => {
     })
   }
 
-  test('a testimonial that rotates during the scan is not reported', async ({ page }) => {
-    await page.emulateMedia({ colorScheme: 'light' })
+  // The scans above stop these timers, so nothing fades in the middle of one.
+  test('the page stays still once its slow timers are stopped', async ({ page }) => {
+    await stopSlowTimers(page)
     await gotoAndReady(page, '/')
-    // Shows the next testimonial at the moment axe arrives in the page.
-    await page.evaluate(() => {
-      const next = document.querySelector('.testimonials__nav-button--active')
-      if (!(next instanceof HTMLElement)) throw new Error('no next-testimonial button')
-      const clickOnceAxeLoads = () => {
-        if ('axe' in window) next.click()
-        else requestAnimationFrame(clickOnceAxeLoads)
-      }
-      clickOnceAxeLoads()
-    })
+    await pageSettled(page)
+    const testimonial = page.locator('.testimonials__comment')
+    const shown = await testimonial.textContent()
 
-    const { violations, discardedScans } = await scanWhileStill(page)
+    // The testimonials change every five seconds.
+    await page.waitForTimeout(6000)
 
-    expect(discardedScans).toBeGreaterThan(0)
-    expect(violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')).toEqual([])
+    expect(await testimonial.textContent()).toBe(shown)
   })
 
   // axe reports these as "incomplete", so the contrast is measured here instead:
