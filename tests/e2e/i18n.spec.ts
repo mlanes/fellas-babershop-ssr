@@ -157,20 +157,76 @@ test.describe('Only a language picked in the selector counts as a choice', () =>
   })
 })
 
-test.describe('A search engine that runs scripts', () => {
-  test.use({
-    locale: 'en-US',
+/**
+ * Search engines must find Portuguese on the plain home address, and the ones
+ * that run scripts report an English browser. A visitor's phone must not be
+ * mistaken for one. Every row is an English browser with nothing saved.
+ */
+const userAgentRules = [
+  {
+    visitor: "Google's crawler",
     userAgent:
       'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+    path: '/',
+    lang: 'pt-PT',
+  },
+  {
+    visitor: "Google's Search Console inspection tool",
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 (compatible; Google-InspectionTool/1.0;)',
+    path: '/',
+    lang: 'pt-PT',
+  },
+  {
+    visitor: 'a Cubot phone, whose name contains "bot"',
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 13; CUBOT KINGKONG 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+    path: '/en',
+    lang: 'en-US',
+  },
+]
+
+test.describe('The plain home address, by who is asking', () => {
+  for (const { visitor, userAgent, path, lang } of userAgentRules) {
+    test.describe(visitor, () => {
+      test.use({ locale: 'en-US', userAgent })
+
+      test(`ends on ${path} in ${lang}`, async ({ page }) => {
+        await gotoAndReady(page, '/')
+        await pageHydrated(page)
+        await page.waitForTimeout(1000)
+
+        await expectAddress(page, path)
+        await expectLanguage(page, lang)
+      })
+    })
+  }
+})
+
+test.describe("The move to the visitor's language", () => {
+  test.use({ locale: 'en-US' })
+
+  test('leaves no extra step for the Back button', async ({ page }) => {
+    await gotoAndReady(page, '/services')
+    await pageHydrated(page)
+
+    await gotoAndReady(page, '/')
+    await expectAddress(page, '/en')
+    await pageHydrated(page)
+
+    await page.goBack()
+    await expectAddress(page, '/services')
   })
 
-  test('is left on the Portuguese home page', async ({ page }) => {
+  // The site used to keep the language last shown in this cookie, so its
+  // values are not picks.
+  test('ignores the cookie the site used before', async ({ page, context, baseURL }) => {
+    if (!baseURL) throw new Error('baseURL is not configured')
+    await context.addCookies([{ name: 'i18n_redirected', value: 'pt', url: baseURL }])
     await gotoAndReady(page, '/')
-    await pageHydrated(page)
-    await page.waitForTimeout(1000)
 
-    await expectAddress(page, '/')
-    await expectLanguage(page, 'pt-PT')
+    await expectAddress(page, '/en')
+    await expectLanguage(page, 'en-US')
   })
 })
 
@@ -220,22 +276,23 @@ test.describe('The language selector', () => {
   // Portuguese is the language of the plain home address, so picking it must
   // hold against both the browser's language and the English fallback.
   for (const browserLanguage of ['en-US', 'de-DE']) {
-    test(`remembers Portuguese on a ${browserLanguage} browser`, async ({ browser }) => {
-      const context = await browser.newContext({ locale: browserLanguage })
-      const page = await context.newPage()
-      await gotoAndReady(page, '/')
-      await expectAddress(page, '/en')
+    test.describe(`${browserLanguage} browser`, () => {
+      test.use({ locale: browserLanguage })
 
-      await pickLanguage(page, 'Português')
-      await expectAddress(page, '/')
-      await expectLanguage(page, 'pt-PT')
+      test('remembers Portuguese', async ({ page }) => {
+        await gotoAndReady(page, '/')
+        await expectAddress(page, '/en')
 
-      await gotoAndReady(page, '/')
-      await pageHydrated(page)
-      await page.waitForTimeout(1000)
-      await expectAddress(page, '/')
-      await expectLanguage(page, 'pt-PT')
-      await context.close()
+        await pickLanguage(page, 'Português')
+        await expectAddress(page, '/')
+        await expectLanguage(page, 'pt-PT')
+
+        await gotoAndReady(page, '/')
+        await pageHydrated(page)
+        await page.waitForTimeout(1000)
+        await expectAddress(page, '/')
+        await expectLanguage(page, 'pt-PT')
+      })
     })
   }
 })
@@ -276,6 +333,21 @@ test.describe('Links inside the site keep the language being read', () => {
 
     await expectAddress(page, '/en', '#barbershops')
     await expectLanguage(page, 'en-US')
+  })
+
+  test.describe('English browser reading a Portuguese page', () => {
+    test.use({ locale: 'en-US' })
+
+    test('the logo leads to the Portuguese home page and stays there', async ({ page }) => {
+      await gotoAndReady(page, '/services')
+      await pageHydrated(page)
+      await page.locator('.header__logo').click()
+
+      await expectAddress(page, '/', '#home')
+      await page.waitForTimeout(1000)
+      await expectAddress(page, '/', '#home')
+      await expectLanguage(page, 'pt-PT')
+    })
   })
 
   test('a menu item on the home page itself', async ({ page }) => {

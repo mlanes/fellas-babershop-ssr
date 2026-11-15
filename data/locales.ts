@@ -21,10 +21,11 @@ export const defaultLocale: Locale = 'pt'
 export const fallbackLocale: Locale = 'en'
 
 /**
- * The cookie the language picked in the selector is saved in. The name is the
- * one the site has always used, so returning visitors keep their language.
+ * The cookie the language picked in the selector is saved in. It is not
+ * `i18n_redirected`, which the site used before: that one held the language
+ * last shown, so its values cannot be read as picks.
  */
-export const localeCookie = 'i18n_redirected'
+export const localeCookie = 'fellas-language'
 
 /**
  * Finds the first of a list of language tags that the site has a language for.
