@@ -1,3 +1,14 @@
+import { defaultLocale, localeCookie, locales, localizedPath } from './data/locales'
+
+const siteUrl = 'https://fellasbarber.com'
+
+// A page added under pages/ goes in one of these two lists, or it is not built.
+const comingSoonPages = ['/services', '/gallery', '/contacts', '/score']
+const pages = ['/', ...comingSoonPages]
+
+const inEveryLanguage = (paths: string[]) =>
+  paths.flatMap((path) => locales.map(({ code }) => localizedPath(path, code)))
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devtools: { enabled: true },
@@ -17,12 +28,15 @@ export default defineNuxtConfig({
   ],
 
   site: {
-    url: 'https://fellasbarber.com',
+    url: siteUrl,
   },
 
   sitemap: {
     // Coming-soon routes are noindex placeholders — keep them out of the sitemap.
-    exclude: ['/services', '/gallery', '/contacts', '/score'],
+    exclude: inEveryLanguage(comingSoonPages),
+    // One sitemap at /sitemap.xml, which robots.txt names. Left on, the module
+    // splits it into one per language behind an index at another address.
+    autoI18n: false,
   },
 
   image: {
@@ -78,7 +92,7 @@ export default defineNuxtConfig({
           property: 'og:description',
           content: 'Serviços profissionais de barbeiro com qualidade premium em Lisboa, Portugal.',
         },
-        { property: 'og:image', content: 'https://fellasbarber.com/og-image.jpg' },
+        { property: 'og:image', content: `${siteUrl}/og-image.jpg` },
         { property: 'og:type', content: 'website' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
@@ -87,7 +101,7 @@ export default defineNuxtConfig({
           name: 'twitter:description',
           content: 'A sua barbearia de confiança em Lisboa, Portugal.',
         },
-        { name: 'twitter:image', content: 'https://fellasbarber.com/og-image.jpg' },
+        { name: 'twitter:image', content: `${siteUrl}/og-image.jpg` },
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
@@ -112,29 +126,28 @@ export default defineNuxtConfig({
     },
   },
 
-  routeRules: {
-    '/': { prerender: true },
-    '/services': { prerender: true },
-    '/gallery': { prerender: true },
-    '/contacts': { prerender: true },
-    '/score': { prerender: true },
-  },
+  routeRules: Object.fromEntries(inEveryLanguage(pages).map((path) => [path, { prerender: true }])),
 
   i18n: {
-    locales: [
-      { code: 'pt', file: 'pt.json', name: 'Português' },
-      { code: 'en', file: 'en.json', name: 'English' },
-      { code: 'es', file: 'es.json', name: 'Español' },
-      { code: 'fr', file: 'fr.json', name: 'Français' },
-    ],
-    defaultLocale: 'pt',
+    locales: locales.map(({ code, language, name }) => ({
+      code,
+      language,
+      name,
+      file: `${code}.json`,
+    })),
+    defaultLocale,
     langDir: 'locales',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
+    baseUrl: siteUrl,
     detectBrowserLanguage: {
       useCookie: true,
-      cookieKey: 'i18n_redirected',
+      cookieKey: localeCookie,
       redirectOn: 'root',
-      fallbackLocale: 'en',
+      // No fallbackLocale here. While the pages are prerendered there is no
+      // visitor to detect, so the module takes the fallback and the build
+      // writes `/` as a bare redirect to it. The browser of a visitor whose
+      // language the site does not have is handled in
+      // plugins/unsupported-language.client.ts.
     },
   },
 

@@ -1,5 +1,7 @@
+import { locales } from '~/data/locales'
+
 export function useStructuredData() {
-  const siteUrl = 'https://fellasbarber.com'
+  const siteUrl = useSiteConfig().url
   const logoUrl = `${siteUrl}/og-image.jpg`
 
   const locations = [
@@ -55,7 +57,7 @@ export function useStructuredData() {
               '@id': `${siteUrl}/#website`,
               url: siteUrl,
               name: 'Fellas Barbers',
-              inLanguage: ['pt-PT', 'en-US', 'es-ES', 'fr-FR'],
+              inLanguage: locales.map(({ language }) => language),
               publisher: { '@id': `${siteUrl}/#organization` },
             },
             ...locations.map((loc) => ({

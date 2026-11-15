@@ -3,30 +3,17 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import { useLocale, type Locale } from '~/composables/useLocale'
 
-const { locale, setLocale } = useLocale()
+const { locale, locales: languages, setLocale } = useLocale()
 const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 const buttonRef = ref<HTMLButtonElement | null>(null)
 const optionRefs = ref<HTMLButtonElement[]>([])
 
-const languages = [
-  { code: 'pt' as Locale, label: 'Português', flag: '🇵🇹' },
-  { code: 'en' as Locale, label: 'English', flag: '🇬🇧' },
-  { code: 'es' as Locale, label: 'Español', flag: '🇪🇸' },
-  { code: 'fr' as Locale, label: 'Français', flag: '🇫🇷' },
-]
-
 const currentLanguage = computed(() => {
   return languages.find((lang) => lang.code === locale.value) || languages[0]
 })
 
-const getCurrentLanguageCode = computed(() => {
-  const code = locale.value
-  if (code === 'pt') return 'PT'
-  if (code === 'es') return 'ES'
-  if (code === 'fr') return 'FR'
-  return code.toUpperCase()
-})
+const getCurrentLanguageCode = computed(() => locale.value.toUpperCase())
 
 const focusOption = (index: number) => {
   const target = optionRefs.value[index]
@@ -112,7 +99,7 @@ onUnmounted(() => {
       ref="buttonRef"
       class="language-selector__button"
       type="button"
-      :title="currentLanguage.label"
+      :title="currentLanguage.name"
       :aria-expanded="isOpen"
       aria-haspopup="listbox"
       @click="toggleDropdown"
@@ -147,7 +134,7 @@ onUnmounted(() => {
           @keydown="handleOptionKeydown($event, index)"
         >
           <span class="language-selector__option-flag" aria-hidden="true">{{ lang.flag }}</span>
-          <span class="language-selector__option-label">{{ lang.label }}</span>
+          <span class="language-selector__option-label">{{ lang.name }}</span>
           <FIcon
             v-if="lang.code === locale"
             name="check"
