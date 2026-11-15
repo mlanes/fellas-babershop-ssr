@@ -8,6 +8,10 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Maintenance
+
+- The accessibility scans stop the page's rotating content first. The earlier approach, repeating a scan that a rotation had disturbed, could give up on a slow machine.
+
 ## 1.1.1 - 2026-11-15
 
 ### Added
