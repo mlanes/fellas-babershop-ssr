@@ -44,7 +44,6 @@
     "@storybook/addon-docs": "^9.1.20",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
-    "chrome-launcher": "^1.2.1",
     "eslint": "^9.38.0",
     "eslint-plugin-storybook": "^9.1.20",
     "lighthouse": "^13.3.0",
