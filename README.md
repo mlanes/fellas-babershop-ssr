@@ -30,7 +30,7 @@ A marketing/showcase site for a three-location barbershop, prerendered at build 
 - **SSR + prerendering**: All pages prerendered at build via Nuxt 3 + Nitro; runtime image transformation through Netlify's image service
 - **Responsive**: Mobile, tablet and desktop layouts; the gallery scrollytelling effect only activates ≥1024px so touch devices scroll naturally
 - **Dark/light theme**: Manual toggle + automatic system-preference detection, no boot flash
-- **i18n**: Portuguese (default), English, Spanish, French with cookie-based detection (`no_prefix` strategy)
+- **i18n**: Portuguese (default), English, Spanish, French, each at its own address (`/`, `/en`, `/es`, `/fr`)
 - **PWA**: Installable, Workbox-cached fonts/images/videos for offline-friendly return visits
 - **A11y**: WCAG 2.1 AA target sizes, ARIA landmarks, modal focus trap, keyboard-navigable language selector
 
@@ -152,12 +152,13 @@ VITE_GOOGLE_ANALYTICS_ID=
 
 ### Adding Things
 
-| Want to add           | Where                                                                                                                        |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| A service             | `data/services.ts` + `i18n/locales/*.json` under `servicesList.<id>`                                                         |
-| A barbershop location | `composables/useBarbershops.ts`, drop images in `public/images/barbershops/<id>/`, add `barbershops.units.<id>` translations |
-| A gallery image       | Drop in `public/images/gallery/`, append filename to the `galleryFilenames` array in `GalleryScrollSection.vue`              |
-| A page                | `pages/<name>.vue`, list in `nuxt.config.ts` `routeRules` prerender, add nav entry in `data/navigation.ts`                   |
+| Want to add           | Where                                                                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| A service             | `data/services.ts` + `i18n/locales/*.json` under `servicesList.<id>`                                                             |
+| A barbershop location | `composables/useBarbershops.ts`, drop images in `public/images/barbershops/<id>/`, add `barbershops.units.<id>` translations     |
+| A gallery image       | Drop in `public/images/gallery/`, append filename to the `galleryFilenames` array in `GalleryScrollSection.vue`                  |
+| A page                | `pages/<name>.vue`, add it to `pages` or `comingSoonPages` at the top of `nuxt.config.ts`, add nav entry in `data/navigation.ts` |
+| A language            | `data/locales.ts` + a translation file `i18n/locales/<code>.json`                                                                |
 
 ### Conventions
 
@@ -224,7 +225,7 @@ npm run test:e2e:built                     # built, prerendered site (see below)
 npm run test:e2e:all                       # both of the above; run this before a pull request
 ```
 
-`test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/` against it. Anything decided during that build-time render, such as the page's language, can only be checked there. Stop `npm run dev` before running it: the build clears files the dev server is using, which makes it log errors and restart.
+`test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/`, plus the language-routing spec `tests/e2e/i18n.spec.ts`, against it. Anything decided during that build-time render, such as the page's language, can only be checked there. Stop `npm run dev` before running it: the build clears files the dev server is using, which makes it log errors and restart.
 
 The spec files (`tests/e2e/*.spec.ts`) cover home page rendering, per-route 200s + titles, theme toggle, mobile menu, language switching, and SEO meta presence.
 
@@ -246,7 +247,9 @@ The Netlify image service handles on-the-fly image transformation for `@nuxt/ima
 
 ## Internationalization
 
-Four locales (`pt` default, `en`, `es`, `fr`) with `no_prefix` strategy — same URL for every language, locale switched via the `i18n_redirected` cookie. `<html lang>` updates dynamically from the active locale.
+Four locales, each with its own address: Portuguese at the plain addresses (`/`, `/services`), and English, Spanish and French under `/en`, `/es` and `/fr`. The list lives in `data/locales.ts`; routing, the language selector, the language tags and the prerendered pages are built from it.
+
+A visitor who opens the plain home address is taken to their language: a choice saved from the selector comes first, then the browser's language, then English when the site does not have it. An address that names a language is always shown in that language. The rules are written as tables at the top of `tests/e2e/i18n.spec.ts`.
 
 Add a key to all four files in `i18n/locales/`, use as:
 
