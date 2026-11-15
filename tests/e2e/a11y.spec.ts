@@ -28,14 +28,15 @@ async function scan(page: Parameters<typeof gotoAndReady>[0]) {
 
 /**
  * Scans the page with axe at a moment when no text is fading. The home page
- * swaps testimonials on a timer, and for a frame between the old one fading
- * out and the new one fading in nothing is listed as fading; a scan that
- * starts there reads the new text half-faded. A scan during which a fade
+ * swaps testimonials on a timer, and for a few frames between the old one
+ * fading out and the new one fading in nothing is listed as fading; a scan
+ * that starts there reads the new text half-faded. A scan during which a fade
  * started on text is thrown away and run again.
  *
  * @returns the violations of the first undisturbed scan, and how many scans
  *   were thrown away before it
- * @throws if a fade started during each of five scans in a row
+ * @throws if a fade started during each of five scans in a row, or the page
+ *   does not settle within 15 seconds
  */
 async function scanWhileStill(page: Page) {
   await pageSettled(page)
@@ -50,8 +51,10 @@ async function scanWhileStill(page: Page) {
 }
 
 /**
- * Counts the opacity and colour transitions that have started on elements
- * holding text since the first call on this page.
+ * Counts the opacity, colour and background-colour transitions that have
+ * started on elements with text anywhere inside them.
+ *
+ * @returns the number started since the first call on this page
  */
 async function textFadesStarted(page: Page): Promise<number> {
   return await page.evaluate(() => {
