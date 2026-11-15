@@ -1,4 +1,5 @@
-import { defaultLocale, locales, localizedPath } from './data/locales'
+import { defaultLocale, fallbackLocale, localeCookie, locales, localizedPath } from './data/locales'
+import { moveToVisitorLanguage, type VisitorLanguageSettings } from './utils/moveToVisitorLanguage'
 
 const siteUrl = 'https://fellasbarber.com'
 
@@ -8,6 +9,13 @@ const pages = ['/', ...comingSoonPages]
 
 const inEveryLanguage = (paths: string[]) =>
   paths.flatMap((path) => locales.map(({ code }) => localizedPath(path, code)))
+
+const visitorLanguageSettings: VisitorLanguageSettings = {
+  codes: locales.map(({ code }) => code),
+  defaultLocale,
+  fallbackLocale,
+  cookie: localeCookie,
+}
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -115,6 +123,11 @@ export default defineNuxtConfig({
       ],
       script: [
         {
+          // First in the head: a visitor who belongs on another language's
+          // home page is sent there before anything of this one is drawn.
+          innerHTML: `(${moveToVisitorLanguage.toString()})(${JSON.stringify(visitorLanguageSettings)})`,
+        },
+        {
           innerHTML: `
             const THEME_STORAGE_KEY = 'fellas-theme-preference';
             const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
@@ -147,7 +160,7 @@ export default defineNuxtConfig({
     // The module would decide the language while the pages are prerendered,
     // with no visitor to ask, and freeze its answer into `/`. It also saves the
     // language last shown as if it had been picked. The visitor's language is
-    // settled in the browser by plugins/home-language.client.ts.
+    // settled in the browser by utils/moveToVisitorLanguage.ts.
     detectBrowserLanguage: false,
   },
 

@@ -28,22 +28,6 @@ export const fallbackLocale: Locale = 'en'
 export const localeCookie = 'fellas-language'
 
 /**
- * Finds the first of a list of language tags that the site has a language for.
- *
- * @param tags - language tags in order of preference, e.g. `['pt-BR', 'en']`
- * @returns the matching language code, or `undefined` when the site has none of them
- * @example matchLocale(['de-DE', 'fr']) // 'fr'
- */
-export function matchLocale(tags: readonly string[]): Locale | undefined {
-  for (const tag of tags) {
-    const primary = tag.toLowerCase().split('-')[0]
-    const match = locales.find(({ code }) => code === primary)
-    if (match) return match.code
-  }
-  return undefined
-}
-
-/**
  * Gives the address of a page in a language.
  *
  * @param page - the page's address in the default language, e.g. `/` or `/services`

@@ -206,6 +206,23 @@ test.describe('The plain home address, by who is asking', () => {
 test.describe("The move to the visitor's language", () => {
   test.use({ locale: 'en-US' })
 
+  // On a slow connection the app takes many seconds to start. Measured on
+  // fast 3G, a move that waited for it left the Portuguese page on screen for
+  // more than four seconds.
+  test('does not wait for the app to start', async ({ page }) => {
+    await page.route('**/_nuxt/**', (route) => route.abort())
+    await page.goto('/', { waitUntil: 'commit' })
+
+    await expectAddress(page, '/en')
+    await expectLanguage(page, 'en-US')
+  })
+
+  test('keeps what followed the address', async ({ page }) => {
+    await gotoAndReady(page, '/?utm_source=flyer#barbershops')
+
+    await expect(page).toHaveURL(/\/en\/\?utm_source=flyer#barbershops$/, { timeout: 15_000 })
+  })
+
   test('leaves no extra step for the Back button', async ({ page }) => {
     await gotoAndReady(page, '/services')
     await pageHydrated(page)
