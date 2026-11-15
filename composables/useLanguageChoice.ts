@@ -1,16 +1,27 @@
-const STORAGE_KEY = 'fellas-language-chosen'
+import { localeCookie, locales, type Locale } from '~/data/locales'
+
+const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365
 
 /**
- * Remembers, in this browser only, whether the visitor has picked a language
- * in the selector. The cookie the i18n module keeps cannot tell: on a first
- * visit the module saves the default language as if it had been chosen.
+ * Keeps the language the visitor picked in the selector, in a cookie. Only a
+ * pick is saved: a page merely opened in a language does not count.
  *
- * @returns `wasChosen`, which reads the mark, and `markChosen`, which sets it.
- *   Both must be called in the browser.
+ * @returns `chosen`, the picked language, or `undefined` when the visitor has
+ *   picked none; and `choose`, which saves a pick
  */
 export function useLanguageChoice() {
+  const saved = useCookie<string | null>(localeCookie, {
+    maxAge: ONE_YEAR_IN_SECONDS,
+    sameSite: 'lax',
+    path: '/',
+  })
+
   return {
-    wasChosen: () => localStorage.getItem(STORAGE_KEY) !== null,
-    markChosen: () => localStorage.setItem(STORAGE_KEY, 'yes'),
+    chosen: computed<Locale | undefined>(
+      () => locales.find(({ code }) => code === saved.value)?.code
+    ),
+    choose: (locale: Locale) => {
+      saved.value = locale
+    },
   }
 }

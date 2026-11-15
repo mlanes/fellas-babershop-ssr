@@ -13,7 +13,7 @@ export type { Locale }
  */
 export function useLocale() {
   const { locale, t, setLocale } = useI18n()
-  const { markChosen } = useLanguageChoice()
+  const { choose } = useLanguageChoice()
 
   const currentLocale = computed<Locale>(
     () => locales.find(({ code }) => code === locale.value)?.code ?? defaultLocale
@@ -23,7 +23,7 @@ export function useLocale() {
     locale: currentLocale,
     locales,
     setLocale: (newLocale: Locale) => {
-      markChosen()
+      choose(newLocale)
       return setLocale(newLocale)
     },
     t,

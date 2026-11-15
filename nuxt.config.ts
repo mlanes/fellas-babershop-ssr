@@ -1,4 +1,4 @@
-import { defaultLocale, localeCookie, locales, localizedPath } from './data/locales'
+import { defaultLocale, locales, localizedPath } from './data/locales'
 
 const siteUrl = 'https://fellasbarber.com'
 
@@ -139,16 +139,11 @@ export default defineNuxtConfig({
     langDir: 'locales',
     strategy: 'prefix_except_default',
     baseUrl: siteUrl,
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: localeCookie,
-      redirectOn: 'root',
-      // No fallbackLocale here. While the pages are prerendered there is no
-      // visitor to detect, so the module takes the fallback and the build
-      // writes `/` as a bare redirect to it. The browser of a visitor whose
-      // language the site does not have is handled in
-      // plugins/unsupported-language.client.ts.
-    },
+    // The module would decide the language while the pages are prerendered,
+    // with no visitor to ask, and freeze its answer into `/`. It also saves the
+    // language last shown as if it had been picked. The visitor's language is
+    // settled in the browser by plugins/home-language.client.ts.
+    detectBrowserLanguage: false,
   },
 
   pwa: {

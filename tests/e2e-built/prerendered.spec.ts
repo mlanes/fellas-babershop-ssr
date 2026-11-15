@@ -81,6 +81,18 @@ test.describe('The built pages', () => {
   })
 })
 
+test('the sitemap lists the four home pages and nothing else', async ({ request }) => {
+  const sitemap = await builtHtml(request, '/sitemap.xml')
+  const listed = [...sitemap.matchAll(/<loc>([^<]*)<\/loc>/g)].map((match) => match[1])
+
+  expect(listed.sort()).toEqual([
+    `${siteAddress}/`,
+    `${siteAddress}/en`,
+    `${siteAddress}/es`,
+    `${siteAddress}/fr`,
+  ])
+})
+
 test.describe('The language list', () => {
   for (const { code, language } of locales) {
     test(`${code} has a translation file and a built home page in ${language}`, async ({

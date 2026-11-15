@@ -20,8 +20,27 @@ export const defaultLocale: Locale = 'pt'
 /** The language shown to a visitor whose browser asks for none of the site's languages. */
 export const fallbackLocale: Locale = 'en'
 
-/** The cookie the visitor's chosen language is saved in. */
+/**
+ * The cookie the language picked in the selector is saved in. The name is the
+ * one the site has always used, so returning visitors keep their language.
+ */
 export const localeCookie = 'i18n_redirected'
+
+/**
+ * Finds the first of a list of language tags that the site has a language for.
+ *
+ * @param tags - language tags in order of preference, e.g. `['pt-BR', 'en']`
+ * @returns the matching language code, or `undefined` when the site has none of them
+ * @example matchLocale(['de-DE', 'fr']) // 'fr'
+ */
+export function matchLocale(tags: readonly string[]): Locale | undefined {
+  for (const tag of tags) {
+    const primary = tag.toLowerCase().split('-')[0]
+    const match = locales.find(({ code }) => code === primary)
+    if (match) return match.code
+  }
+  return undefined
+}
 
 /**
  * Gives the address of a page in a language.

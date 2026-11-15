@@ -108,6 +108,72 @@ test.describe('An address that names a language', () => {
   }
 })
 
+test.describe('Only a language picked in the selector counts as a choice', () => {
+  test.describe('Portuguese browser', () => {
+    test.use({ locale: 'pt-PT' })
+
+    test('opening an English link once does not make English the choice', async ({ page }) => {
+      await gotoAndReady(page, '/en')
+      await expectLanguage(page, 'en-US')
+      await pageHydrated(page)
+
+      await gotoAndReady(page, '/')
+      await pageHydrated(page)
+      await page.waitForTimeout(1000)
+      await expectAddress(page, '/')
+      await expectLanguage(page, 'pt-PT')
+    })
+  })
+
+  test.describe('English browser', () => {
+    test.use({ locale: 'en-US' })
+
+    test('arriving on a Portuguese page first does not make Portuguese the choice', async ({
+      page,
+    }) => {
+      await gotoAndReady(page, '/services')
+      await expectLanguage(page, 'pt-PT')
+      await pageHydrated(page)
+
+      await gotoAndReady(page, '/')
+      await expectAddress(page, '/en')
+      await expectLanguage(page, 'en-US')
+    })
+
+    test('a picked language holds after opening a link in another one', async ({ page }) => {
+      await gotoAndReady(page, '/')
+      await expectAddress(page, '/en')
+      await pickLanguage(page, 'Français')
+      await expectAddress(page, '/fr')
+
+      await gotoAndReady(page, '/es/services')
+      await expectLanguage(page, 'es-ES')
+      await pageHydrated(page)
+
+      await gotoAndReady(page, '/')
+      await expectAddress(page, '/fr')
+      await expectLanguage(page, 'fr-FR')
+    })
+  })
+})
+
+test.describe('A search engine that runs scripts', () => {
+  test.use({
+    locale: 'en-US',
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+  })
+
+  test('is left on the Portuguese home page', async ({ page }) => {
+    await gotoAndReady(page, '/')
+    await pageHydrated(page)
+    await page.waitForTimeout(1000)
+
+    await expectAddress(page, '/')
+    await expectLanguage(page, 'pt-PT')
+  })
+})
+
 test.describe('The language selector', () => {
   test('takes the visitor to the same page in the picked language', async ({ page }) => {
     await gotoAndReady(page, '/')
