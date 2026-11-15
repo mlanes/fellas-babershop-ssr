@@ -44,9 +44,9 @@ test.describe('SEO meta', () => {
     )
     expect(listed.sort()).toEqual([
       'https://fellasbarber.com/',
-      'https://fellasbarber.com/en',
-      'https://fellasbarber.com/es',
-      'https://fellasbarber.com/fr',
+      'https://fellasbarber.com/en/',
+      'https://fellasbarber.com/es/',
+      'https://fellasbarber.com/fr/',
     ])
   })
 })

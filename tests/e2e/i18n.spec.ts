@@ -374,7 +374,8 @@ test.describe('Each page names its sister pages for search engines', () => {
       },
     },
   ]
-  const address = (path: string) => `${siteAddress}${path === '/' ? '' : path}`
+  // Every address but the home page's ends in a slash, as Netlify serves it.
+  const address = (path: string) => (path === '/' ? siteAddress : `${siteAddress}${path}/`)
 
   for (const { path, sisters } of pages) {
     test(`${path}`, async ({ page }) => {

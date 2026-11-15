@@ -30,8 +30,11 @@ async function builtHtml(
 
 const langOf = (html: string) => /<html[^>]*\blang="([^"]*)"/.exec(html)?.[1]
 const pathOf = (prefix: string, page: string) => (page === '/' ? prefix || '/' : `${prefix}${page}`)
-const addressOf = (prefix: string, page: string) =>
-  `${siteAddress}${page === '/' ? prefix : `${prefix}${page}`}`
+// Every address but the Portuguese home page's ends in a slash, as Netlify serves it.
+const addressOf = (prefix: string, page: string) => {
+  const path = page === '/' ? prefix : `${prefix}${page}`
+  return path === '' ? siteAddress : `${siteAddress}${path}/`
+}
 
 test.describe('The built pages', () => {
   // The build once wrote this page as a bare redirect to the English one.
@@ -87,9 +90,9 @@ test('the sitemap lists the four home pages and nothing else', async ({ request 
 
   expect(listed.sort()).toEqual([
     `${siteAddress}/`,
-    `${siteAddress}/en`,
-    `${siteAddress}/es`,
-    `${siteAddress}/fr`,
+    `${siteAddress}/en/`,
+    `${siteAddress}/es/`,
+    `${siteAddress}/fr/`,
   ])
 })
 
@@ -107,7 +110,8 @@ test.describe('The language list', () => {
     test(`${code} has its home page in the sitemap`, async ({ request }) => {
       const sitemap = await builtHtml(request, '/sitemap.xml')
 
-      expect(sitemap).toContain(`<loc>${siteAddress}${localizedPath('/', code)}</loc>`)
+      const home = localizedPath('/', code)
+      expect(sitemap).toContain(`<loc>${siteAddress}${home === '/' ? home : `${home}/`}</loc>`)
     })
   }
 })

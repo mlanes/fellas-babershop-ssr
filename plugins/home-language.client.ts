@@ -1,4 +1,4 @@
-import { defaultLocale, fallbackLocale, localizedPath, matchLocale } from '~/data/locales'
+import { defaultLocale, fallbackLocale, matchLocale } from '~/data/locales'
 import { useLanguageChoice } from '~/composables/useLanguageChoice'
 
 /**
@@ -23,6 +23,7 @@ function isCrawler(userAgent: string): boolean {
  */
 export default defineNuxtPlugin((nuxtApp) => {
   const { chosen } = useLanguageChoice()
+  const localePath = useLocalePath()
 
   nuxtApp.hook('app:mounted', async () => {
     if (window.location.pathname !== '/' || isCrawler(navigator.userAgent)) return
@@ -36,6 +37,6 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // Replaces the entry in the history, so Back leaves the site as the
     // visitor expects and does not land on the page they were moved from.
-    await nuxtApp.runWithContext(() => navigateTo(localizedPath('/', wanted), { replace: true }))
+    await nuxtApp.runWithContext(() => navigateTo(localePath('/', wanted), { replace: true }))
   })
 })

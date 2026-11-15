@@ -29,6 +29,10 @@ export default defineNuxtConfig({
 
   site: {
     url: siteUrl,
+    // Netlify serves every page at an address ending in a slash and redirects
+    // the form without one, so the addresses given to search engines end in
+    // one too. The i18n module has the same setting below.
+    trailingSlash: true,
   },
 
   sitemap: {
@@ -139,6 +143,7 @@ export default defineNuxtConfig({
     langDir: 'locales',
     strategy: 'prefix_except_default',
     baseUrl: siteUrl,
+    trailingSlash: true,
     // The module would decide the language while the pages are prerendered,
     // with no visitor to ask, and freeze its answer into `/`. It also saves the
     // language last shown as if it had been picked. The visitor's language is
