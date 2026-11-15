@@ -2,11 +2,19 @@ import { locales } from '~/data/locales'
 
 /**
  * Adds the business's structured data to the page head for search engines:
- * the organisation, the website and each barbershop location.
+ * the organisation, the website and each barbershop location, which are the
+ * same on every page, and the page itself with its language and address.
  */
 export function useStructuredData() {
   const siteUrl = useSiteConfig().url
   const logoUrl = `${siteUrl}/og-image.jpg`
+  const { locale, localeProperties } = useI18n()
+  const switchLocalePath = useSwitchLocalePath()
+
+  const pageUrl = computed(() => {
+    const path = switchLocalePath(locale.value)
+    return path === '/' ? siteUrl : `${siteUrl}${path}`
+  })
 
   const locations = [
     {
@@ -38,7 +46,7 @@ export function useStructuredData() {
     },
   ]
 
-  useHead({
+  useHead(() => ({
     script: [
       {
         type: 'application/ld+json',
@@ -64,6 +72,13 @@ export function useStructuredData() {
               inLanguage: locales.map(({ language }) => language),
               publisher: { '@id': `${siteUrl}/#organization` },
             },
+            {
+              '@type': 'WebPage',
+              '@id': `${pageUrl.value}#webpage`,
+              url: pageUrl.value,
+              inLanguage: localeProperties.value.language,
+              isPartOf: { '@id': `${siteUrl}/#website` },
+            },
             ...locations.map((loc) => ({
               '@type': 'BarberShop',
               '@id': `${siteUrl}/#location-${loc.id}`,
@@ -86,5 +101,5 @@ export function useStructuredData() {
         }),
       },
     ],
-  })
+  }))
 }

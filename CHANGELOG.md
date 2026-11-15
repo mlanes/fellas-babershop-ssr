@@ -8,6 +8,16 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Added
+
+- The home page's title and description are in the page's language, in the browser tab, in search results and when a link is shared.
+- The sitemap gives each language's home page its sister pages in the other languages.
+- The business details given to search engines name the language and address of the page they are on.
+
+### Changed
+
+- A shared link shows the same title and description as a search result. The Portuguese share texts were shorter variants of their own.
+
 ## 1.1.0 - 2026-11-15
 
 ### Added

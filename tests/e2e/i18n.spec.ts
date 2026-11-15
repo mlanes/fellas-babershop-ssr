@@ -377,6 +377,60 @@ test.describe('Links inside the site keep the language being read', () => {
   })
 })
 
+/**
+ * What a search result and a shared link show for the home page: one title
+ * and one description per language.
+ */
+const homePageTexts = [
+  {
+    path: '/',
+    title: 'Fellas Barbers - A Sua Barbearia de Confiança',
+    description:
+      'Fellas Barbers - Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional. Ambiente moderno e serviço de excelência. Agende já!',
+  },
+  {
+    path: '/en',
+    title: 'Fellas Barbers - Your Trusted Barbershop in Lisbon',
+    description:
+      "Fellas Barbers - Premium barbershop in Lisbon. Men's haircuts, beard trims, styling and professional grooming. Modern space and excellent service. Book now!",
+  },
+  {
+    path: '/es',
+    title: 'Fellas Barbers - Tu Barbería de Confianza en Lisboa',
+    description:
+      'Fellas Barbers - Barbería premium en Lisboa. Cortes de pelo para hombre, barba, styling y grooming profesional. Ambiente moderno y servicio de excelencia. ¡Reserva ya!',
+  },
+  {
+    path: '/fr',
+    title: 'Fellas Barbers - Votre Barbier de Confiance à Lisbonne',
+    description:
+      // French puts a narrow no-break space before the exclamation mark.
+      "Fellas Barbers - Barbier haut de gamme à Lisbonne. Coupes homme, barbe, coiffage et soins professionnels. Cadre moderne et service d'excellence. Réservez maintenant\u202F!",
+  },
+]
+
+test.describe('The home page is titled and described in its own language', () => {
+  for (const { path, title, description } of homePageTexts) {
+    test(`${path} carries its language's title and description`, async ({ page }) => {
+      await page.goto(path, { waitUntil: 'domcontentloaded' })
+
+      await expect(page).toHaveTitle(title)
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description)
+      // A shared link shows the same title and description.
+      for (const name of ['og:title', 'twitter:title']) {
+        await expect(
+          page.locator(`meta[property="${name}"], meta[name="${name}"]`)
+        ).toHaveAttribute('content', title)
+      }
+      for (const name of ['og:description', 'twitter:description']) {
+        await expect(
+          page.locator(`meta[property="${name}"], meta[name="${name}"]`)
+        ).toHaveAttribute('content', description)
+      }
+    })
+  }
+})
+
 test.describe('Each page names its sister pages for search engines', () => {
   const pages = [
     { path: '/', sisters: { 'pt-PT': '/', 'en-US': '/en', 'es-ES': '/es', 'fr-FR': '/fr' } },
@@ -395,7 +449,7 @@ test.describe('Each page names its sister pages for search engines', () => {
   const address = (path: string) => (path === '/' ? siteAddress : `${siteAddress}${path}/`)
 
   for (const { path, sisters } of pages) {
-    test(`${path}`, async ({ page }) => {
+    test(`${path} names its own address and the three others`, async ({ page }) => {
       await page.goto(path, { waitUntil: 'domcontentloaded' })
 
       for (const [lang, sisterPath] of Object.entries(sisters)) {
