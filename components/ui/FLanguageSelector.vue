@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, type ComponentPublicInstance } from 'vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import { useLocale, type Locale } from '~/composables/useLocale'
 
@@ -8,6 +8,10 @@ const isOpen = ref(false)
 const dropdownRef = ref<HTMLElement | null>(null)
 const buttonRef = ref<HTMLButtonElement | null>(null)
 const optionRefs = ref<HTMLButtonElement[]>([])
+
+const setOptionRef = (el: Element | ComponentPublicInstance | null, index: number) => {
+  if (el instanceof HTMLButtonElement) optionRefs.value[index] = el
+}
 
 const currentLanguage = computed(() => {
   return languages.find((lang) => lang.code === locale.value) || languages[0]
@@ -37,9 +41,9 @@ const toggleDropdown = () => {
   else openDropdown()
 }
 
-const selectLanguage = (code: Locale) => {
-  setLocale(code)
+const selectLanguage = async (code: Locale) => {
   closeDropdown()
+  await setLocale(code)
 }
 
 const handleButtonKeydown = (event: KeyboardEvent) => {
@@ -75,7 +79,8 @@ const handleOptionKeydown = (event: KeyboardEvent, index: number) => {
 }
 
 const handleClickOutside = (event: MouseEvent) => {
-  if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+  const clicked = event.target
+  if (dropdownRef.value && clicked instanceof Node && !dropdownRef.value.contains(clicked)) {
     isOpen.value = false
   }
 }
@@ -120,11 +125,7 @@ onUnmounted(() => {
         <button
           v-for="(lang, index) in languages"
           :key="lang.code"
-          :ref="
-            (el) => {
-              if (el) optionRefs[index] = el as HTMLButtonElement
-            }
-          "
+          :ref="(el) => setOptionRef(el, index)"
           class="language-selector__option"
           :class="{ 'language-selector__option--active': lang.code === locale }"
           type="button"
