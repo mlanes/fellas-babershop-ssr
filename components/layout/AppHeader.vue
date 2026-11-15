@@ -10,12 +10,13 @@ import { useUIStore } from '~/stores/ui'
 import { useSmoothScroll } from '~/composables/useSmoothScroll'
 import { useTheme } from '~/composables/useTheme'
 import { useLocale } from '~/composables/useLocale'
+import { useHomeLink } from '~/composables/useHomeLink'
 
 /**
  * AppHeader - Main navigation header
  */
 const uiStore = useUIStore()
-const route = useRoute()
+const { homePath, isHome } = useHomeLink()
 const { isMobileMenuOpen, activeSection } = storeToRefs(uiStore)
 const { scrollTo } = useSmoothScroll()
 const { isDark, toggleTheme } = useTheme()
@@ -96,8 +97,8 @@ const handleNavClick = (href: string) => {
   // Nav targets are in-page anchors that only exist on the home page.
   // From any other route, navigate home with the hash so Nuxt scrolls
   // to the section on arrival instead of silently doing nothing.
-  if (route.path !== '/') {
-    navigateTo(`/${href}`)
+  if (!isHome.value) {
+    navigateTo(`${homePath.value}${href}`)
     return
   }
 
@@ -118,8 +119,8 @@ const handleNavClick = (href: string) => {
 const handleBookingClick = () => {
   uiStore.closeMobileMenu()
 
-  if (route.path !== '/') {
-    navigateTo('/#barbershops')
+  if (!isHome.value) {
+    navigateTo(`${homePath.value}#barbershops`)
     return
   }
 

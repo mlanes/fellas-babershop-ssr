@@ -21,7 +21,9 @@ const { t } = useLocale()
       <p class="coming-soon__badge">{{ t('comingSoon.badge') }}</p>
       <h1 class="coming-soon__title">{{ title }}</h1>
       <p class="coming-soon__text">{{ t('comingSoon.description') }}</p>
-      <NuxtLink to="/" class="coming-soon__back">{{ t('comingSoon.backHome') }}</NuxtLink>
+      <NuxtLinkLocale to="/" class="coming-soon__back">{{
+        t('comingSoon.backHome')
+      }}</NuxtLinkLocale>
     </div>
   </section>
 </template>
