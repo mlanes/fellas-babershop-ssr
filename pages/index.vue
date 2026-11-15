@@ -10,10 +10,6 @@ import GalleryScrollSection from '~/components/sections/GalleryScrollSection.vue
 import BeforeAfterSection from '~/components/sections/BeforeAfterSection.vue'
 import TestimonialsSection from '~/components/sections/TestimonialsSection.vue'
 import BarbershopsSection from '~/components/sections/BarbershopsSection.vue'
-
-useHead({
-  title: 'Fellas Barbers - A Sua Barbearia de Confiança',
-})
 </script>
 
 <template>

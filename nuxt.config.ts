@@ -46,9 +46,9 @@ export default defineNuxtConfig({
   sitemap: {
     // Coming-soon routes are noindex placeholders — keep them out of the sitemap.
     exclude: inEveryLanguage(comingSoonPages),
-    // One sitemap at /sitemap.xml, which robots.txt names. Left on, the module
+    // One sitemap at /sitemap.xml, which robots.txt names. Otherwise the module
     // splits it into one per language behind an index at another address.
-    autoI18n: false,
+    sitemaps: false,
   },
 
   image: {
@@ -84,14 +84,8 @@ export default defineNuxtConfig({
     head: {
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
-      title: 'Fellas Barbers - A Sua Barbearia de Confiança',
       meta: [
         { name: 'theme-color', content: '#e63946' },
-        {
-          name: 'description',
-          content:
-            'Fellas Barbers - Barbearia premium em Lisboa. Cortes de cabelo masculinos, barba, styling e grooming profissional. Ambiente moderno e serviço de excelência. Agende já!',
-        },
         {
           name: 'keywords',
           content:
@@ -99,20 +93,10 @@ export default defineNuxtConfig({
         },
         // Open Graph
         { property: 'og:site_name', content: 'Fellas Barbers' },
-        { property: 'og:title', content: 'Fellas Barbers - A Sua Barbearia de Confiança' },
-        {
-          property: 'og:description',
-          content: 'Serviços profissionais de barbeiro com qualidade premium em Lisboa, Portugal.',
-        },
         { property: 'og:image', content: `${siteUrl}/og-image.jpg` },
         { property: 'og:type', content: 'website' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: 'Fellas Barbers' },
-        {
-          name: 'twitter:description',
-          content: 'A sua barbearia de confiança em Lisboa, Portugal.',
-        },
         { name: 'twitter:image', content: `${siteUrl}/og-image.jpg` },
       ],
       link: [

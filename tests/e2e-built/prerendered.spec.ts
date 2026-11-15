@@ -96,6 +96,40 @@ test('the sitemap lists the four home pages and nothing else', async ({ request 
   ])
 })
 
+test('the sitemap gives each home page its sister pages', async ({ request }) => {
+  const sitemap = await builtHtml(request, '/sitemap.xml')
+  const entries = sitemap.split('<url>').slice(1)
+
+  expect(entries).toHaveLength(4)
+  for (const entry of entries) {
+    for (const sister of [
+      `href="${siteAddress}/" hreflang="x-default"`,
+      `href="${siteAddress}/" hreflang="pt-PT"`,
+      `href="${siteAddress}/en/" hreflang="en-US"`,
+      `href="${siteAddress}/es/" hreflang="es-ES"`,
+      `href="${siteAddress}/fr/" hreflang="fr-FR"`,
+    ]) {
+      expect(entry).toContain(sister)
+    }
+  }
+})
+
+test.describe('The business details given to search engines', () => {
+  for (const { prefix, lang } of languages) {
+    test(`on ${pathOf(prefix, '/')} name ${lang} and that page's address`, async ({ request }) => {
+      const html = await builtHtml(request, pathOf(prefix, '/'))
+      const json = /<script type="application\/ld\+json"[^>]*>(.*?)<\/script>/s.exec(html)?.[1]
+      if (!json) throw new Error('no structured data on the page')
+      const graph: { '@type': string; inLanguage?: string; url?: string }[] =
+        JSON.parse(json)['@graph']
+      const website = graph.find((item) => item['@type'] === 'WebSite')
+
+      expect(website?.inLanguage).toBe(lang)
+      expect(website?.url).toBe(prefix ? `${siteAddress}${prefix}/` : siteAddress)
+    })
+  }
+})
+
 test.describe('The language list', () => {
   for (const { code, language } of locales) {
     test(`${code} has a translation file and a built home page in ${language}`, async ({

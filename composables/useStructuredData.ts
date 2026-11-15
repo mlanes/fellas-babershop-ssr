@@ -1,12 +1,18 @@
-import { locales } from '~/data/locales'
-
 /**
  * Adds the business's structured data to the page head for search engines:
- * the organisation, the website and each barbershop location.
+ * the organisation, the website and each barbershop location. The website and
+ * the locations name the language being read and its home page's address.
  */
 export function useStructuredData() {
   const siteUrl = useSiteConfig().url
   const logoUrl = `${siteUrl}/og-image.jpg`
+  const { localeProperties } = useI18n()
+  const localePath = useLocalePath()
+
+  const homeUrl = computed(() => {
+    const path = localePath('/')
+    return path === '/' ? siteUrl : `${siteUrl}${path}`
+  })
 
   const locations = [
     {
@@ -38,7 +44,7 @@ export function useStructuredData() {
     },
   ]
 
-  useHead({
+  useHead(() => ({
     script: [
       {
         type: 'application/ld+json',
@@ -59,9 +65,9 @@ export function useStructuredData() {
             {
               '@type': 'WebSite',
               '@id': `${siteUrl}/#website`,
-              url: siteUrl,
+              url: homeUrl.value,
               name: 'Fellas Barbers',
-              inLanguage: locales.map(({ language }) => language),
+              inLanguage: localeProperties.value.language,
               publisher: { '@id': `${siteUrl}/#organization` },
             },
             ...locations.map((loc) => ({
@@ -69,7 +75,7 @@ export function useStructuredData() {
               '@id': `${siteUrl}/#location-${loc.id}`,
               name: loc.name,
               image: logoUrl,
-              url: siteUrl,
+              url: homeUrl.value,
               ...(loc.phone ? { telephone: loc.phone } : {}),
               address: {
                 '@type': 'PostalAddress',
@@ -86,5 +92,5 @@ export function useStructuredData() {
         }),
       },
     ],
-  })
+  }))
 }

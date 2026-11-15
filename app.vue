@@ -16,6 +16,17 @@ useHead(() => ({
   meta: localeHead.value.meta,
 }))
 
+// One title and one description per language, for the browser tab, search
+// results and shared links alike. A page with its own title sets it itself.
+useSeoMeta({
+  title: () => t('seo.title'),
+  description: () => t('seo.description'),
+  ogTitle: () => t('seo.title'),
+  ogDescription: () => t('seo.description'),
+  twitterTitle: () => t('seo.title'),
+  twitterDescription: () => t('seo.description'),
+})
+
 useStructuredData()
 </script>
 
