@@ -36,9 +36,17 @@ test.describe('SEO meta', () => {
   })
 
   // The dev server lists its own localhost URLs unless asked for the canonical ones.
-  test('sitemap.xml lists the home page on the production domain', async ({ request }) => {
+  test('sitemap.xml lists the home page in each language and nothing else', async ({ request }) => {
     const response = await request.get('/sitemap.xml?canonical')
     expect(response.status()).toBe(200)
-    expect(await response.text()).toContain('<loc>https://fellasbarber.com/</loc>')
+    const listed = [...(await response.text()).matchAll(/<loc>([^<]*)<\/loc>/g)].map(
+      (match) => match[1]
+    )
+    expect(listed.sort()).toEqual([
+      'https://fellasbarber.com/',
+      'https://fellasbarber.com/en',
+      'https://fellasbarber.com/es',
+      'https://fellasbarber.com/fr',
+    ])
   })
 })

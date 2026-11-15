@@ -16,6 +16,9 @@ export default defineConfig({
   reporter: 'html',
   use: {
     baseURL: 'http://localhost:3000',
+    // The site's own language, so a test that opens `/` stays on it. Tests
+    // about other languages set their own.
+    locale: 'pt-PT',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

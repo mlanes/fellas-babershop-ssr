@@ -1,7 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 
-/** The cookie the site stores the visitor's chosen language in. */
-export const localeCookie = 'i18n_redirected'
+export { localeCookie } from '../../data/locales'
 
 export async function gotoAndReady(page: Page, path: string) {
   await page.addInitScript(() => {
