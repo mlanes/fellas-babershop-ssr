@@ -202,7 +202,34 @@ export default defineNuxtConfig({
     workbox: {
       maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB limit
       globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,jpeg,webp,woff,woff2}'],
+      // Every address has its own prerendered page, in its own language. By
+      // default the worker answers each page request with its copy of the home
+      // page, and the app then keeps that copy's language at another address.
+      navigateFallback: null,
       runtimeCaching: [
+        {
+          urlPattern: ({ request }) => request.mode === 'navigate',
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'pages-cache',
+            expiration: {
+              maxEntries: 40,
+              maxAgeSeconds: 60 * 60 * 24 * 30,
+            },
+          },
+        },
+        {
+          // The translations a page loads when the app starts.
+          urlPattern: /\/_i18n\//,
+          handler: 'StaleWhileRevalidate',
+          options: {
+            cacheName: 'translations-cache',
+            expiration: {
+              maxEntries: 20,
+              maxAgeSeconds: 60 * 60 * 24 * 30,
+            },
+          },
+        },
         {
           urlPattern: /\.(?:woff|woff2)$/,
           handler: 'CacheFirst',

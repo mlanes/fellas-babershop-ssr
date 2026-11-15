@@ -8,7 +8,14 @@ export async function gotoAndReady(page: Page, path: string) {
     style.textContent = '.app-loader { display: none !important; }'
     document.documentElement.appendChild(style)
   })
-  await page.goto(path, { waitUntil: 'domcontentloaded' })
+  // The home address may hand over to another language's page before it has
+  // loaded, and Firefox then reports the first load as aborted. Whichever page
+  // ends up on screen is the one to wait for.
+  await page.goto(path, { waitUntil: 'commit' }).catch((error: unknown) => {
+    const handedOver = error instanceof Error && error.message.includes('NS_BINDING_ABORTED')
+    if (!handedOver) throw error
+  })
+  await page.waitForLoadState('domcontentloaded')
 }
 
 /**
