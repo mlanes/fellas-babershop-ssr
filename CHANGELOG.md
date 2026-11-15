@@ -8,6 +8,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+## 1.1.0 - 2026-11-15
+
 ### Added
 
 - Each language has its own address. Portuguese stays at `/`, and English, Spanish and French are at `/en`, `/es` and `/fr`, for every page.
