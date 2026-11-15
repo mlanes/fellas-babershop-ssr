@@ -1,5 +1,9 @@
 import { locales } from '~/data/locales'
 
+/**
+ * Adds the business's structured data to the page head for search engines:
+ * the organisation, the website and each barbershop location.
+ */
 export function useStructuredData() {
   const siteUrl = useSiteConfig().url
   const logoUrl = `${siteUrl}/og-image.jpg`
