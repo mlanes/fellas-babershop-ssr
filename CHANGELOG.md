@@ -8,6 +8,10 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Maintenance
+
+- Every Storybook story is now scanned for accessibility problems in the light and the dark theme, on each pull request: 32 stories, 64 checks. Before, a component was only checked in the states the pages happen to use.
+
 ## 1.1.4 - 2026-11-16
 
 ### Fixed
