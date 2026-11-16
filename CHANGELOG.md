@@ -8,6 +8,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+## 1.1.3 - 2026-11-16
+
 ### Fixed
 
 - Search engines are given each barbershop's full address, phone and map link. Two of the three shops were described with half an address and no phone, from a second list that had fallen behind the page.
