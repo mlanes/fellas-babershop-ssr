@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { blockingViolations, unfinishedFades } from '../accessibility'
+import { blockingViolations, paintedTheme, textContrast, unfinishedFades } from '../accessibility'
 import { gotoAndReady, openLanguageMenu, pageHydrated } from './helpers'
 
 /**
@@ -128,37 +128,6 @@ test.describe('Accessibility (axe-core)', () => {
   }
 })
 
-type Rgb = [number, number, number]
-type Theme = (typeof themes)[number]
-
-/**
- * Measures the WCAG contrast ratio of an element's text colour against the
- * background colours of the element and its ancestors, stacked from the page up.
- * The element's own opacity is applied. Not taken into account: background
- * images, gradients, pseudo-elements, the opacity of ancestors, and whatever
- * page content shows through a translucent fixed ancestor such as the header.
- *
- * @param page - the page holding the element
- * @param selector - CSS selector; the first match is measured
- * @returns the contrast ratio, from 1 (none) to 21 (black on white)
- * @throws if the selector matches nothing, the browser cannot parse one of the
- *   colours, or the stacked background is not opaque
- */
-async function textContrast(page: Page, selector: string): Promise<number> {
-  const { text, backdrop } = await textAndBackdropLuminance(page, selector)
-  const [lighter, darker] = [text, backdrop].sort((a, b) => b - a)
-  return (lighter + 0.05) / (darker + 0.05)
-}
-
-/**
- * Reports which theme the page is actually painted in, judged by whether the
- * body background is darker than the body text.
- */
-async function paintedTheme(page: Page): Promise<Theme> {
-  const { text, backdrop } = await textAndBackdropLuminance(page, 'body')
-  return backdrop < text ? 'dark' : 'light'
-}
-
 /**
  * Hovers an element and waits until the hover holds and nothing on the page
  * is still fading. Hydration can drop the hover state, so it hovers again
@@ -194,59 +163,4 @@ async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
 async function pageSettled(page: Page): Promise<void> {
   await pageHydrated(page)
   await expect.poll(() => unfinishedFades(page), { timeout: 15000 }).toBe(0)
-}
-
-async function textAndBackdropLuminance(
-  page: Page,
-  selector: string
-): Promise<{ text: number; backdrop: number }> {
-  await page.locator(selector).first().waitFor({ state: 'attached' })
-  const { text, backdrop, behind, opacity } = await page.evaluate((target) => {
-    const flatten = (layers: string[]): [number, number, number] => {
-      const canvas = document.createElement('canvas')
-      canvas.width = 1
-      canvas.height = 1
-      const ctx = canvas.getContext('2d')
-      if (!ctx) throw new Error('2d canvas unavailable')
-      for (const layer of layers) {
-        // An unparseable fillStyle is ignored silently and would repaint the previous layer.
-        if (!CSS.supports('color', layer)) throw new Error(`cannot parse colour: ${layer}`)
-        ctx.fillStyle = layer
-        ctx.fillRect(0, 0, 1, 1)
-      }
-      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data
-      if (a !== 255) throw new Error(`backdrop is not opaque: ${layers.join(' under ')}`)
-      return [r, g, b]
-    }
-    const element = document.querySelector(target)
-    if (!element) throw new Error(`${target} not found`)
-    const ancestors: string[] = []
-    for (let node = element.parentElement; node; node = node.parentElement) {
-      ancestors.unshift(getComputedStyle(node).backgroundColor)
-    }
-    const style = getComputedStyle(element)
-    const own = [...ancestors, style.backgroundColor]
-    const opacity = Number(style.opacity)
-    return {
-      text: flatten([...own, style.color]),
-      backdrop: flatten(own),
-      behind: opacity < 1 ? flatten(ancestors) : null,
-      opacity,
-    }
-  }, selector)
-  const mix = (front: number, back: number) => front * opacity + back * (1 - opacity)
-  const seeThrough = (rgb: Rgb): Rgb =>
-    behind ? [mix(rgb[0], behind[0]), mix(rgb[1], behind[1]), mix(rgb[2], behind[2])] : rgb
-  return {
-    text: relativeLuminance(seeThrough(text)),
-    backdrop: relativeLuminance(seeThrough(backdrop)),
-  }
-}
-
-function relativeLuminance(rgb: Rgb): number {
-  const [r, g, b] = rgb.map((channel) => {
-    const value = channel / 255
-    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4
-  })
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
