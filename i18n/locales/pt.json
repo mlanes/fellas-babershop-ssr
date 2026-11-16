@@ -119,6 +119,9 @@
     "instagram": "Instagram de {shop}",
     "facebook": "Facebook de {shop}",
     "galleryImage": "Imagem da galeria {n}",
-    "galleryVideo": "Vídeo da galeria {n}"
+    "galleryVideo": "Vídeo da galeria {n}",
+    "previousServices": "Serviços anteriores",
+    "nextServices": "Serviços seguintes",
+    "rating": "Avaliação: {rating} de {max} estrelas"
   }
 }

@@ -33,6 +33,8 @@ const spokenLabels = [
     galleryImage: /^Imagem da galeria \d+$/,
     mediaPreview: 'Pré-visualização de multimédia',
     close: 'Fechar',
+    servicePages: ['Serviços anteriores', 'Serviços seguintes'],
+    rating: 'Avaliação: 5 de 5 estrelas',
   },
   {
     path: '/en',
@@ -60,6 +62,8 @@ const spokenLabels = [
     galleryImage: /^Gallery image \d+$/,
     mediaPreview: 'Media preview',
     close: 'Close',
+    servicePages: ['Previous services', 'Next services'],
+    rating: 'Rated 5 out of 5 stars',
   },
   {
     path: '/es',
@@ -87,6 +91,8 @@ const spokenLabels = [
     galleryImage: /^Imagen de la galería \d+$/,
     mediaPreview: 'Vista previa multimedia',
     close: 'Cerrar',
+    servicePages: ['Servicios anteriores', 'Servicios siguientes'],
+    rating: 'Valoración: 5 de 5 estrellas',
   },
   {
     path: '/fr',
@@ -114,6 +120,8 @@ const spokenLabels = [
     galleryImage: /^Image de la galerie \d+$/,
     mediaPreview: 'Aperçu du média',
     close: 'Fermer',
+    servicePages: ['Services précédents', 'Services suivants'],
+    rating: 'Note : 5 sur 5 étoiles',
   },
 ]
 
@@ -179,6 +187,34 @@ test.describe('Controls and pictures are labelled in the language of the page', 
       )
     })
 
+    // The footer shows a phone number and a WhatsApp number side by side;
+    // without a label each is only a number.
+    test(`${labels.path}: the footer's phone and WhatsApp links`, async ({ page }) => {
+      await gotoAndReady(page, labels.path)
+      const footer = page.locator('footer')
+
+      await expect(footer.locator('a[href^="tel:"]').first()).toHaveAccessibleName(labels.call)
+      await expect(footer.locator('a[href^="https://wa.me/"]').first()).toHaveAccessibleName(
+        labels.whatsapp
+      )
+    })
+
+    // The arrows had no name but their icon's, and the stars were read as
+    // "star" five times, with no rating.
+    test(`${labels.path}: the services' arrows and a testimonial's rating`, async ({ page }) => {
+      await gotoAndReady(page, labels.path)
+
+      // Two pairs: one laid out for wide screens, one for narrow.
+      const arrows = await page
+        .locator('.expanded-services__pagination-btn')
+        .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))
+      expect(arrows).toEqual([...labels.servicePages, ...labels.servicePages])
+
+      const rating = page.locator('.testimonials__rating')
+      await expect(rating).toHaveAttribute('role', 'img')
+      await expect(rating).toHaveAttribute('aria-label', labels.rating)
+    })
+
     test(`${labels.path}: the service photos and the gallery`, async ({ page }) => {
       await gotoAndReady(page, labels.path)
 
@@ -201,4 +237,23 @@ test.describe('Controls and pictures are labelled in the language of the page', 
       await expect(page.locator('.f-modal__close')).toHaveAttribute('aria-label', labels.close)
     })
   }
+})
+
+// An icon is decoration beside a label. It used to announce its file name
+// ("phone", "chevron-left"), in English, on every one of the four sites.
+test('no icon announces its own name', async ({ page }) => {
+  await gotoAndReady(page, '/')
+  await pageHydrated(page)
+
+  const icons = page.locator('.f-icon')
+  // A page on which no icon is found would otherwise pass.
+  await expect(icons).not.toHaveCount(0)
+
+  const announced = await icons.evaluateAll(
+    (found) =>
+      found.filter(
+        (icon) => icon.getAttribute('aria-hidden') !== 'true' || icon.hasAttribute('aria-label')
+      ).length
+  )
+  expect(announced).toBe(0)
 })

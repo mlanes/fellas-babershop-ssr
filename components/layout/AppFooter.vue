@@ -66,7 +66,12 @@ const scrollToTop = () => {
         <div v-for="shop in barbershops" :key="shop.id" class="footer__column">
           <h3 class="footer__heading text-h6">{{ shop.name }}</h3>
           <div class="footer__contacts">
-            <a v-if="shop.phone" :href="shop.phoneUrl" class="footer__contact">
+            <a
+              v-if="shop.phone"
+              :href="shop.phoneUrl"
+              class="footer__contact"
+              :aria-label="t('a11y.call', { number: shop.phone })"
+            >
               <FIcon name="phone" :size="20" />
               <span>{{ shop.phone }}</span>
             </a>
@@ -76,6 +81,7 @@ const scrollToTop = () => {
               target="_blank"
               rel="noopener noreferrer"
               class="footer__contact"
+              :aria-label="t('a11y.whatsapp', { number: shop.whatsapp })"
             >
               <FIcon name="whatsapp" :size="20" />
               <span>{{ shop.whatsapp }}</span>

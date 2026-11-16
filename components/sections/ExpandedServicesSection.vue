@@ -69,6 +69,7 @@ onMounted(() => {
               class="expanded-services__pagination-btn"
               :class="{ 'expanded-services__pagination-btn--disabled': !canGoPrev }"
               :disabled="!canGoPrev"
+              :aria-label="t('a11y.previousServices')"
               @click="prevPage"
             >
               <FIcon name="chevron-left" :size="24" />
@@ -84,6 +85,7 @@ onMounted(() => {
               class="expanded-services__pagination-btn"
               :class="{ 'expanded-services__pagination-btn--disabled': !canGoNext }"
               :disabled="!canGoNext"
+              :aria-label="t('a11y.nextServices')"
               @click="nextPage"
             >
               <FIcon name="chevron-right" :size="24" />
@@ -128,6 +130,7 @@ onMounted(() => {
             class="expanded-services__pagination-btn"
             :class="{ 'expanded-services__pagination-btn--disabled': !canGoPrev }"
             :disabled="!canGoPrev"
+            :aria-label="t('a11y.previousServices')"
             @click="prevPage"
           >
             <FIcon name="chevron-left" :size="24" />
@@ -143,6 +146,7 @@ onMounted(() => {
             class="expanded-services__pagination-btn"
             :class="{ 'expanded-services__pagination-btn--disabled': !canGoNext }"
             :disabled="!canGoNext"
+            :aria-label="t('a11y.nextServices')"
             @click="nextPage"
           >
             <FIcon name="chevron-right" :size="24" />
