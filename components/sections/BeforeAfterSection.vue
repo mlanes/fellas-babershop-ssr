@@ -61,6 +61,13 @@ onMounted(() => {
             :after-image="pair.after"
             :before-label="t('beforeAfter.before')"
             :after-label="t('beforeAfter.after')"
+            :comparison-label="
+              t('a11y.comparison', {
+                before: t('beforeAfter.before'),
+                after: t('beforeAfter.after'),
+              })
+            "
+            :handle-label="t('a11y.comparisonHandle')"
             :initial-position="50"
           />
         </div>

@@ -8,6 +8,11 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Fixed
+
+- Screen readers now hear every control and picture in the language of the page. About 25 labels were written into the components in English or Portuguese, so each of the four sites read some of them in the wrong language.
+- The six service photos are described by what they show.
+
 ## 1.1.3 - 2026-11-16
 
 ### Fixed

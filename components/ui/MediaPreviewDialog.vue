@@ -6,7 +6,12 @@ interface Props {
   isOpen: boolean
   mediaType: 'image' | 'video'
   mediaSrc: string
+  /** Describes the picture for a screen reader; videos have none */
   mediaAlt?: string
+  /** What a screen reader announces when the dialog opens */
+  label: string
+  /** What a screen reader calls the close button */
+  closeLabel: string
 }
 
 const props = defineProps<Props>()
@@ -29,7 +34,7 @@ watch(
 </script>
 
 <template>
-  <FModal :open="isOpen" aria-label="Media preview" @close="emit('close')">
+  <FModal :open="isOpen" :label="label" :close-label="closeLabel" @close="emit('close')">
     <div class="media-preview-dialog__media-wrapper">
       <video
         v-if="mediaType === 'video'"

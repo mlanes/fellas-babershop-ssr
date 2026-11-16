@@ -33,8 +33,12 @@ const closePreview = () => {
 type MediaItem = {
   type: 'image' | 'video'
   src: string
-  alt: string
+  /** The number in the file's name, which the description counts by */
+  number: number
 }
+
+const descriptionOf = (item: MediaItem) =>
+  t(item.type === 'video' ? 'a11y.galleryVideo' : 'a11y.galleryImage', { n: item.number })
 
 // Add new gallery images to public/images/gallery/ and append the filename here.
 const galleryFilenames = [
@@ -88,7 +92,7 @@ const galleryItems: MediaItem[] = galleryFilenames.map((filename) => {
   return {
     type: isVideo ? 'video' : 'image',
     src: `/images/gallery/${filename}`,
-    alt: `${isVideo ? 'Gallery video' : 'Gallery image'} ${number}`,
+    number,
   }
 })
 
@@ -222,7 +226,7 @@ onUnmounted(() => {
               v-for="(item, index) in [...row1Items, ...row1Items]"
               :key="`row1-${index}`"
               class="gallery-scroll__item"
-              @click="openPreview(item.type, item.src, item.alt)"
+              @click="openPreview(item.type, item.src, descriptionOf(item))"
             >
               <video
                 v-if="item.type === 'video'"
@@ -237,7 +241,7 @@ onUnmounted(() => {
               <NuxtImg
                 v-else
                 :src="item.src"
-                :alt="item.alt"
+                :alt="descriptionOf(item)"
                 class="gallery-scroll__media"
                 width="400"
                 height="711"
@@ -254,7 +258,7 @@ onUnmounted(() => {
               v-for="(item, index) in [...row2Items, ...row2Items]"
               :key="`row2-${index}`"
               class="gallery-scroll__item"
-              @click="openPreview(item.type, item.src, item.alt)"
+              @click="openPreview(item.type, item.src, descriptionOf(item))"
             >
               <video
                 v-if="item.type === 'video'"
@@ -269,7 +273,7 @@ onUnmounted(() => {
               <NuxtImg
                 v-else
                 :src="item.src"
-                :alt="item.alt"
+                :alt="descriptionOf(item)"
                 class="gallery-scroll__media"
                 width="400"
                 height="711"
@@ -286,7 +290,7 @@ onUnmounted(() => {
               v-for="(item, index) in [...row3Items, ...row3Items]"
               :key="`row3-${index}`"
               class="gallery-scroll__item"
-              @click="openPreview(item.type, item.src, item.alt)"
+              @click="openPreview(item.type, item.src, descriptionOf(item))"
             >
               <video
                 v-if="item.type === 'video'"
@@ -301,7 +305,7 @@ onUnmounted(() => {
               <NuxtImg
                 v-else
                 :src="item.src"
-                :alt="item.alt"
+                :alt="descriptionOf(item)"
                 class="gallery-scroll__media"
                 width="400"
                 height="711"
@@ -321,6 +325,8 @@ onUnmounted(() => {
       :media-type="previewMediaType"
       :media-src="previewMediaSrc"
       :media-alt="previewMediaAlt"
+      :label="t('a11y.mediaPreview')"
+      :close-label="t('a11y.close')"
       @close="closePreview"
     />
   </section>

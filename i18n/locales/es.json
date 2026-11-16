@@ -28,7 +28,15 @@
     "heading": "Servicios Populares",
     "viewPricing": "VER PRECIOS",
     "allServices": "Todos los Servicios",
-    "allServicesSubtitle": "Servicios profesionales de barbería con calidad premium"
+    "allServicesSubtitle": "Servicios profesionales de barbería con calidad premium",
+    "photos": {
+      "fadeWithLine": "Corte de pelo con degradado y una línea rasurada, visto de lado",
+      "beardShaping": "Un barbero perfilando la barba de un cliente",
+      "beardLine": "Una máquina recortando la línea de la barba en el cuello de un cliente",
+      "texturedCut": "Un cliente con corte texturizado, sentado en el sillón del barbero",
+      "clipperFade": "Corte corto a máquina con degradado, visto de lado",
+      "scissorCut": "Corte a tijera con peine"
+    }
   },
   "testimonials": {
     "subtitle": "TESTIMONIOS",
@@ -258,5 +266,26 @@
       "closed": "Cerrado",
       "and": "y"
     }
+  },
+  "a11y": {
+    "home": "Fellas Barbers, página de inicio",
+    "backToTop": "Volver arriba",
+    "close": "Cerrar",
+    "mediaPreview": "Vista previa multimedia",
+    "previousImage": "Imagen anterior",
+    "nextImage": "Imagen siguiente",
+    "previousTestimonial": "Testimonio anterior",
+    "nextTestimonial": "Testimonio siguiente",
+    "comparisonHandle": "Control de comparación de imágenes",
+    "comparison": "Comparación de imágenes: {before} y {after}",
+    "shopPhoto": "{shop}, interior, foto {n}",
+    "shopPhotos": "Fotos de {shop}",
+    "viewShopPhoto": "Ver foto {n} de {total} de {shop}",
+    "call": "Llamar al {number}",
+    "whatsapp": "Chatear por WhatsApp: {number}",
+    "instagram": "Instagram de {shop}",
+    "facebook": "Facebook de {shop}",
+    "galleryImage": "Imagen de la galería {n}",
+    "galleryVideo": "Vídeo de la galería {n}"
   }
 }

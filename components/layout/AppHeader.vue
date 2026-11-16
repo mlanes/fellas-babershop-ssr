@@ -162,7 +162,7 @@ onUnmounted(() => {
         <a
           href="#home"
           class="header__logo"
-          aria-label="Fellas Barbers Home"
+          :aria-label="t('a11y.home')"
           @click.prevent="handleNavClick('#home')"
         >
           <FLogo size="md" />

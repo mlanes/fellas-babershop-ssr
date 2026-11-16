@@ -108,14 +108,14 @@ const nextTestimonial = () => {
           <div class="testimonials__navigation">
             <button
               class="testimonials__nav-button"
-              aria-label="Anterior"
+              :aria-label="t('a11y.previousTestimonial')"
               @click="previousTestimonial"
             >
               <FIcon name="chevron-left" :size="20" />
             </button>
             <button
               class="testimonials__nav-button testimonials__nav-button--active"
-              aria-label="Próximo"
+              :aria-label="t('a11y.nextTestimonial')"
               @click="nextTestimonial"
             >
               <FIcon name="chevron-right" :size="20" />

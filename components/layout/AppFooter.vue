@@ -111,7 +111,7 @@ const scrollToTop = () => {
         </p>
 
         <!-- Go to Top Button -->
-        <button class="footer__go-to-top" aria-label="Go to top" @click="scrollToTop">
+        <button class="footer__go-to-top" :aria-label="t('a11y.backToTop')" @click="scrollToTop">
           <FIcon name="arrow-up" :size="24" />
         </button>
       </div>
