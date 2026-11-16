@@ -38,6 +38,7 @@ export default defineConfig({
     env: { PORT: String(port), NITRO_PRESET: 'node-server' },
     // Never reuse: a server left running would serve an older build.
     reuseExistingServer: false,
-    timeout: 240_000,
+    // The build comes first; a shared CI runner takes several minutes over it.
+    timeout: process.env.CI ? 600_000 : 240_000,
   },
 })

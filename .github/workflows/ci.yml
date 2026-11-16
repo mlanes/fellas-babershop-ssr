@@ -1,0 +1,72 @@
+name: CI
+
+# The same gates that are run by hand before a pull request: lint, the
+# type-check and both Playwright suites on every browser project.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same branch makes the older run pointless.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  static:
+    name: Lint and type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+  e2e:
+    name: ${{ matrix.suite.name }} (${{ matrix.target.project }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      # One browser failing says nothing about the others; let them finish.
+      fail-fast: false
+      matrix:
+        suite:
+          - { name: Dev server, config: playwright.config.ts }
+          - { name: Built site, config: playwright.built.config.ts }
+        target:
+          - { project: chromium, browser: chromium }
+          - { project: firefox, browser: firefox }
+          - { project: webkit, browser: webkit }
+          - { project: Mobile Chrome, browser: chromium }
+          - { project: Mobile Safari, browser: webkit }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Install the browser
+        run: npx playwright install --with-deps ${{ matrix.target.browser }}
+      - name: Run the suite
+        run: npx playwright test -c ${{ matrix.suite.config }} --project="${{ matrix.target.project }}"
+        env:
+          PLAYWRIGHT_HTML_OPEN: never
+      - name: Keep the report of a failed run
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-${{ matrix.suite.config }}-${{ matrix.target.project }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
