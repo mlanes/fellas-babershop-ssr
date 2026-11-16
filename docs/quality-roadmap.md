@@ -1,6 +1,6 @@
 # Quality roadmap
 
-Written 2026-11-15, on `main` at `4c05e7b` (`v1.1.1` plus two maintenance PRs). Analysis only: no package was installed, no configuration or code changed. The companion document, `.claude/notes/review-whole-project.md`, answers the four review questions (anti-corruption layers, doc comments, unit tests, Storybook against Ring UI) in detail; this one decides what to adopt and in which order.
+Written 2026-11-15 and 16, on `main` at `4c05e7b` (`v1.1.1` plus two maintenance PRs). Analysis only: no package was installed, no configuration or code changed. The companion document, `.claude/notes/review-whole-project.md`, answers the four review questions (anti-corruption layers, doc comments, unit tests, Storybook against Ring UI) in detail; this one decides what to adopt and in which order.
 
 Every claim is marked **[ran]** (a command was run and its output read), **[read]** (a file or page was read) or **[inferred]**.
 
@@ -11,6 +11,7 @@ Every claim is marked **[ran]** (a command was run and its output read), **[read
 - **Four are not worth it yet**: CRAP as a tool, dependency-cruiser, mutation testing, and any SonarQube edition. Each has a cheaper substitute that covers this codebase, named below, and a condition under which to revisit.
 - **Three premises in the brief do not match the repository**, so nothing is recommended for them: there is no Google Business Profile integration and no OAuth (the reviews are static data in `data/testimonials.ts`), there is no server code (`server/` is empty and nothing is rendered at request time; every page is prerendered), and SEO meta per page is already tested **[ran]**.
 - **The Figma file fails contrast in four places** and has drifted from the site. The site fixed the same problem for two of its buttons; its primary button is a gradient that no test measures.
+- **Every visitor downloads 18 MB of hero video they mostly never play.** Found while measuring Lighthouse for this document; the score barely notices it. It is the one performance fix worth doing now.
 - **Extracting the components into a shared package: not yet.** Prepare the boundary now, extract when the second app exists.
 
 ## Roadmap
@@ -24,7 +25,8 @@ Every claim is marked **[ran]** (a command was run and its output read), **[read
 | Smoke test on deploy previews              | **Do**                                                           | The preview was checked by hand four times this week with throwaway configs                 | 2 to 3 hours                   | 5            |
 | Complexity lint rule                       | **Do**                                                           | Nothing limits function complexity                                                          | 15 minutes                     | 6            |
 | `no-restricted-imports` for the layer rule | **Do**, in place of dependency-cruiser                           | Three components import data directly against the project's rule                            | 30 minutes                     | 7            |
-| Lighthouse in CI                           | **Do, as a budget, not a gate at first**                         | Performance is measured by hand, last in May                                                | 2 hours                        | 8            |
+| Stop prefetching the hero videos           | **Do now**                                                       | Each visitor downloads 18 MB of video, four files where one is needed                       | 1 hour                         | 1            |
+| Lighthouse in CI                           | **Do, as a budget on timings, not a gate on the score**          | Performance is measured by hand, last in May                                                | 2 hours                        | 8            |
 | Figma: fix contrast, record the drift      | **Do before designing the next app**                             | Four failing colour pairs would be carried into the new system                              | 2 to 3 hours of design work    | 9            |
 | Shared design-system package               | **Prepare, do not extract**                                      | n/a                                                                                         | 2 hours now; 2 to 3 days later | 10           |
 | Coverage floor                             | **Later**, from a measured number                                | n/a until unit tests exist                                                                  | 30 minutes                     | Later        |
@@ -209,7 +211,20 @@ JavaScript, TypeScript, CSS and HTML are listed for all of them; **Vue is not na
 
 ## Anything else
 
-- **Lighthouse in CI.** `npm run lighthouse` runs against production by hand; the reports in `.lighthouse/` date from May **[ran]**. `lhci autorun` "runs collection and assertions with inferred defaults" and supports budgets such as `minScore` ([Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md)). Run it against the deploy preview in the same job as the smoke test, reporting only at first; turn scores into a gate once you have a month of numbers. I would not use Netlify's Lighthouse plugin: its README says contributions are not being accepted, and its threshold mode "does not work for SSR or ISR sites" ([plugin](https://github.com/netlify/netlify-plugin-lighthouse)).
+- **Lighthouse in CI.** `npm run lighthouse` runs against production by hand; the reports in `.lighthouse/` date from May **[ran]**. `lhci autorun` "runs collection and assertions with inferred defaults" and supports budgets such as `minScore` ([Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/getting-started.md)). Run it against the deploy preview in the same job as the smoke test, reporting only at first; turn it into a gate once you have a month of numbers. I would not use Netlify's Lighthouse plugin: its README says contributions are not being accepted, and its threshold mode "does not work for SSR or ISR sites" ([plugin](https://github.com/netlify/netlify-plugin-lighthouse)).
+
+  Measured on 2026-11-16 against the live site, headless Chrome, no extensions **[ran]**:
+
+  | Page and setting | Performance          | Largest paint | Blocking time | Layout shift |
+  | ---------------- | -------------------- | ------------- | ------------- | ------------ |
+  | `/en/`, phone    | 89 and 98 (two runs) | 1.2 to 1.3 s  | 130 to 370 ms | 0            |
+  | `/en/`, desktop  | 96 and 99            | 0.4 to 0.5 s  | 0 to 90 ms    | 0            |
+  | `/`, phone       | 94                   | 1.4 s         | 230 ms        | 0            |
+
+  Accessibility, Best Practices and SEO were 100 on every run. Two lessons for a budget: **gate on the timings, not on the score** (the same page scored 89 and 98 minutes apart, moved by blocking time alone), and **measure in a clean browser** (a run inside a normal Chrome profile reported 77 for Best Practices because of an extension).
+
+- **The hero videos.** The page's HTML carries four `<link rel="prefetch" as="video">` tags, one per file: the desktop and the phone video, each as `.webm` and `.mp4`. Nuxt adds them for every asset the entry bundle references. Lighthouse recorded all four being fetched, 18,050 KB, on a phone **[ran]**. Each visitor needs one of the four, and only if the video plays. Fix: stop the prefetch for video files. A second, smaller step is one `<video>` element with a source per screen size in place of two elements that each start loading.
+- **What actually holds the score under 100.** Main-thread work during startup (4.1 s under Lighthouse's phone throttling, of which script evaluation is only 0.6 s) and a Speed Index of 2.8 to 4.0 s on the phone setting. The full-screen loader keeps the page covered until everything has loaded plus 300 ms (`AppLoader.vue`), which Speed Index counts against the page. Hydrating the sections below the fold only when they come into view would cut the startup work. Neither is urgent: content is on screen in about a second.
 - **Accessibility in CI.** Already there in substance: axe scans of every page in both themes, measured contrast for hover and selected states. It only needs to run in CI.
 - **SEO meta per page.** Done this week and tested: one title and description per language, canonical and sister-page tags in the static HTML, a sitemap with sister links, structured data per page, `noindex` on the coming-soon pages in four languages **[ran]**.
 - **Dependency updates.** `npm audit` reports 32 known issues today: 2 high, 28 moderate, 2 low, none critical **[ran]**. Dependabot or Renovate with one grouped pull request a week would keep that from growing; with CI in place such a pull request tests itself.
@@ -295,6 +310,7 @@ This is where three "not now" items above come back in: visual regression, depen
 
 | #     | Pull request                                                                                                                                       | Needs your yes for                   |
 | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| 0     | Stop the page prefetching the four hero videos                                                                                                     | Nothing new                          |
 | 1     | CI workflow: lint, type-check, both suites on three browser projects                                                                               | Keeping the repository public        |
 | 2     | Add the CI jobs to the `main` ruleset's required checks, after a week of green                                                                     | The ruleset change                   |
 | 3     | Husky, lint-staged, commitlint                                                                                                                     | Four dev dependencies                |
