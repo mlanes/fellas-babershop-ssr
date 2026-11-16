@@ -13,6 +13,7 @@
     "preview": "nuxt preview",
     "start": "node .output/server/index.mjs",
     "postinstall": "nuxt prepare",
+    "prepare": "husky || true",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
@@ -34,6 +35,8 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
     "@fontsource/bebas-neue": "^5.2.7",
     "@fontsource/raleway": "^5.2.8",
     "@nuxt/eslint": "^1.4.1",
@@ -46,7 +49,9 @@
     "@vue/eslint-config-typescript": "^14.7.0",
     "eslint": "^9.38.0",
     "eslint-plugin-storybook": "^9.1.20",
+    "husky": "^9.1.7",
     "lighthouse": "^13.3.0",
+    "lint-staged": "^17.6.1",
     "nuxt-svgo": "^5.3.2",
     "prettier": "^3.6.2",
     "sass": "^1.93.2",
@@ -62,5 +67,12 @@
     "@parcel/watcher@2.5.1": true,
     "fsevents@2.3.3": true,
     "unrs-resolver@1.11.1": true
+  },
+  "lint-staged": {
+    "*.{ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,json,md,scss,yml}": "prettier --write"
   }
 }

@@ -299,7 +299,15 @@ Chrome, Firefox, Safari and Edge — latest two stable versions of each.
 1. Branch off `main`: `git checkout -b mario/<type>/<short-name>` (`feat`, `fix`, `chore`, `perf`, `docs`, `test`, `refactor`)
 2. Commit using [Conventional Commits](https://www.conventionalcommits.org/): `<type>(<scope>): <subject>`
 3. Prefer multiple focused commits over one big commit when changes touch unrelated concerns
-4. Push and open a PR
+4. Add a line under **Unreleased** in `CHANGELOG.md` when the change is worth telling
+5. Push and open a PR. `main` only takes pull requests, and one merges once its checks pass: Netlify's preview, lint, the type-check and both test suites on five browser projects
+
+Two git hooks run on every commit, installed by `npm install`:
+
+- **pre-commit** runs ESLint and Prettier on the staged files only (`lint-staged`), so it takes a second or two.
+- **commit-msg** checks the message against Conventional Commits and a 72-character subject (`commitlint.config.js`).
+
+The type-check and the test suites are left to CI; they are too slow for a hook.
 
 ---
 
