@@ -203,6 +203,10 @@ test.describe('The business details given to search engines', () => {
     inLanguage?: string | string[]
     url?: string
     isPartOf?: { '@id': string }
+    name?: string
+    telephone?: string
+    hasMap?: string
+    address?: { streetAddress: string; addressLocality: string; postalCode: string }
   }
 
   /** Reads the structured data out of a page's HTML. */
@@ -211,6 +215,51 @@ test.describe('The business details given to search engines', () => {
     if (!json) throw new Error('no structured data on the page')
     return JSON.parse(json)['@graph']
   }
+
+  // The same details a visitor reads on the page. They were once kept in a
+  // second list that had fallen behind: two shops had no phone and half an
+  // address.
+  test('each shop is described with the address, phone and map the page shows', async ({
+    request,
+  }) => {
+    const shops = entriesOf(await builtHtml(request, '/'))
+      .filter((entry) => entry['@type'] === 'BarberShop')
+      .map(({ name, telephone, hasMap, address }) => ({
+        name,
+        telephone,
+        hasMap,
+        street: address?.streetAddress,
+        postalCode: address?.postalCode,
+        city: address?.addressLocality,
+      }))
+
+    expect(shops).toEqual([
+      {
+        name: 'Fellas Barbers - Alameda',
+        telephone: '+351215860238',
+        hasMap: 'https://maps.app.goo.gl/D83DuiVBsqQ4mith6',
+        street: 'Alameda Dom Afonso Henriques, 47A',
+        postalCode: '1000-123',
+        city: 'Lisboa',
+      },
+      {
+        name: 'Fellas Barbers - Campo Grande',
+        telephone: '+351215904241',
+        hasMap: 'https://maps.app.goo.gl/ykdUubmgE2FxJQph9',
+        street: 'Campo Grande, 296 B',
+        postalCode: '1700-097',
+        city: 'Lisboa',
+      },
+      {
+        name: 'Fellas Barbers - Almada',
+        telephone: '+351215500374',
+        hasMap: 'https://maps.app.goo.gl/JhKbV9Rn9UXhU6U4A',
+        street: 'Av. do Cristo Rei 2A',
+        postalCode: '2800-055',
+        city: 'Almada',
+      },
+    ])
+  })
 
   const pagesToDescribe = [
     { path: '/', lang: 'pt-PT', address: siteAddress },

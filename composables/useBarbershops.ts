@@ -15,14 +15,29 @@ const almada3 = '/images/barbershops/almada/fellas-barbers-almada-interior-3.png
 const almada4 = '/images/barbershops/almada/fellas-barbers-almada-interior-4.png'
 const almada5 = '/images/barbershops/almada/fellas-barbers-almada-interior-5.png'
 
+type ShopDetails = Omit<Barbershop, 'name' | 'phoneUrl' | 'whatsappUrl'>
+
+const digitsOf = (number: string) => number.replace(/\D/g, '')
+
+/**
+ * Gives the barbershops with everything the site says about them: the card on
+ * the home page, the footer and the details given to search engines all read
+ * this one list.
+ *
+ * @returns `barbershops`, with names and opening hours in the language being
+ *   read and ready-made links for calling and for WhatsApp
+ */
 export function useBarbershops() {
   const { t } = useI18n()
 
-  const barbershops = computed<Barbershop[]>(() => [
+  const details = computed<ShopDetails[]>(() => [
     {
       id: 'alameda',
-      name: `${t('barbershops.unit')} Alameda`,
+      area: 'Alameda',
       address: 'Alameda Dom Afonso Henriques, 47A - 1000-123 Alameda - Lisboa/LI - Portugal',
+      street: 'Alameda Dom Afonso Henriques, 47A',
+      postalCode: '1000-123',
+      city: 'Lisboa',
       phone: '+351 215 860 238',
       whatsapp: '+351 912 286 442',
       instagram: 'https://www.instagram.com/fellasbarber.pt',
@@ -36,8 +51,11 @@ export function useBarbershops() {
     },
     {
       id: 'campo-grande',
-      name: `${t('barbershops.unit')} Campo Grande`,
+      area: 'Campo Grande',
       address: 'Campo Grande, 296 B - 1700-097 Alvalade - Lisboa/LI - Portugal',
+      street: 'Campo Grande, 296 B',
+      postalCode: '1700-097',
+      city: 'Lisboa',
       phone: '+351 215 904 241',
       whatsapp: '+351 910 452 767',
       instagram: 'https://www.instagram.com/fellasbarber2.pt',
@@ -52,8 +70,11 @@ export function useBarbershops() {
     },
     {
       id: 'almada',
-      name: `${t('barbershops.unit')} Almada`,
+      area: 'Almada',
       address: 'Av. do Cristo Rei 2A, 2800-055 Almada - Portugal',
+      street: 'Av. do Cristo Rei 2A',
+      postalCode: '2800-055',
+      city: 'Almada',
       phone: '+351 215 500 374',
       whatsapp: '+351 923 343 517',
       instagram: 'https://www.instagram.com/fellasbarber.pt',
@@ -66,6 +87,16 @@ export function useBarbershops() {
       images: [almada1, almada2, almada3, almada4, almada5],
     },
   ])
+
+  const barbershops = computed<Barbershop[]>(() =>
+    details.value.map((shop) => ({
+      ...shop,
+      name: `${t('barbershops.unit')} ${shop.area}`,
+      phoneUrl: shop.phone ? `tel:+${digitsOf(shop.phone)}` : undefined,
+      // WhatsApp's link format takes the number as digits only, without the plus.
+      whatsappUrl: shop.whatsapp ? `https://wa.me/${digitsOf(shop.whatsapp)}` : undefined,
+    }))
+  )
 
   return { barbershops }
 }

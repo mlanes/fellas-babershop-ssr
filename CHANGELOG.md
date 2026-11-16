@@ -8,6 +8,11 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Fixed
+
+- Search engines are given each barbershop's full address, phone and map link. Two of the three shops were described with half an address and no phone, from a second list that had fallen behind the page.
+- A shop's phone and WhatsApp links are the same in its card and in the footer.
+
 ### Maintenance
 
 - Git hooks check each commit: lint and formatting on the changed files, and the commit message's format.
