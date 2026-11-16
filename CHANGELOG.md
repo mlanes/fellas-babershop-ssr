@@ -12,6 +12,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 - Screen readers now hear every control and picture in the language of the page. About 25 labels were written into the components in English or Portuguese, so each of the four sites read some of them in the wrong language.
 - The six service photos are described by what they show.
+- Screen readers no longer hear an icon's English name ("phone", "chevron-left") before every label it sits beside. Icons are decoration now, in all four languages.
+- The arrows that page through the services, the stars under a testimonial, and the footer's phone and WhatsApp links each have a label in the language of the page. The arrows had only their icon's name, and the stars had nothing.
 
 ## 1.1.3 - 2026-11-16
 

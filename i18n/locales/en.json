@@ -286,6 +286,9 @@
     "instagram": "{shop} on Instagram",
     "facebook": "{shop} on Facebook",
     "galleryImage": "Gallery image {n}",
-    "galleryVideo": "Gallery video {n}"
+    "galleryVideo": "Gallery video {n}",
+    "previousServices": "Previous services",
+    "nextServices": "Next services",
+    "rating": "Rated {rating} out of {max} stars"
   }
 }

@@ -55,8 +55,10 @@ const getInitials = (name: string) => {
 /**
  * Render star rating
  */
+const MAX_RATING = 5
+
 const renderStars = (rating: number) => {
-  return Array.from({ length: 5 }, (_, i) => i < rating)
+  return Array.from({ length: MAX_RATING }, (_, i) => i < rating)
 }
 
 /**
@@ -145,7 +147,16 @@ const nextTestimonial = () => {
                 {{ testimonials[selectedTestimonial].testimonialText }}
               </p>
 
-              <div class="testimonials__rating">
+              <div
+                class="testimonials__rating"
+                role="img"
+                :aria-label="
+                  t('a11y.rating', {
+                    rating: testimonials[selectedTestimonial].rating,
+                    max: MAX_RATING,
+                  })
+                "
+              >
                 <FIcon
                   v-for="(filled, i) in renderStars(testimonials[selectedTestimonial].rating)"
                   :key="i"
