@@ -5,7 +5,7 @@ import FLogo from '~/components/ui/FLogo.vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import FButton from '~/components/ui/FButton.vue'
 import FLanguageSelector from '~/components/ui/FLanguageSelector.vue'
-import { navigationItems } from '~/data/navigation'
+import { useNavigation } from '~/composables/useNavigation'
 import { useUIStore } from '~/stores/ui'
 import { useSmoothScroll } from '~/composables/useSmoothScroll'
 import { useTheme } from '~/composables/useTheme'
@@ -21,6 +21,7 @@ const { isMobileMenuOpen, activeSection } = storeToRefs(uiStore)
 const { scrollTo } = useSmoothScroll()
 const { isDark, toggleTheme } = useTheme()
 const { t } = useLocale()
+const { items: navigationItems } = useNavigation()
 
 const headerRef = ref<HTMLElement | null>(null)
 const isScrolled = ref(false)
@@ -175,10 +176,10 @@ onUnmounted(() => {
             :href="item.href"
             class="header__nav-link"
             :class="{ 'header__nav-link--active': activeSection === item.href.slice(1) }"
-            :data-text="t(item.label)"
+            :data-text="item.label"
             @click.prevent="handleNavClick(item.href)"
           >
-            {{ t(item.label) }}
+            {{ item.label }}
           </a>
         </nav>
       </div>
@@ -235,7 +236,7 @@ onUnmounted(() => {
             :class="{ 'header__mobile-nav-link--active': activeSection === item.href.slice(1) }"
             @click.prevent="handleNavClick(item.href)"
           >
-            {{ t(item.label) }}
+            {{ item.label }}
           </a>
         </nav>
 

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import FLogoFooter from '~/components/ui/FLogoFooter.vue'
 import FIcon from '~/components/ui/FIcon.vue'
-import { navigationItems } from '~/data/navigation'
+import { useNavigation } from '~/composables/useNavigation'
 import { useSmoothScroll } from '~/composables/useSmoothScroll'
 import { useLocale } from '~/composables/useLocale'
 import { useBarbershops } from '~/composables/useBarbershops'
@@ -12,6 +12,7 @@ import { useBarbershops } from '~/composables/useBarbershops'
  */
 const { scrollTo } = useSmoothScroll()
 const { t } = useLocale()
+const { items: navigationItems } = useNavigation()
 const { barbershops } = useBarbershops()
 const currentYear = ref(new Date().getFullYear())
 
@@ -56,7 +57,7 @@ const scrollToTop = () => {
               class="footer__link"
               @click.prevent="handleNavClick(item.href)"
             >
-              {{ t(item.label) }}
+              {{ item.label }}
             </a>
           </nav>
         </div>

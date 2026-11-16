@@ -4,7 +4,7 @@ import FIcon from '~/components/ui/FIcon.vue'
 import FSectionHeading from '~/components/ui/FSectionHeading.vue'
 import QuoteIcon from '~/assets/icons/quote.svg'
 import GoogleLogo from '~/assets/img/testimonials/google-logo.svg'
-import { testimonials } from '~/data/testimonials'
+import { useTestimonials } from '~/composables/useTestimonials'
 import { useLocale } from '~/composables/useLocale'
 
 /**
@@ -12,6 +12,7 @@ import { useLocale } from '~/composables/useLocale'
  */
 const sectionRef = ref<HTMLElement | null>(null)
 const { t } = useLocale()
+const { testimonials } = useTestimonials()
 const selectedTestimonial = ref(0)
 let autoRotateInterval: ReturnType<typeof setInterval> | null = null
 
@@ -87,7 +88,7 @@ const nextTestimonial = () => {
 </script>
 
 <template>
-  <section ref="sectionRef" id="testimonials" class="testimonials">
+  <section id="testimonials" ref="sectionRef" class="testimonials">
     <div class="testimonials__container container">
       <div class="testimonials__layout">
         <!-- Left Side: Title, Heading and Navigation -->
@@ -107,15 +108,15 @@ const nextTestimonial = () => {
           <div class="testimonials__navigation">
             <button
               class="testimonials__nav-button"
-              @click="previousTestimonial"
               aria-label="Anterior"
+              @click="previousTestimonial"
             >
               <FIcon name="chevron-left" :size="20" />
             </button>
             <button
               class="testimonials__nav-button testimonials__nav-button--active"
-              @click="nextTestimonial"
               aria-label="Próximo"
+              @click="nextTestimonial"
             >
               <FIcon name="chevron-right" :size="20" />
             </button>
