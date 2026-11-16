@@ -8,6 +8,10 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Maintenance
+
+- Git hooks check each commit: lint and formatting on the changed files, and the commit message's format.
+
 ## 1.1.2 - 2026-11-16
 
 ### Fixed
