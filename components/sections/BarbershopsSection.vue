@@ -206,7 +206,7 @@ onUnmounted(() => {
             >
               <a
                 v-if="shop.phone"
-                :href="`tel:${shop.phone}`"
+                :href="shop.phoneUrl"
                 class="barbershop-card__contact-icon-button"
                 :aria-label="`Call ${shop.phone}`"
               >
@@ -214,7 +214,7 @@ onUnmounted(() => {
               </a>
               <a
                 v-if="shop.whatsapp"
-                :href="`https://wa.me/${shop.whatsapp.replace(/\s/g, '')}`"
+                :href="shop.whatsappUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="barbershop-card__contact-icon-button barbershop-card__contact-icon-button--whatsapp"

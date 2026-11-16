@@ -66,17 +66,13 @@ const scrollToTop = () => {
         <div v-for="shop in barbershops" :key="shop.id" class="footer__column">
           <h3 class="footer__heading text-h6">{{ shop.name }}</h3>
           <div class="footer__contacts">
-            <a
-              v-if="shop.phone"
-              :href="`tel:${shop.phone.replace(/\s/g, '')}`"
-              class="footer__contact"
-            >
+            <a v-if="shop.phone" :href="shop.phoneUrl" class="footer__contact">
               <FIcon name="phone" :size="20" />
               <span>{{ shop.phone }}</span>
             </a>
             <a
               v-if="shop.whatsapp"
-              :href="`https://wa.me/${shop.whatsapp.replace(/[\s+]/g, '')}`"
+              :href="shop.whatsappUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="footer__contact"

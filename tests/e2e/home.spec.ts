@@ -61,6 +61,29 @@ test.describe('Home page', () => {
   })
 })
 
+test.describe('Barbershop contact links', () => {
+  // Each link was once built in two components, two different ways.
+  test('are the same in the shop cards and in the footer', async ({ page }) => {
+    await gotoAndReady(page, '/')
+    const hrefs = (selector: string) =>
+      page
+        .locator(selector)
+        .evaluateAll((links) => links.map((link) => link.getAttribute('href')).sort())
+
+    const cardChats = await hrefs('#barbershops a[href^="https://wa.me/"]')
+    const cardCalls = await hrefs('#barbershops a[href^="tel:"]')
+
+    expect(cardChats).toEqual([
+      'https://wa.me/351910452767',
+      'https://wa.me/351912286442',
+      'https://wa.me/351923343517',
+    ])
+    expect(cardCalls).toEqual(['tel:+351215500374', 'tel:+351215860238', 'tel:+351215904241'])
+    expect(await hrefs('footer a[href^="https://wa.me/"]')).toEqual(cardChats)
+    expect(await hrefs('footer a[href^="tel:"]')).toEqual(cardCalls)
+  })
+})
+
 // The hero has one video for wide screens and one for phones; the stylesheet
 // shows one of them. Loading both cost a phone about four megabytes for a
 // video it never showed.

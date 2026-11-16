@@ -2,8 +2,9 @@ import { locales } from '~/data/locales'
 
 /**
  * Adds the business's structured data to the page head for search engines:
- * the organisation, the website and each barbershop location, which are the
- * same on every page, and the page itself with its language and address.
+ * the organisation, the website and each barbershop, which are the same on
+ * every page, and the page itself with its language and address. The shops'
+ * details come from `useBarbershops`, the list the page itself shows.
  */
 export function useStructuredData() {
   const siteUrl = useSiteConfig().url
@@ -16,35 +17,7 @@ export function useStructuredData() {
     return path === '/' ? siteUrl : `${siteUrl}${path}`
   })
 
-  const locations = [
-    {
-      id: 'alameda',
-      name: 'Fellas Barbers - Alameda',
-      street: 'Alameda Dom Afonso Henriques, 47A',
-      postal: '1000-123',
-      city: 'Lisboa',
-      phone: '+351215860238',
-      maps: 'https://maps.app.goo.gl/D83DuiVBsqQ4mith6',
-    },
-    {
-      id: 'campo-grande',
-      name: 'Fellas Barbers - Campo Grande',
-      street: 'Campo Grande',
-      postal: '1700',
-      city: 'Lisboa',
-      phone: '',
-      maps: '',
-    },
-    {
-      id: 'almada',
-      name: 'Fellas Barbers - Almada',
-      street: 'Almada',
-      postal: '2800',
-      city: 'Almada',
-      phone: '',
-      maps: '',
-    },
-  ]
+  const { barbershops } = useBarbershops()
 
   useHead(() => ({
     script: [
@@ -79,21 +52,21 @@ export function useStructuredData() {
               inLanguage: localeProperties.value.language,
               isPartOf: { '@id': `${siteUrl}/#website` },
             },
-            ...locations.map((loc) => ({
+            ...barbershops.value.map((shop) => ({
               '@type': 'BarberShop',
-              '@id': `${siteUrl}/#location-${loc.id}`,
-              name: loc.name,
+              '@id': `${siteUrl}/#location-${shop.id}`,
+              name: `Fellas Barbers - ${shop.area}`,
               image: logoUrl,
               url: siteUrl,
-              ...(loc.phone ? { telephone: loc.phone } : {}),
+              ...(shop.phone ? { telephone: shop.phone.replace(/\s/g, '') } : {}),
               address: {
                 '@type': 'PostalAddress',
-                streetAddress: loc.street,
-                addressLocality: loc.city,
-                postalCode: loc.postal,
+                streetAddress: shop.street,
+                addressLocality: shop.city,
+                postalCode: shop.postalCode,
                 addressCountry: 'PT',
               },
-              ...(loc.maps ? { hasMap: loc.maps } : {}),
+              hasMap: shop.mapsUrl,
               priceRange: '€€',
               parentOrganization: { '@id': `${siteUrl}/#organization` },
             })),
