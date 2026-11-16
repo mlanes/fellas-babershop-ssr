@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { useLocale } from '~/composables/useLocale'
 import FIcon from '~/components/ui/FIcon.vue'
 import FSectionHeading from '~/components/ui/FSectionHeading.vue'
 import { useBarbershops } from '~/composables/useBarbershops'
 
-const { t } = useI18n()
+const { t } = useLocale()
 const { barbershops } = useBarbershops()
 
 const shopIds = computed(() => barbershops.value.map((s) => s.id))
@@ -116,7 +116,7 @@ onUnmounted(() => {
                 v-for="(image, index) in shop.images"
                 :key="index"
                 :src="image"
-                :alt="`${shop.name} - Interior ${index + 1}`"
+                :alt="t('a11y.shopPhoto', { shop: shop.name, n: index + 1 })"
                 class="barbershop-card__image"
                 width="1200"
                 height="900"
@@ -129,21 +129,25 @@ onUnmounted(() => {
             <!-- Navigation Arrows -->
             <button
               class="barbershop-card__nav barbershop-card__nav--prev"
-              aria-label="Previous image"
+              :aria-label="t('a11y.previousImage')"
               @click="prevImage(shop.id, shop.images.length)"
             >
               <FIcon name="chevron-left" :size="20" />
             </button>
             <button
               class="barbershop-card__nav barbershop-card__nav--next"
-              aria-label="Next image"
+              :aria-label="t('a11y.nextImage')"
               @click="nextImage(shop.id, shop.images.length)"
             >
               <FIcon name="chevron-right" :size="20" />
             </button>
 
             <!-- Dots Indicator -->
-            <div class="barbershop-card__dots" role="tablist" :aria-label="`${shop.name} photos`">
+            <div
+              class="barbershop-card__dots"
+              role="tablist"
+              :aria-label="t('a11y.shopPhotos', { shop: shop.name })"
+            >
               <button
                 v-for="(_, index) in shop.images"
                 :key="index"
@@ -152,7 +156,13 @@ onUnmounted(() => {
                 role="tab"
                 type="button"
                 :aria-selected="currentImageIndex[shop.id] === index"
-                :aria-label="`View photo ${index + 1} of ${shop.images.length} of ${shop.name}`"
+                :aria-label="
+                  t('a11y.viewShopPhoto', {
+                    n: index + 1,
+                    total: shop.images.length,
+                    shop: shop.name,
+                  })
+                "
                 @click="goToImage(shop.id, index, shop.images.length)"
               ></button>
             </div>
@@ -208,7 +218,7 @@ onUnmounted(() => {
                 v-if="shop.phone"
                 :href="shop.phoneUrl"
                 class="barbershop-card__contact-icon-button"
-                :aria-label="`Call ${shop.phone}`"
+                :aria-label="t('a11y.call', { number: shop.phone })"
               >
                 <FIcon name="phone" :size="20" />
               </a>
@@ -218,7 +228,7 @@ onUnmounted(() => {
                 target="_blank"
                 rel="noopener noreferrer"
                 class="barbershop-card__contact-icon-button barbershop-card__contact-icon-button--whatsapp"
-                :aria-label="`WhatsApp ${shop.whatsapp}`"
+                :aria-label="t('a11y.whatsapp', { number: shop.whatsapp })"
               >
                 <FIcon name="whatsapp" :size="20" />
               </a>
@@ -228,7 +238,7 @@ onUnmounted(() => {
                 target="_blank"
                 rel="noopener noreferrer"
                 class="barbershop-card__contact-icon-button barbershop-card__contact-icon-button--instagram"
-                :aria-label="`Instagram ${shop.name}`"
+                :aria-label="t('a11y.instagram', { shop: shop.name })"
               >
                 <FIcon name="instagram" :size="20" />
               </a>
@@ -238,7 +248,7 @@ onUnmounted(() => {
                 target="_blank"
                 rel="noopener noreferrer"
                 class="barbershop-card__contact-icon-button barbershop-card__contact-icon-button--facebook"
-                :aria-label="`Facebook ${shop.name}`"
+                :aria-label="t('a11y.facebook', { shop: shop.name })"
               >
                 <FIcon name="facebook" :size="20" />
               </a>

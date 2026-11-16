@@ -7,7 +7,7 @@ const meta = {
   title: 'Components/FModal',
   component: FModal,
   tags: ['autodocs'],
-  args: { open: false, ariaLabel: 'Demo modal', closeOnBackdrop: true },
+  args: { open: false, label: 'Demo modal', closeLabel: 'Close', closeOnBackdrop: true },
   parameters: {
     docs: {
       description: {
@@ -33,7 +33,7 @@ export const Default: Story = {
     template: `
       <div>
         <FButton @click="open = true">Open modal</FButton>
-        <FModal :open="open" aria-label="Demo modal" @close="open = false">
+        <FModal :open="open" label="Demo modal" close-label="Close" @close="open = false">
           <div style="background:#fff;color:#0A0909;padding:2rem;border-radius:12px;max-width:480px">
             <h2 style="margin-top:0">A reusable modal</h2>
             <p>Press Escape, click the X, or click the dark backdrop to close.</p>
@@ -54,7 +54,7 @@ export const NoBackdropClose: Story = {
     template: `
       <div>
         <FButton @click="open = true">Open (X only)</FButton>
-        <FModal :open="open" :close-on-backdrop="false" aria-label="Demo" @close="open = false">
+        <FModal :open="open" :close-on-backdrop="false" label="Demo" close-label="Close" @close="open = false">
           <div style="background:#fff;color:#0A0909;padding:2rem;border-radius:12px;max-width:420px">
             <h2 style="margin-top:0">Backdrop disabled</h2>
             <p>You can only close this with the X button or Escape.</p>

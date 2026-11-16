@@ -15,12 +15,14 @@ const props = withDefaults(
   defineProps<{
     /** Controls visibility — typically bound with v-model:open. */
     open: boolean
-    /** Accessible label announced when the dialog opens. */
-    ariaLabel?: string
+    /** What a screen reader announces when the dialog opens. */
+    label: string
+    /** What a screen reader calls the close button. */
+    closeLabel: string
     /** Click on the dark backdrop closes the modal. */
     closeOnBackdrop?: boolean
   }>(),
-  { ariaLabel: 'Dialog', closeOnBackdrop: true }
+  { closeOnBackdrop: true }
 )
 
 const emit = defineEmits<{
@@ -85,7 +87,7 @@ onUnmounted(() => {
         class="f-modal"
         role="dialog"
         aria-modal="true"
-        :aria-label="ariaLabel"
+        :aria-label="label"
         @click="handleBackdropClick"
       >
         <div class="f-modal__content">
@@ -93,7 +95,7 @@ onUnmounted(() => {
             ref="closeButtonRef"
             class="f-modal__close"
             type="button"
-            aria-label="Close"
+            :aria-label="closeLabel"
             @click="close"
           >
             <svg

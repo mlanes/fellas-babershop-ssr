@@ -73,7 +73,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[0]"
-                alt="Fellas Barbers professional haircut service"
+                :alt="t('services.photos.fadeWithLine')"
                 class="services__image"
                 width="800"
                 height="480"
@@ -87,7 +87,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[1]"
-                alt="Fellas Barbers beard trim and grooming service"
+                :alt="t('services.photos.beardShaping')"
                 class="services__image"
                 width="800"
                 height="480"
@@ -103,7 +103,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[2]"
-                alt="Fellas Barbers hair styling service"
+                :alt="t('services.photos.beardLine')"
                 class="services__image"
                 width="800"
                 height="480"
@@ -117,7 +117,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[3]"
-                alt="Fellas Barbers premium grooming service"
+                :alt="t('services.photos.texturedCut')"
                 class="services__image"
                 width="800"
                 height="480"
@@ -133,7 +133,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[4]"
-                alt="Fellas Barbers fade haircut service"
+                :alt="t('services.photos.clipperFade')"
                 class="services__image"
                 width="800"
                 height="480"
@@ -147,7 +147,7 @@ onMounted(() => {
             >
               <NuxtImg
                 :src="serviceImages[5]"
-                alt="Fellas Barbers premium barbershop service"
+                :alt="t('services.photos.scissorCut')"
                 class="services__image"
                 width="800"
                 height="480"

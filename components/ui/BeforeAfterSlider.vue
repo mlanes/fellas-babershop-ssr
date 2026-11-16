@@ -14,16 +14,23 @@ import FIcon from '~/components/ui/FIcon.vue'
  */
 
 interface Props {
+  /** Address of the picture taken before */
   beforeImage: string
+  /** Address of the picture taken after */
   afterImage: string
-  beforeLabel?: string
-  afterLabel?: string
+  /** Word shown on, and describing, the "before" picture */
+  beforeLabel: string
+  /** Word shown on, and describing, the "after" picture */
+  afterLabel: string
+  /** What a screen reader calls the whole comparison */
+  comparisonLabel: string
+  /** What a screen reader calls the handle that is dragged */
+  handleLabel: string
+  /** Where the handle starts, as a percentage from the left */
   initialPosition?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  beforeLabel: 'Antes',
-  afterLabel: 'Depois',
   initialPosition: 50,
 })
 
@@ -121,7 +128,7 @@ onUnmounted(() => {
     ref="containerRef"
     class="before-after-slider"
     role="img"
-    :aria-label="`Comparação de imagens: ${beforeLabel} e ${afterLabel}`"
+    :aria-label="comparisonLabel"
     tabindex="0"
     @keydown="handleKeyDown"
   >
@@ -172,7 +179,7 @@ onUnmounted(() => {
       :aria-valuenow="Math.round(sliderPosition)"
       aria-valuemin="0"
       aria-valuemax="100"
-      aria-label="Controle de comparação de imagens"
+      :aria-label="handleLabel"
       @mousedown="handleMouseDown"
       @touchstart.passive="handleTouchStart"
     >

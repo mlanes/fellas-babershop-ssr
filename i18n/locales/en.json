@@ -28,7 +28,15 @@
     "heading": "Popular Services",
     "viewPricing": "VIEW PRICING",
     "allServices": "All Services",
-    "allServicesSubtitle": "Professional barber services with premium quality"
+    "allServicesSubtitle": "Professional barber services with premium quality",
+    "photos": {
+      "fadeWithLine": "Haircut with a fade and a shaved line, seen from the side",
+      "beardShaping": "A barber shaping a client's beard",
+      "beardLine": "A trimmer tidying the beard line on a client's neck",
+      "texturedCut": "A client with a textured cut, seated in the barber's chair",
+      "clipperFade": "A short clipper cut with a fade, seen from the side",
+      "scissorCut": "A scissor-over-comb haircut in progress"
+    }
   },
   "testimonials": {
     "subtitle": "TESTIMONIALS",
@@ -258,5 +266,26 @@
       "closed": "Closed",
       "and": "and"
     }
+  },
+  "a11y": {
+    "home": "Fellas Barbers, home page",
+    "backToTop": "Back to top",
+    "close": "Close",
+    "mediaPreview": "Media preview",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "previousTestimonial": "Previous testimonial",
+    "nextTestimonial": "Next testimonial",
+    "comparisonHandle": "Image comparison control",
+    "comparison": "Image comparison: {before} and {after}",
+    "shopPhoto": "{shop}, interior, photo {n}",
+    "shopPhotos": "Photos of {shop}",
+    "viewShopPhoto": "View photo {n} of {total} of {shop}",
+    "call": "Call {number}",
+    "whatsapp": "Chat on WhatsApp: {number}",
+    "instagram": "{shop} on Instagram",
+    "facebook": "{shop} on Facebook",
+    "galleryImage": "Gallery image {n}",
+    "galleryVideo": "Gallery video {n}"
   }
 }

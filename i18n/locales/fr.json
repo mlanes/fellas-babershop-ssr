@@ -28,7 +28,15 @@
     "heading": "Services Populaires",
     "viewPricing": "VOIR LES TARIFS",
     "allServices": "Tous les Services",
-    "allServicesSubtitle": "Services de barbier professionnels avec qualité premium"
+    "allServicesSubtitle": "Services de barbier professionnels avec qualité premium",
+    "photos": {
+      "fadeWithLine": "Coupe avec dégradé et trait rasé, vue de côté",
+      "beardShaping": "Un barbier dessinant les contours de la barbe d'un client",
+      "beardLine": "Une tondeuse nettoyant la ligne de barbe sur le cou d'un client",
+      "texturedCut": "Un client avec une coupe texturée, assis dans le fauteuil du barbier",
+      "clipperFade": "Coupe courte à la tondeuse avec dégradé, vue de côté",
+      "scissorCut": "Coupe aux ciseaux sur peigne"
+    }
   },
   "testimonials": {
     "subtitle": "TÉMOIGNAGES",
@@ -258,5 +266,26 @@
       "closed": "Fermé",
       "and": "et"
     }
+  },
+  "a11y": {
+    "home": "Fellas Barbers, page d'accueil",
+    "backToTop": "Retour en haut",
+    "close": "Fermer",
+    "mediaPreview": "Aperçu du média",
+    "previousImage": "Image précédente",
+    "nextImage": "Image suivante",
+    "previousTestimonial": "Témoignage précédent",
+    "nextTestimonial": "Témoignage suivant",
+    "comparisonHandle": "Curseur de comparaison d'images",
+    "comparison": "Comparaison d'images : {before} et {after}",
+    "shopPhoto": "{shop}, intérieur, photo {n}",
+    "shopPhotos": "Photos de {shop}",
+    "viewShopPhoto": "Voir la photo {n} sur {total} de {shop}",
+    "call": "Appeler le {number}",
+    "whatsapp": "Discuter sur WhatsApp : {number}",
+    "instagram": "Instagram de {shop}",
+    "facebook": "Facebook de {shop}",
+    "galleryImage": "Image de la galerie {n}",
+    "galleryVideo": "Vidéo de la galerie {n}"
   }
 }

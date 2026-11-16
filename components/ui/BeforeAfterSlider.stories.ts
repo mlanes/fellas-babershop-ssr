@@ -15,6 +15,8 @@ const meta = {
     afterImage: '/images/before-after/fellas-barbers-haircut-after-3.jpg',
     beforeLabel: 'Before',
     afterLabel: 'After',
+    comparisonLabel: 'Image comparison: Before and After',
+    handleLabel: 'Image comparison control',
     initialPosition: 50,
   },
   // Give the slider some breathing room in the canvas.
