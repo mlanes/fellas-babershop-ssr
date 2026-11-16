@@ -223,9 +223,12 @@ npm run test:e2e                           # all 5 projects
 npm run test:e2e:ui                        # interactive UI mode
 npm run test:e2e:built                     # built, prerendered site (see below)
 npm run test:e2e:all                       # both of the above; run this before a pull request
+npm run test:stories                       # every Storybook story, scanned for accessibility
 ```
 
 `test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/`, plus the language-routing spec `tests/e2e/i18n.spec.ts`, against it. Anything decided during that build-time render, such as the page's language, can only be checked there. Stop `npm run dev` before running it: the build clears files the dev server is using, which makes it log errors and restart.
+
+`test:stories` builds Storybook, serves it on port 6106 and scans each story with axe in the light and the dark theme (`tests/storybook/a11y.spec.ts`). The stories come from the build's own list, so a new story is scanned without being added anywhere. Pages and stories are held to the same bar, `blockingViolations` in `tests/accessibility.ts`. A story is scanned as it first appears: one that needs a click to show something, such as the modal, is not scanned open.
 
 The spec files (`tests/e2e/*.spec.ts`) cover home page rendering, per-route 200s + titles, theme toggle, mobile menu, language switching, and SEO meta presence.
 

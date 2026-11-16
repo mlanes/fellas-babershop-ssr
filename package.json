@@ -19,6 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:built": "playwright test -c playwright.built.config.ts",
     "test:e2e:all": "PLAYWRIGHT_HTML_OPEN=never npm run test:e2e; dev=$?; npm run test:e2e:built; built=$?; [ $dev -eq 0 ] && [ $built -eq 0 ]",
+    "test:stories": "playwright test -c playwright.storybook.config.ts",
     "test:e2e:ui": "playwright test --ui",
     "lighthouse": "lighthouse https://fellasbarber.com/ --output=html --output-path=.lighthouse/report.html --view",
     "storybook": "storybook dev -p 6006",
