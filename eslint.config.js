@@ -42,7 +42,7 @@ export default [
       },
     },
     rules: {
-      'vue/multi-word-component-names': 'off',
+      'vue/multi-word-component-names': 'error',
       'vue/no-reserved-component-names': 'off',
       'vue/component-definition-name-casing': ['error', 'PascalCase'],
       'vue/component-name-in-template-casing': ['error', 'PascalCase'],
@@ -66,6 +66,37 @@ export default [
         {
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
+  {
+    // A page is named after its address, so one word is right for it.
+    name: 'app/page-names',
+    files: ['pages/**/*.vue', 'app.vue'],
+    rules: { 'vue/multi-word-component-names': 'off' },
+  },
+  {
+    // The highest in the code when this was set was 10; the rule holds that line.
+    name: 'app/complexity',
+    files: ['**/*.{ts,vue}'],
+    rules: { complexity: ['error', 10] },
+  },
+  {
+    // Data reaches a component through a composable, which is where it is
+    // translated. A direct import skips that.
+    name: 'app/components-read-data-through-composables',
+    files: ['components/**/*.vue', 'pages/**/*.vue', 'app.vue'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['~/data/*', '**/data/*'],
+              message: 'Read data through a composable (composables/use*.ts), not from data/.',
+            },
+          ],
         },
       ],
     },
