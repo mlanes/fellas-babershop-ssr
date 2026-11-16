@@ -3,8 +3,8 @@ import { MAX_RATING, getInitials, renderStars } from '../../utils/testimonials'
 
 describe("A customer's initials, shown where a photo would be", () => {
   it.each([
-    { name: 'Mario Lanes', initials: 'ML' },
-    { name: 'madonna', initials: 'M' },
+    { name: 'Rui Matos', initials: 'RM' },
+    { name: 'tiago', initials: 'T' },
     { name: 'élise dupont', initials: 'ÉD' },
     { name: 'Ana  Silva', initials: 'AS' },
   ])('$name gives $initials', ({ name, initials }) => {

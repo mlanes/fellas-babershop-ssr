@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { readFileSync, readdirSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 import { defaultLocale, localizedPath, locales } from '../../data/locales'
@@ -39,6 +39,9 @@ function collect(value: unknown, key: string, into: Map<string, string>): void {
     throw new Error(`${key || 'the file'} is neither a text nor a group of texts`)
   }
   for (const [name, inner] of Object.entries(value)) {
+    // vue-i18n reads a dot as a step into a group, so it never finds a name
+    // written with one, though joined up it would look the same as a nested key.
+    if (name.includes('.')) throw new Error(`"${name}" under ${key || 'the top'} has a dot in it`)
     collect(inner, key ? `${key}.${name}` : name, into)
   }
 }
@@ -46,6 +49,28 @@ function collect(value: unknown, key: string, into: Map<string, string>): void {
 /** The names a text leaves to be filled in, e.g. `{shop}` and `{n}`. */
 function placeholdersIn(text: string): string[] {
   return [...text.matchAll(/\{(\w+)\}/g)].map((match) => match[1] ?? '').sort()
+}
+
+/**
+ * Lists the translation keys the site's code asks for by name, as in
+ * `t('a11y.close')`. Keys built while the site runs are not found.
+ */
+function keysTheCodeAsksFor(): string[] {
+  const root = fileURLToPath(new URL('../../', import.meta.url))
+  const sources = ['components', 'composables', 'pages']
+    .flatMap((folder) =>
+      readdirSync(`${root}${folder}`, { recursive: true, encoding: 'utf8' }).map(
+        (file) => `${folder}/${file}`
+      )
+    )
+    .filter((file) => /\.(vue|ts)$/.test(file))
+    .concat('app.vue')
+  const keys = sources.flatMap((file) =>
+    [...readFileSync(`${root}${file}`, 'utf8').matchAll(/\bt\(\s*'([\w.-]+)'/g)].map(
+      (match) => match[1] ?? ''
+    )
+  )
+  return [...new Set(keys)].sort()
 }
 
 // Portuguese service texts are in the service list itself (data/services.ts);
@@ -83,6 +108,22 @@ describe('The translation files', () => {
       )
       .map(([key]) => key)
     expect(different).toEqual([])
+  })
+
+  // "@" starts a link to another text and "|" separates plural forms, so an
+  // Instagram handle or an email address written plainly is misread.
+  it.each([defaultLocale, ...others])('%s has no text vue-i18n would read as syntax', (code) => {
+    const misread = [...textsOf(code)]
+      .filter(([, text]) => /[@|]/.test(text.replaceAll(/\{'[^']*'\}/g, '')))
+      .map(([key]) => key)
+    expect(misread).toEqual([])
+  })
+
+  // A key that is in no file is shown to the visitor as the key itself.
+  it('have every text the code asks for by name', () => {
+    const asked = keysTheCodeAsksFor()
+    expect(asked.length).toBeGreaterThan(50)
+    expect(asked.filter((key) => !reference.has(key))).toEqual([])
   })
 
   // A service with a translation missing is not an error on the page: it is

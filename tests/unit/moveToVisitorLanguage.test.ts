@@ -1,4 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { runInNewContext } from 'node:vm'
+import { describe, expect, it, vi } from 'vitest'
 import { defaultLocale, fallbackLocale, localeCookie, locales } from '../../data/locales'
 import { moveToVisitorLanguage } from '../../utils/moveToVisitorLanguage'
 
@@ -27,29 +28,33 @@ interface Visit {
  * Opens an address as a visitor's browser would and reports where the visitor
  * was taken. The browser is the one thing here that is not the site's own.
  *
+ * The function is run as the site runs it. nuxt.config.ts writes its text into
+ * the head of every page, where nothing outside its own body exists, so it is
+ * run here from its text, in a context holding only the browser. A version
+ * that leaned on a helper beside it would pass if called directly and fail on
+ * every page.
+ *
  * @returns the address moved to, or `null` when the visitor stays
  */
 function open(visit: Visit): string | null {
   const url = new URL(visit.address, 'https://fellasbarber.com')
   const replace = vi.fn<(address: string) => void>()
-  vi.stubGlobal('window', {
-    location: { pathname: url.pathname, search: url.search, hash: url.hash, replace },
-  })
-  vi.stubGlobal('navigator', {
-    userAgent: visit.userAgent ?? phone,
-    languages: visit.browser,
-    language: visit.browserLanguage ?? visit.browser[0] ?? '',
-  })
-  vi.stubGlobal('document', { cookie: visit.cookies ?? '' })
+  const browser = {
+    window: {
+      location: { pathname: url.pathname, search: url.search, hash: url.hash, replace },
+    },
+    navigator: {
+      userAgent: visit.userAgent ?? phone,
+      languages: visit.browser,
+      language: visit.browserLanguage ?? visit.browser[0] ?? '',
+    },
+    document: { cookie: visit.cookies ?? '' },
+  }
 
-  moveToVisitorLanguage(settings)
+  runInNewContext(`(${moveToVisitorLanguage.toString()})(${JSON.stringify(settings)})`, browser)
 
   return replace.mock.calls[0]?.[0] ?? null
 }
-
-afterEach(() => {
-  vi.unstubAllGlobals()
-})
 
 describe('A visitor who opens the plain home address', () => {
   it.each([
@@ -89,13 +94,22 @@ describe('A visitor who opens the plain home address', () => {
 })
 
 describe('A visitor who picked a language in the selector', () => {
-  it('is taken to it, whatever the browser asks for', () => {
-    expect(open({ address: '/', browser: ['en'], cookies: `${localeCookie}=fr` })).toBe('/fr/')
+  // An empty list is a browser that asks for no language at all.
+  it.each([
+    { pick: 'fr', browser: ['en'], lands: '/fr/' },
+    { pick: 'es', browser: ['pt-PT'], lands: '/es/' },
+    { pick: 'fr', browser: ['de-DE'], lands: '/fr/' },
+    { pick: 'es', browser: [], lands: '/es/' },
+  ])('$pick, with a $browser browser, is taken to $lands', ({ pick, browser, lands }) => {
+    expect(open({ address: '/', browser, cookies: `${localeCookie}=${pick}` })).toBe(lands)
   })
 
-  it('stays on the Portuguese page after picking Portuguese in an English browser', () => {
-    expect(open({ address: '/', browser: ['en'], cookies: `${localeCookie}=pt` })).toBeNull()
-  })
+  it.each([{ browser: ['en'] }, { browser: ['pt-PT'] }, { browser: ['de-DE'] }, { browser: [] }])(
+    'Portuguese, with a $browser browser, stays on the Portuguese page',
+    ({ browser }) => {
+      expect(open({ address: '/', browser, cookies: `${localeCookie}=pt` })).toBeNull()
+    }
+  )
 
   it('is found among other cookies', () => {
     const cookies = `theme=dark; ${localeCookie}=es; other=1`
@@ -107,9 +121,22 @@ describe('A visitor who picked a language in the selector', () => {
   })
 
   // The site once saved the language last shown under this name; it is not a pick.
-  it('is not placed by the cookie the site used before', () => {
-    expect(open({ address: '/', browser: ['pt'], cookies: 'i18n_redirected=fr' })).toBeNull()
-  })
+  it.each([
+    { cookies: 'i18n_redirected=fr', browser: ['pt'], lands: null },
+    { cookies: 'i18n_redirected=pt', browser: ['en'], lands: '/en/' },
+  ])(
+    'is not placed by the cookie the site used before ($cookies)',
+    ({ cookies, browser, lands }) => {
+      expect(open({ address: '/', browser, cookies })).toBe(lands)
+    }
+  )
+
+  it.each([`old-${localeCookie}=fr`, `${localeCookie}-old=fr`])(
+    'is not placed by a cookie whose name only contains the name (%s)',
+    (cookies) => {
+      expect(open({ address: '/', browser: ['pt'], cookies })).toBeNull()
+    }
+  )
 })
 
 describe('An address that is not the plain home address', () => {
