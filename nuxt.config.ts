@@ -21,6 +21,19 @@ const visitorLanguageSettings: VisitorLanguageSettings = {
 export default defineNuxtConfig({
   devtools: { enabled: true },
 
+  hooks: {
+    // Nuxt asks the browser to prefetch every file the main bundle refers to.
+    // For the hero that was four videos, 18 MB, of which a visitor plays one.
+    'build:manifest': (manifest) => {
+      for (const file of Object.values(manifest)) {
+        if (/\.(mp4|webm)$/.test(file.file)) {
+          file.prefetch = false
+          file.preload = false
+        }
+      }
+    },
+  },
+
   // Nitro auto-detects the deployment target: 'netlify' when the
   // NETLIFY env var is present (during Netlify builds), 'node-server'
   // when building anywhere else (Coolify, local). Keeps the repo

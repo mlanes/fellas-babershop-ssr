@@ -80,6 +80,24 @@ test.describe('The built pages', () => {
     }
   }
 
+  // Nuxt asks the browser to prefetch every file the main bundle refers to.
+  // For the hero that was four videos, 18 MB, of which a visitor plays one.
+  for (const path of ['/', '/en', '/services']) {
+    test(`${path} does not ask the browser to fetch videos ahead of time`, async ({ request }) => {
+      const html = await builtHtml(request, path)
+      const hints = html.match(/<link[^>]*rel="(?:prefetch|preload)"[^>]*>/g) ?? []
+
+      expect(hints.filter((hint) => /\.(?:mp4|webm)"/.test(hint))).toEqual([])
+    })
+  }
+
+  test('the home page still offers both hero videos to play', async ({ request }) => {
+    const html = await builtHtml(request, '/')
+
+    expect(html.match(/<source[^>]*type="video\/webm"/g)).toHaveLength(2)
+    expect(html.match(/<source[^>]*type="video\/mp4"/g)).toHaveLength(2)
+  })
+
   test('a page names its sister pages before any script runs', async ({ request }) => {
     const html = await builtHtml(request, '/en')
 
