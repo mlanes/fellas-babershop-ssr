@@ -52,11 +52,11 @@ const getInitials = (name: string) => {
     .slice(0, 2)
 }
 
+const MAX_RATING = 5
+
 /**
  * Render star rating
  */
-const MAX_RATING = 5
-
 const renderStars = (rating: number) => {
   return Array.from({ length: MAX_RATING }, (_, i) => i < rating)
 }

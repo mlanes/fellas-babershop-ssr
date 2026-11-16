@@ -141,7 +141,6 @@ onUnmounted(() => {
             name="check"
             :size="16"
             class="language-selector__option-check"
-            aria-hidden="true"
           />
         </button>
       </div>

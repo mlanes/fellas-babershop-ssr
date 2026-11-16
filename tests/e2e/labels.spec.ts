@@ -193,17 +193,14 @@ test.describe('Controls and pictures are labelled in the language of the page', 
       await gotoAndReady(page, labels.path)
       const footer = page.locator('footer')
 
-      await expect(footer.locator('a[href^="tel:"]').first()).toHaveAttribute(
-        'aria-label',
-        labels.call
-      )
-      await expect(footer.locator('a[href^="https://wa.me/"]').first()).toHaveAttribute(
-        'aria-label',
+      await expect(footer.locator('a[href^="tel:"]').first()).toHaveAccessibleName(labels.call)
+      await expect(footer.locator('a[href^="https://wa.me/"]').first()).toHaveAccessibleName(
         labels.whatsapp
       )
     })
 
-    // The arrows had no name but their icon's, and the stars had none at all.
+    // The arrows had no name but their icon's, and the stars were read as
+    // "star" five times, with no rating.
     test(`${labels.path}: the services' arrows and a testimonial's rating`, async ({ page }) => {
       await gotoAndReady(page, labels.path)
 
@@ -248,15 +245,15 @@ test('no icon announces its own name', async ({ page }) => {
   await gotoAndReady(page, '/')
   await pageHydrated(page)
 
-  const announced = await page
-    .locator('.f-icon')
-    .evaluateAll((icons) =>
-      icons.map((icon) => icon.getAttribute('aria-label')).filter((label) => label !== null)
-    )
-  expect(announced).toEqual([])
+  const icons = page.locator('.f-icon')
+  // A page on which no icon is found would otherwise pass.
+  await expect(icons).not.toHaveCount(0)
 
-  const hidden = await page
-    .locator('.f-icon')
-    .evaluateAll((icons) => icons.every((icon) => icon.getAttribute('aria-hidden') === 'true'))
-  expect(hidden).toBe(true)
+  const announced = await icons.evaluateAll(
+    (found) =>
+      found.filter(
+        (icon) => icon.getAttribute('aria-hidden') !== 'true' || icon.hasAttribute('aria-label')
+      ).length
+  )
+  expect(announced).toBe(0)
 })
