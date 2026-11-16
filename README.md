@@ -65,7 +65,7 @@ A marketing/showcase site for a three-location barbershop, prerendered at build 
 | PWA           | @vite-pwa/nuxt (Workbox)                                                      |
 | Styling       | SCSS with CSS custom properties for theming, nuxt-svgo for SVGs               |
 | Design system | Storybook 9 (`@storybook-vue/nuxt`) — Foundations docs + component playground |
-| Tests         | Playwright (e2e), Lighthouse (`npm run lighthouse`)                           |
+| Tests         | Vitest (unit), Playwright (e2e, stories), Lighthouse (`npm run lighthouse`)   |
 | Lint/format   | ESLint, Prettier                                                              |
 
 ## Project Structure
@@ -215,9 +215,10 @@ during the Nuxt build path crashed `nuxt prepare` on Netlify.
 
 ## Testing
 
-End-to-end coverage with Playwright across Chromium, Firefox, WebKit, Mobile Chrome and Mobile Safari:
+Unit tests with Vitest for the plain functions, and end-to-end coverage with Playwright across Chromium, Firefox, WebKit, Mobile Chrome and Mobile Safari:
 
 ```bash
+npm run test:unit                          # unit tests, well under a second
 npm run test:e2e -- --project=chromium     # single browser
 npm run test:e2e                           # all 5 projects
 npm run test:e2e:ui                        # interactive UI mode
@@ -227,6 +228,8 @@ npm run test:stories                       # every Storybook story, scanned for 
 ```
 
 `test:e2e` runs against the dev server, which renders every request afresh. The live site serves pages rendered once at build time, so `test:e2e:built` builds the site, serves it on port 3100 and runs the specs in `tests/e2e-built/`, plus the language-routing spec `tests/e2e/i18n.spec.ts`, against it. Anything decided during that build-time render, such as the page's language, can only be checked there. Stop `npm run dev` before running it: the build clears files the dev server is using, which makes it log errors and restart.
+
+`test:unit` runs `tests/unit/*.test.ts` in Node, with no browser and no Nuxt app: the rules that place a visitor on the home address by language (`utils/moveToVisitorLanguage.ts`), the address of a page in a language, the testimonial helpers, and the translation files. The last one fails when a language lacks a key Portuguese has, when a text loses or renames a gap such as `{shop}`, and when a service in `data/services.ts` has no English, Spanish or French text, which the site would otherwise show in Portuguese without saying so.
 
 `test:stories` builds Storybook, serves it on port 6106 and scans each story with axe in the light and the dark theme (`tests/storybook/a11y.spec.ts`). The stories come from the build's own list, so a new story is scanned without being added anywhere. Pages and stories are held to the same bar, `blockingViolations` in `tests/accessibility.ts`. A story is scanned as it first appears: one that needs a click to show something, such as the modal, is not scanned open.
 

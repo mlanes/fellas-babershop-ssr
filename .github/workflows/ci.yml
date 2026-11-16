@@ -1,8 +1,8 @@
 name: CI
 
 # The same gates that are run by hand before a pull request: lint, the
-# type-check, both Playwright suites on every browser project, and the
-# accessibility scan of the Storybook stories.
+# type-check, the unit tests, both Playwright suites on every browser project,
+# and the accessibility scan of the Storybook stories.
 on:
   pull_request:
   push:
@@ -31,6 +31,19 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run test:unit
 
   stories:
     name: Storybook stories
