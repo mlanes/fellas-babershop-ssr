@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import FLogo from '~/components/ui/FLogo.vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import FButton from '~/components/ui/FButton.vue'
@@ -23,49 +23,62 @@ const handleBookingClick = () => {
   scrollTo('#barbershops')
 }
 
+const DESKTOP_VIDEO_START_SECONDS = 7
+
+/**
+ * Plays the hero video the stylesheet shows at this screen size and leaves the
+ * other one alone, so only one of the two files is ever downloaded.
+ */
+const playShownVideo = () => {
+  for (const video of [videoRef.value, mobileVideoRef.value]) {
+    if (!video) continue
+    if (getComputedStyle(video).display === 'none') {
+      video.pause()
+      continue
+    }
+    video.play().catch(() => {
+      // Autoplay refused: the poster stays.
+    })
+  }
+}
+
 onMounted(() => {
   // Trigger fade-in animation
   if (heroRef.value) {
     heroRef.value.classList.add('fade-in')
   }
 
-  // Start video from second 7 and ensure it plays (iOS Safari fix)
+  // The desktop video opens on its eighth second, also each time it loops.
   if (videoRef.value) {
-    videoRef.value.currentTime = 7
-
-    // Reset to second 7 when video loops
+    videoRef.value.currentTime = DESKTOP_VIDEO_START_SECONDS
     videoRef.value.addEventListener('timeupdate', () => {
-      if (videoRef.value && videoRef.value.currentTime < 7) {
-        videoRef.value.currentTime = 7
+      if (videoRef.value && videoRef.value.currentTime < DESKTOP_VIDEO_START_SECONDS) {
+        videoRef.value.currentTime = DESKTOP_VIDEO_START_SECONDS
       }
     })
-
-    videoRef.value.play().catch(() => {
-      // Autoplay failed, video will show poster instead
-    })
   }
 
-  // Ensure mobile video loops and plays
-  if (mobileVideoRef.value) {
-    mobileVideoRef.value.loop = true
-    mobileVideoRef.value.play().catch(() => {
-      // Autoplay failed, video will show poster instead
-    })
-  }
+  playShownVideo()
+  window.addEventListener('resize', playShownVideo)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', playShownVideo)
 })
 </script>
 
 <template>
   <section id="home" ref="heroRef" class="hero">
+    <!-- Two background videos; the stylesheet shows one. Neither loads until
+         playShownVideo starts the one on screen. -->
     <!-- Background Video - Desktop -->
     <video
       ref="videoRef"
       class="hero__video hero__video--desktop"
-      autoplay
       muted
       loop
       playsinline
-      preload="metadata"
+      preload="none"
       poster="/images/hero/hero-desktop-poster.jpg"
       width="1920"
       height="804"
@@ -82,11 +95,10 @@ onMounted(() => {
     <video
       ref="mobileVideoRef"
       class="hero__video hero__video--mobile"
-      autoplay
       muted
       loop
       playsinline
-      preload="metadata"
+      preload="none"
       poster="/images/hero/hero-mobile-poster.jpg"
       width="608"
       height="1080"

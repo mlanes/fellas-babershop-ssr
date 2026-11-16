@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { gotoAndReady } from './helpers'
+import { gotoAndReady, pageHydrated } from './helpers'
 
 test.describe('Home page', () => {
   test('loads with the expected title', async ({ page }) => {
@@ -59,4 +59,52 @@ test.describe('Home page', () => {
     const bookingLinks = page.locator('a[href*="appbarber"], a[href*="booking"]')
     await expect(bookingLinks.first()).toBeVisible()
   })
+})
+
+// The hero has one video for wide screens and one for phones; the stylesheet
+// shows one of them. Loading both cost a phone about four megabytes for a
+// video it never showed.
+test.describe('Hero video', () => {
+  const screens = [
+    {
+      screen: 'a phone',
+      viewport: { width: 390, height: 844 },
+      shown: '.hero__video--mobile',
+      hidden: '.hero__video--desktop',
+    },
+    {
+      screen: 'a wide screen',
+      viewport: { width: 1440, height: 900 },
+      shown: '.hero__video--desktop',
+      hidden: '.hero__video--mobile',
+    },
+  ]
+
+  for (const { screen, viewport, shown, hidden } of screens) {
+    test(`on ${screen}, the video shown there plays and the other is not loaded`, async ({
+      page,
+    }) => {
+      await page.setViewportSize(viewport)
+      await gotoAndReady(page, '/')
+      await pageHydrated(page)
+
+      // The element says what it has loaded; WebKit does not report media
+      // requests to the test.
+      await expect
+        .poll(() =>
+          page
+            .locator(shown)
+            .evaluate((video: HTMLVideoElement) => !video.paused && video.readyState >= 2)
+        )
+        .toBe(true)
+
+      await page.waitForTimeout(1500)
+      const hiddenVideo = await page.locator(hidden).evaluate((video: HTMLVideoElement) => ({
+        paused: video.paused,
+        readyState: video.readyState,
+        buffered: video.buffered.length,
+      }))
+      expect(hiddenVideo).toEqual({ paused: true, readyState: 0, buffered: 0 })
+    })
+  }
 })
