@@ -37,7 +37,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section ref="sectionRef" id="services" class="services">
+  <section id="services" ref="sectionRef" class="services">
     <div class="services__container container">
       <div class="services__content">
         <div class="services__left">

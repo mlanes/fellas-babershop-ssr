@@ -19,7 +19,7 @@ withDefaults(
     /** Alignment of the whole block. */
     align?: 'left' | 'center'
   }>(),
-  { level: 'h2', align: 'center' }
+  { eyebrow: undefined, heading: undefined, subtitle: undefined, level: 'h2', align: 'center' }
 )
 </script>
 

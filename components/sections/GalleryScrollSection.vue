@@ -199,7 +199,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <section ref="sectionRef" id="gallery" class="gallery-scroll">
+  <section id="gallery" ref="sectionRef" class="gallery-scroll">
     <div class="gallery-scroll__header-wrapper">
       <div class="gallery-scroll__header-sticky">
         <div class="gallery-scroll__header">

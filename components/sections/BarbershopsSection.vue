@@ -129,15 +129,15 @@ onUnmounted(() => {
             <!-- Navigation Arrows -->
             <button
               class="barbershop-card__nav barbershop-card__nav--prev"
-              @click="prevImage(shop.id, shop.images.length)"
               aria-label="Previous image"
+              @click="prevImage(shop.id, shop.images.length)"
             >
               <FIcon name="chevron-left" :size="20" />
             </button>
             <button
               class="barbershop-card__nav barbershop-card__nav--next"
-              @click="nextImage(shop.id, shop.images.length)"
               aria-label="Next image"
+              @click="nextImage(shop.id, shop.images.length)"
             >
               <FIcon name="chevron-right" :size="20" />
             </button>

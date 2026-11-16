@@ -11,6 +11,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 ### Maintenance
 
 - Git hooks check each commit: lint and formatting on the changed files, and the commit message's format.
+- Lint now limits how complex a function may be and stops components reading data files directly. Three components that did were moved to composables, and 19 of 20 lint warnings are gone.
 
 ## 1.1.2 - 2026-11-16
 

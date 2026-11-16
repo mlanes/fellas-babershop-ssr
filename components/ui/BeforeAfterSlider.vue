@@ -168,13 +168,13 @@ onUnmounted(() => {
     <div
       class="before-after-slider__handle"
       :style="{ left: sliderLeft }"
-      @mousedown="handleMouseDown"
-      @touchstart.passive="handleTouchStart"
       role="slider"
       :aria-valuenow="Math.round(sliderPosition)"
       aria-valuemin="0"
       aria-valuemax="100"
       aria-label="Controle de comparação de imagens"
+      @mousedown="handleMouseDown"
+      @touchstart.passive="handleTouchStart"
     >
       <div class="before-after-slider__handle-line"></div>
       <div class="before-after-slider__handle-button">
