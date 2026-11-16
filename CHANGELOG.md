@@ -8,6 +8,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+## 1.1.2 - 2026-11-16
+
 ### Fixed
 
 - Visitors no longer download all four hero videos, about 18 MB, in the background. The page was asking browsers to fetch them ahead of time, and loaded the phone and the wide-screen video together. Now only the one shown on the visitor's screen is loaded.
