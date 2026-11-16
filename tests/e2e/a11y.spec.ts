@@ -1,14 +1,10 @@
-import AxeBuilder from '@axe-core/playwright'
 import { expect, test, type Locator, type Page } from '@playwright/test'
+import { blockingViolations, unfinishedFades } from '../accessibility'
 import { gotoAndReady, openLanguageMenu, pageHydrated } from './helpers'
 
 /**
- * Automated WCAG 2.1 A/AA accessibility scan via axe-core.
- *
- * Asserts that no axe violations marked `critical` or `serious` exist
- * on the page. `moderate` and `minor` violations are not reported and
- * don't fail the build — keeping the bar at "must-fix" stops the
- * suite turning into a perpetual noise generator.
+ * Automated WCAG 2.1 A/AA accessibility scan of every page via axe-core.
+ * What counts as a failure is decided once, in `blockingViolations`.
  */
 const routes = ['/', '/services', '/gallery', '/contacts', '/score']
 const themes = ['light', 'dark'] as const
@@ -17,14 +13,6 @@ const hoveredText = [
   { name: 'footer nav link', route: '/', selector: '.footer__link' },
   { name: 'footer contact link', route: '/', selector: '.footer__contact' },
 ]
-
-async function scan(page: Parameters<typeof gotoAndReady>[0]) {
-  // The dev server injects a DevTools badge that is not part of the site.
-  return await new AxeBuilder({ page })
-    .exclude('nuxt-devtools-frame')
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .analyze()
-}
 
 /**
  * Stops the page's slow repeating timers before it loads. The home page swaps
@@ -45,17 +33,6 @@ async function stopSlowTimers(page: Page): Promise<void> {
   })
 }
 
-function formatViolations(violations: Awaited<ReturnType<typeof scan>>['violations']) {
-  return violations.map((v) => ({
-    id: v.id,
-    impact: v.impact,
-    help: v.help,
-    helpUrl: v.helpUrl,
-    nodeCount: v.nodes.length,
-    firstNode: v.nodes[0]?.target,
-  }))
-}
-
 test.describe('Accessibility (axe-core)', () => {
   for (const theme of themes) {
     for (const route of routes) {
@@ -67,12 +44,7 @@ test.describe('Accessibility (axe-core)', () => {
         await gotoAndReady(page, route)
         expect(await paintedTheme(page)).toBe(theme)
         await pageSettled(page)
-        const { violations } = await scan(page)
-        const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
-        if (blocking.length) {
-          console.log(`axe violations on ${route} (${theme}):`, formatViolations(blocking))
-        }
-        expect(blocking).toEqual([])
+        expect(await blockingViolations(page)).toEqual([])
       })
     }
 
@@ -88,12 +60,7 @@ test.describe('Accessibility (axe-core)', () => {
       await page.locator('button.header__mobile-toggle').click()
       await page.locator('.header__mobile-menu').waitFor()
       await pageSettled(page)
-      const { violations } = await scan(page)
-      const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
-      if (blocking.length) {
-        console.log(`axe violations (mobile menu open, ${theme}):`, formatViolations(blocking))
-      }
-      expect(blocking).toEqual([])
+      expect(await blockingViolations(page)).toEqual([])
     })
   }
 
@@ -227,35 +194,6 @@ async function hoverUntilSettled(page: Page, target: Locator): Promise<void> {
 async function pageSettled(page: Page): Promise<void> {
   await pageHydrated(page)
   await expect.poll(() => unfinishedFades(page), { timeout: 15000 }).toBe(0)
-}
-
-/**
- * Counts the animations and transitions still changing an element's opacity
- * or colour. Endless ones (pulses, drifts) are left out, and so is anything
- * that only moves an element: WebKit leaves some transform transitions
- * pending forever.
- */
-async function unfinishedFades(page: Page): Promise<number> {
-  return await page.evaluate(
-    () =>
-      document.getAnimations().filter((animation) => {
-        const effect = animation.effect
-        if (!(effect instanceof KeyframeEffect)) return false
-        // A finished transition leaves the list once its last frame is painted.
-        // WebKit was measured listing one as finished with its element still at
-        // 54% opacity, so a listed one counts. A finished animation that keeps
-        // its end state stays listed for good, and does not.
-        const painted = animation.playState === 'finished' && !(animation instanceof CSSTransition)
-        if (painted) return false
-        if (effect.getComputedTiming().endTime === Infinity) return false
-        return effect
-          .getKeyframes()
-          .some(
-            (keyframe) =>
-              'opacity' in keyframe || 'color' in keyframe || 'backgroundColor' in keyframe
-          )
-      }).length
-  )
 }
 
 async function textAndBackdropLuminance(
