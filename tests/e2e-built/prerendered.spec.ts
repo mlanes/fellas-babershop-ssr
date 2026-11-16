@@ -313,3 +313,64 @@ test.describe('The language list', () => {
     })
   }
 })
+
+// Every page named a share image, and the app manifest two icons, that had
+// never existed: a tag being present says nothing about the file behind it.
+test.describe('The files a page names', () => {
+  /**
+   * Asks for each file and lists the ones that are not there as images.
+   *
+   * @param files - addresses on the site, or paths from its root
+   * @returns one line per file that does not answer 200 with an image
+   */
+  async function missingImages(request: APIRequestContext, files: string[]): Promise<string[]> {
+    const missing: string[] = []
+    for (const file of files) {
+      const response = await request.get(file.replace(siteAddress, ''), { maxRedirects: 0 })
+      const type = response.headers()['content-type'] ?? ''
+      if (response.status() !== 200 || !type.startsWith('image/')) {
+        missing.push(`${file}: ${response.status()} ${type}`)
+      }
+    }
+    return missing
+  }
+
+  test('the picture a shared link shows is there, with the size the page states', async ({
+    request,
+  }) => {
+    const html = await builtHtml(request, '/')
+    const shared = metaContent(html, 'og:image')
+
+    expect(shared).toBe(`${siteAddress}/og-image.jpg`)
+    expect(metaContent(html, 'twitter:image')).toBe(shared)
+    expect(await missingImages(request, [shared ?? ''])).toEqual([])
+    expect(metaContent(html, 'og:image:width')).toBe('1200')
+    expect(metaContent(html, 'og:image:height')).toBe('630')
+  })
+
+  test('the icons a page links are there', async ({ request }) => {
+    const html = await builtHtml(request, '/')
+    const icons = (html.match(/<link[^>]*rel="(?:icon|apple-touch-icon)"[^>]*>/g) ?? []).map(
+      (link) => /href="([^"]*)"/.exec(link)?.[1] ?? ''
+    )
+
+    expect(icons.length).toBeGreaterThan(0)
+    expect(await missingImages(request, icons)).toEqual([])
+  })
+
+  test('the icons the app manifest names are there', async ({ request }) => {
+    const manifest: unknown = JSON.parse(await builtHtml(request, '/manifest.webmanifest'))
+    const icons =
+      typeof manifest === 'object' &&
+      manifest !== null &&
+      'icons' in manifest &&
+      Array.isArray(manifest.icons)
+        ? manifest.icons.map((icon: unknown) =>
+            typeof icon === 'object' && icon !== null && 'src' in icon ? String(icon.src) : ''
+          )
+        : []
+
+    expect(icons.length).toBeGreaterThan(0)
+    expect(await missingImages(request, icons)).toEqual([])
+  })
+})

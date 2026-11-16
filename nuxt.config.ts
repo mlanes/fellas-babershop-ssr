@@ -107,6 +107,10 @@ export default defineNuxtConfig({
         // Open Graph
         { property: 'og:site_name', content: 'Fellas Barbers' },
         { property: 'og:image', content: `${siteUrl}/og-image.jpg` },
+        // Stated so that an app laying out a link's preview need not fetch the
+        // picture first to learn its shape.
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
         { property: 'og:type', content: 'website' },
         // Twitter Card
         { name: 'twitter:card', content: 'summary_large_image' },
@@ -179,17 +183,17 @@ export default defineNuxtConfig({
       display: 'standalone',
       icons: [
         {
-          src: '/pwa-192x192.png',
+          src: '/android-chrome-192x192.png',
           sizes: '192x192',
           type: 'image/png',
         },
         {
-          src: '/pwa-512x512.png',
+          src: '/android-chrome-512x512.png',
           sizes: '512x512',
           type: 'image/png',
         },
         {
-          src: '/pwa-512x512.png',
+          src: '/android-chrome-512x512.png',
           sizes: '512x512',
           type: 'image/png',
           purpose: 'any maskable',
