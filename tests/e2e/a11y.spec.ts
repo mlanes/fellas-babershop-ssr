@@ -70,7 +70,6 @@ test.describe('Accessibility (axe-core)', () => {
         const { violations } = await scan(page)
         const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
         if (blocking.length) {
-          // eslint-disable-next-line no-console
           console.log(`axe violations on ${route} (${theme}):`, formatViolations(blocking))
         }
         expect(blocking).toEqual([])
@@ -92,7 +91,6 @@ test.describe('Accessibility (axe-core)', () => {
       const { violations } = await scan(page)
       const blocking = violations.filter((v) => v.impact === 'critical' || v.impact === 'serious')
       if (blocking.length) {
-        // eslint-disable-next-line no-console
         console.log(`axe violations (mobile menu open, ${theme}):`, formatViolations(blocking))
       }
       expect(blocking).toEqual([])

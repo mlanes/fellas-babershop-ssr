@@ -35,7 +35,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section ref="sectionRef" id="before-after" class="before-after-section">
+  <section id="before-after" ref="sectionRef" class="before-after-section">
     <div class="before-after-section__container container">
       <FSectionHeading
         class="before-after-section__heading"
