@@ -16,6 +16,7 @@
     "prepare": "husky || true",
     "lint": "eslint .",
     "format": "prettier --write .",
+    "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:built": "playwright test -c playwright.built.config.ts",
     "test:e2e:all": "PLAYWRIGHT_HTML_OPEN=never npm run test:e2e; dev=$?; npm run test:e2e:built; built=$?; [ $dev -eq 0 ] && [ $built -eq 0 ]",
@@ -59,6 +60,7 @@
     "sass-embedded": "^1.89.2",
     "storybook": "^9.1.20",
     "typescript": "^5.9.3",
+    "vitest": "^5.1.0",
     "vue-tsc": "^3.3.14"
   },
   "allowScripts": {

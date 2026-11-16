@@ -6,6 +6,7 @@ import QuoteIcon from '~/assets/icons/quote.svg'
 import GoogleLogo from '~/assets/img/testimonials/google-logo.svg'
 import { useTestimonials } from '~/composables/useTestimonials'
 import { useLocale } from '~/composables/useLocale'
+import { MAX_RATING, getInitials, renderStars } from '~/utils/testimonials'
 
 /**
  * TestimonialsSection - Customer testimonials and reviews
@@ -39,27 +40,6 @@ onUnmounted(() => {
     clearInterval(autoRotateInterval)
   }
 })
-
-/**
- * Get customer initials from name
- */
-const getInitials = (name: string) => {
-  return name
-    .split(' ')
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2)
-}
-
-const MAX_RATING = 5
-
-/**
- * Render star rating
- */
-const renderStars = (rating: number) => {
-  return Array.from({ length: MAX_RATING }, (_, i) => i < rating)
-}
 
 /**
  * Reset auto-rotation timer
