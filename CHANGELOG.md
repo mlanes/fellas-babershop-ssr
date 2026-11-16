@@ -8,6 +8,10 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Fixed
+
+- Visitors no longer download all four hero videos, about 18 MB, in the background. The page was asking browsers to fetch them ahead of time; now only the one being played is loaded.
+
 ### Maintenance
 
 - The accessibility scans stop the page's rotating content first. The earlier approach, repeating a scan that a rotation had disturbed, could give up on a slow machine.
