@@ -333,3 +333,5 @@ This is where three "not now" items above come back in: visual regression, depen
 - Ring UI's Storybook as a person sees it (the published page is a script shell), and the name of its screenshot tool.
 - Exact fills of individual text layers in Figma; the contrast table uses the file's variables.
 - `.env` was not read. Nothing was deployed, no Netlify or DNS setting was changed, and no Google API was called.
+
+Trial line for the docs-only skip. This branch is never merged.
