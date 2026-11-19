@@ -48,6 +48,13 @@ jobs:
   stories:
     name: Storybook stories
     runs-on: ubuntu-latest
+    # Playwright's own image, with the browsers and their system packages in
+    # it. Installing those on the runner took from 16 seconds to 20 minutes,
+    # as fast as Ubuntu's package mirror answered. Its version is the one in
+    # the lockfile; a unit test fails when the two part.
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -56,8 +63,6 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Install the browser
-        run: npx playwright install --with-deps chromium
       - name: Build Storybook and scan every story
         run: npm run test:stories
       - name: Keep the report of a failed run
@@ -69,8 +74,11 @@ jobs:
           retention-days: 7
 
   e2e:
-    name: ${{ matrix.suite.name }} (${{ matrix.target.project }})
+    name: ${{ matrix.suite.name }} (${{ matrix.project }})
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.65.1-noble
+      options: --user 1001
     timeout-minutes: 40
     strategy:
       # One browser failing says nothing about the others; let them finish.
@@ -79,12 +87,7 @@ jobs:
         suite:
           - { name: Dev server, config: playwright.config.ts }
           - { name: Built site, config: playwright.built.config.ts }
-        target:
-          - { project: chromium, browser: chromium }
-          - { project: firefox, browser: firefox }
-          - { project: webkit, browser: webkit }
-          - { project: Mobile Chrome, browser: chromium }
-          - { project: Mobile Safari, browser: webkit }
+        project: [chromium, firefox, webkit, Mobile Chrome, Mobile Safari]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -92,17 +95,15 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
-      - name: Install the browser
-        run: npx playwright install --with-deps ${{ matrix.target.browser }}
       - name: Run the suite
-        run: npx playwright test -c ${{ matrix.suite.config }} --project="${{ matrix.target.project }}"
+        run: npx playwright test -c ${{ matrix.suite.config }} --project="${{ matrix.project }}"
         env:
           PLAYWRIGHT_HTML_OPEN: never
       - name: Keep the report of a failed run
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: playwright-${{ matrix.suite.config }}-${{ matrix.target.project }}
+          name: playwright-${{ matrix.suite.config }}-${{ matrix.project }}
           path: |
             playwright-report/
             test-results/
