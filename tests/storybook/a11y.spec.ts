@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { blockingViolations, paintedTheme, unfinishedFades } from '../accessibility'
 
 /**
@@ -25,6 +25,15 @@ interface Story {
   name: string
 }
 
+declare global {
+  interface Window {
+    /** Storybook's preview, as far as this spec reads it: the settings a story was opened with. */
+    __STORYBOOK_PREVIEW__?: {
+      storyStoreValue?: { userGlobals?: { globals?: { a11y?: { manual?: boolean } } } }
+    }
+  }
+}
+
 const stories = builtStories()
 
 for (const story of stories) {
@@ -42,7 +51,10 @@ for (const story of stories) {
         }
       })
 
-      await page.goto(`/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme}`)
+      // a11y.manual stops the addon scanning the story itself; see below.
+      await page.goto(
+        `/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme};a11y.manual:!true`
+      )
       // The server answers an unknown story with this same page, and Storybook
       // then shows an empty one that would pass any scan.
       await expect(page.locator('body')).toHaveClass(/sb-show-main/)
@@ -50,10 +62,25 @@ for (const story of stories) {
       expect(await paintedTheme(page)).toBe(theme)
       await expect.poll(() => unfinishedFades(page), { timeout: 15_000 }).toBe(0)
 
+      // Storybook's accessibility addon scans each story about 200 ms after
+      // it renders, and axe refuses to start while another scan is running on
+      // the page. On a slow machine that scan was under way when this one
+      // began, and the test failed with "Axe is already running".
+      expect(await addonScanIsOff(page)).toBe(true)
       expect(await blockingViolations(page)).toEqual([])
       expect(errors).toEqual([])
     })
   }
+}
+
+/**
+ * Says whether the story was opened with the accessibility addon's own scan
+ * switched off, read from the settings Storybook applied to the story.
+ */
+async function addonScanIsOff(page: Page): Promise<boolean> {
+  return await page.evaluate(
+    () => window.__STORYBOOK_PREVIEW__?.storyStoreValue?.userGlobals?.globals?.a11y?.manual === true
+  )
 }
 
 /**

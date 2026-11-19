@@ -17,6 +17,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 - Unit tests, run on each pull request: the rules that send a visitor on the home address to their language, and a check that every service and every label is translated in all the languages. A service added without its translations was shown in Portuguese on the other three sites, and nothing said so.
 - Every Storybook story is now scanned for accessibility problems in the light and the dark theme, on each pull request: 32 stories, 64 checks. Before, a component was only checked in the states the pages happen to use.
+- Starting the site locally no longer warns six times that `nuxt/server` cannot be found. The image module's helper for our version of Nuxt was being swapped for the one written for Nuxt 4. No visitor saw a difference.
 
 ## 1.1.4 - 2026-11-16
 
