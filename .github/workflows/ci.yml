@@ -45,8 +45,44 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
 
+  changes:
+    name: What changed
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      browser-tests: ${{ steps.rule.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Every commit, since the one this change is compared with can be
+          # any way back; no file contents but the ones checked out.
+          fetch-depth: 0
+          filter: blob:none
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+      - name: Ask whether the browser jobs are needed
+        id: rule
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        # A run started by hand has no commit to compare with, and a new
+        # branch has an all-zero one. The list is then empty, which the
+        # script answers with "true".
+        run: |
+          paths=$(git diff --name-only "$BASE" HEAD) || paths=''
+          echo "needed=$(printf '%s\n' "$paths" | node scripts/browserTestsNeeded.ts)" >> "$GITHUB_OUTPUT"
+
   stories:
     name: Storybook stories
+    needs: changes
+    # Never skipped as a job, and run whatever became of "changes". The
+    # ruleset waits for this job's name, and for each name of the matrix
+    # below; a skipped job reports none of them, and the pull request would
+    # wait for ever. So the job always starts and it is its steps that are
+    # skipped. Only the word "false" skips them: no answer runs everything.
+    if: ${{ !cancelled() }}
+    env:
+      BROWSER_TESTS: ${{ needs.changes.outputs.browser-tests }}
     runs-on: ubuntu-latest
     # Playwright's own image, with the browsers and their system packages in
     # it. Installing those on the runner took from 16 seconds to 20 minutes,
@@ -58,12 +94,16 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
+        if: env.BROWSER_TESTS != 'false'
       - uses: actions/setup-node@v7
+        if: env.BROWSER_TESTS != 'false'
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+        if: env.BROWSER_TESTS != 'false'
       - name: Build Storybook and scan every story
+        if: env.BROWSER_TESTS != 'false'
         run: npm run test:stories
       - name: Keep the report of a failed run
         if: failure()
@@ -75,6 +115,10 @@ jobs:
 
   e2e:
     name: ${{ matrix.suite.name }} (${{ matrix.project }})
+    needs: changes
+    if: ${{ !cancelled() }}
+    env:
+      BROWSER_TESTS: ${{ needs.changes.outputs.browser-tests }}
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.65.1-noble
@@ -90,12 +134,16 @@ jobs:
         project: [chromium, firefox, webkit, Mobile Chrome, Mobile Safari]
     steps:
       - uses: actions/checkout@v7
+        if: env.BROWSER_TESTS != 'false'
       - uses: actions/setup-node@v7
+        if: env.BROWSER_TESTS != 'false'
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+        if: env.BROWSER_TESTS != 'false'
       - name: Run the suite
+        if: env.BROWSER_TESTS != 'false'
         run: npx playwright test -c ${{ matrix.suite.config }} --project="${{ matrix.project }}"
         env:
           PLAYWRIGHT_HTML_OPEN: never
