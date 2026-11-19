@@ -8,6 +8,8 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+## 1.1.5 - 2026-11-19
+
 ### Fixed
 
 - A link to the site shared on WhatsApp, Instagram or anywhere else now shows a picture: the logo on the site's dark background. Every page named a share image that had never existed, so shared links had none.
