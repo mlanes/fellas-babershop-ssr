@@ -1,5 +1,6 @@
 import { defaultLocale, fallbackLocale, localeCookie, locales, localizedPath } from './data/locales'
 import { moveToVisitorLanguage, type VisitorLanguageSettings } from './utils/moveToVisitorLanguage'
+import { withLegacyFileExtension } from './utils/withLegacyFileExtension'
 
 const siteUrl = 'https://fellasbarber.com'
 
@@ -45,6 +46,15 @@ export default defineNuxtConfig({
     '@vite-pwa/nuxt',
     'nuxt-svgo',
     '@nuxt/image',
+    // After @nuxt/image, so this runs once its helper is on the list.
+    (_options, nuxt) => {
+      nuxt.hook('nitro:config', (config) => {
+        if (!config.imports) return
+        for (const helper of config.imports.imports ?? []) {
+          if (helper?.from) helper.from = withLegacyFileExtension(helper.from)
+        }
+      })
+    },
     '@nuxtjs/sitemap',
   ],
 
