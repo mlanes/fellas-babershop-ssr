@@ -8,6 +8,11 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Fixed
+
+- A link to the site shared on WhatsApp, Instagram or anywhere else now shows a picture: the logo on the site's dark background. Every page named a share image that had never existed, so shared links had none.
+- The app manifest names the two icons that exist. It named two files that did not.
+
 ### Maintenance
 
 - Unit tests, run on each pull request: the rules that send a visitor on the home address to their language, and a check that every service and every label is translated in all the languages. A service added without its translations was shown in Portuguese on the other three sites, and nothing said so.
