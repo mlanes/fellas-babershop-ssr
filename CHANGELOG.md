@@ -20,6 +20,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 - The browser tests on each pull request run in Playwright's own image, which already holds the browsers. Installing them on the test machine took from 16 seconds to 20 minutes, as fast as Ubuntu's package mirror answered, and one slow install held a pull request for 24 minutes.
 - A change made of Markdown files alone, such as a line in this changelog, no longer runs the browser tests. Nothing in the site or its tests reads those files. Lint, the type-check and the unit tests still run on every change.
+- Dependabot now proposes newer versions of what the site depends on: one pull request a week for minor and patch updates, and one a month for the CI's own actions. New major versions are left for a decision.
 
 ## 1.1.5 - 2026-11-19
 

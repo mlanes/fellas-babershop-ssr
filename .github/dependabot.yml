@@ -1,0 +1,47 @@
+# Dependabot opens pull requests for newer versions of what the site depends
+# on. Each goes through the same checks as any other pull request, and none is
+# merged by itself.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Lisbon
+    open-pull-requests-limit: 3
+    commit-message:
+      # With "include: scope" this gives "chore(deps): ..." and
+      # "chore(deps-dev): ...", which is the form commits take here.
+      prefix: chore
+      include: scope
+    ignore:
+      # A new major version is a decision, not a routine update: Nuxt 4 moves
+      # the folders, for one. Security fixes are not held back by this.
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+    groups:
+      # By itself, because its version is also written in the CI workflow as
+      # the tag of the image the browser tests run in. A unit test fails until
+      # the two match, so this pull request needs that tag changed by hand.
+      playwright:
+        patterns:
+          - '@playwright/test'
+          - 'playwright'
+          - 'playwright-core'
+      # Everything else that is a minor or a patch update, in one pull request
+      # a week and not one per package.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: ci
+      include: scope
