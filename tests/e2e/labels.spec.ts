@@ -210,7 +210,7 @@ test.describe('Controls and pictures are labelled in the language of the page', 
         .evaluateAll((buttons) => buttons.map((button) => button.getAttribute('aria-label')))
       expect(arrows).toEqual([...labels.servicePages, ...labels.servicePages])
 
-      const rating = page.locator('.testimonials__rating')
+      const rating = page.locator('.testimonials__content--showing .testimonials__rating')
       await expect(rating).toHaveAttribute('role', 'img')
       await expect(rating).toHaveAttribute('aria-label', labels.rating)
     })

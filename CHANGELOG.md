@@ -14,6 +14,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 - Choosing a menu item puts that section in the address, so it can be copied and sent, and Back returns to the section before. Before, the address never changed.
 - Menu links are real addresses. Opened in a new tab from another page they led nowhere.
 - A visitor who asked their device for less motion is taken to a section at once, without the glide.
+- On a phone, the page no longer jumps every five seconds while the testimonials change. A long review made that section up to 81 pixels taller than a short one, and everything below it moved each time.
 
 ### Maintenance
 

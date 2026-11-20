@@ -109,36 +109,37 @@ const nextTestimonial = () => {
         <div class="testimonials__featured">
           <QuoteIcon class="testimonials__quote-icon" />
 
-          <transition name="testimonial-fade" mode="out-in">
-            <div :key="selectedTestimonial" class="testimonials__content">
+          <!-- All of them are laid out, one over the other, and one is shown.
+               The card is then as tall as the longest and stays that tall. -->
+          <div class="testimonials__stack">
+            <div
+              v-for="(testimonial, index) in testimonials"
+              :key="index"
+              class="testimonials__content"
+              :class="{ 'testimonials__content--showing': index === selectedTestimonial }"
+              :aria-hidden="index !== selectedTestimonial"
+            >
               <!-- Customer info (mobile only) -->
               <div class="testimonials__featured-info">
                 <div class="testimonials__featured-avatar">
-                  {{ getInitials(testimonials[selectedTestimonial].customerName) }}
+                  {{ getInitials(testimonial.customerName) }}
                 </div>
                 <div class="testimonials__featured-details">
-                  <span class="testimonials__featured-name">{{
-                    testimonials[selectedTestimonial].customerName
-                  }}</span>
+                  <span class="testimonials__featured-name">{{ testimonial.customerName }}</span>
                 </div>
               </div>
 
               <p class="testimonials__comment">
-                {{ testimonials[selectedTestimonial].testimonialText }}
+                {{ testimonial.testimonialText }}
               </p>
 
               <div
                 class="testimonials__rating"
                 role="img"
-                :aria-label="
-                  t('a11y.rating', {
-                    rating: testimonials[selectedTestimonial].rating,
-                    max: MAX_RATING,
-                  })
-                "
+                :aria-label="t('a11y.rating', { rating: testimonial.rating, max: MAX_RATING })"
               >
                 <FIcon
-                  v-for="(filled, i) in renderStars(testimonials[selectedTestimonial].rating)"
+                  v-for="(filled, i) in renderStars(testimonial.rating)"
                   :key="i"
                   name="star"
                   :size="24"
@@ -147,7 +148,7 @@ const nextTestimonial = () => {
                 />
               </div>
             </div>
-          </transition>
+          </div>
         </div>
       </div>
     </div>
@@ -283,6 +284,44 @@ const nextTestimonial = () => {
     }
   }
 
+  // Every testimonial sits in the one cell, so the cell is as tall as the
+  // tallest. Shown one at a time, a long review made the section 81px taller
+  // than a short one on a phone, and the page below jumped every five seconds.
+  @include element('stack') {
+    display: grid;
+  }
+
+  @include element('content') {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(-10px);
+    // Hidden from the eye, the keyboard and screen readers, but only once it
+    // has faded.
+    visibility: hidden;
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease,
+      visibility 0s linear 0.5s;
+
+    @include modifier('showing') {
+      opacity: 1;
+      transform: none;
+      visibility: visible;
+      // It waits for the one before it to go, as it always has.
+      transition-delay: 0.5s;
+    }
+
+    // For a visitor who asked for less motion the fades are already cut to
+    // nothing, but not these waits, which left the card empty for half a
+    // second at every change.
+    @media (prefers-reduced-motion: reduce) {
+      &,
+      &--showing {
+        transition-delay: 0s;
+      }
+    }
+  }
+
   @include element('featured-info') {
     display: flex;
     align-items: center;
@@ -368,23 +407,5 @@ const nextTestimonial = () => {
       }
     }
   }
-}
-
-// Testimonial transition
-.testimonial-fade-enter-active,
-.testimonial-fade-leave-active {
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
-}
-
-.testimonial-fade-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.testimonial-fade-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
 }
 </style>
