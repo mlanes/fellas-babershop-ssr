@@ -3,25 +3,21 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import FLogo from '~/components/ui/FLogo.vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import FButton from '~/components/ui/FButton.vue'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
+import { useSectionLink } from '~/composables/useSectionLink'
 import { useLocale } from '~/composables/useLocale'
 
 /**
  * HeroSection - Full-screen hero section with brand identity and scroll indicator
  */
-const { scrollTo } = useSmoothScroll()
+const { goToSection } = useSectionLink()
 const { t } = useLocale()
 const heroRef = ref<HTMLElement | null>(null)
 const videoRef = ref<HTMLVideoElement | null>(null)
 const mobileVideoRef = ref<HTMLVideoElement | null>(null)
 
-const handleScrollClick = () => {
-  scrollTo('#about')
-}
+const handleScrollClick = () => goToSection('about')
 
-const handleBookingClick = () => {
-  scrollTo('#barbershops')
-}
+const handleBookingClick = () => goToSection('barbershops')
 
 const DESKTOP_VIDEO_START_SECONDS = 7
 

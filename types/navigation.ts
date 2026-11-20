@@ -11,6 +11,19 @@ export interface NavigationItem {
 }
 
 /**
+ * The sections of the home page, by the id each one has.
+ */
+export type HomeSection =
+  | 'home'
+  | 'about'
+  | 'services'
+  | 'expanded-services'
+  | 'gallery'
+  | 'before-after'
+  | 'testimonials'
+  | 'barbershops'
+
+/**
  * A menu item as the header and the footer show it.
  */
 export interface MenuLink {

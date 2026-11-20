@@ -14,6 +14,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 - Choosing a menu item puts that section in the address, so it can be copied and sent, and Back returns to the section before. Before, the address never changed.
 - Menu links are real addresses. Opened in a new tab from another page they led nowhere.
 - A visitor who asked their device for less motion is taken to a section at once, without the glide.
+- The buttons that lead to a section (Book now, See more, View pricing) now behave like the menu. They land in the same place, and they put the section in the address so Back returns to where the visitor was. Before, each stopped 40 pixels from where the menu did.
 
 ### Maintenance
 

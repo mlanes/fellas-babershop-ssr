@@ -3,18 +3,16 @@ import { ref, onMounted } from 'vue'
 import FButton from '~/components/ui/FButton.vue'
 import FellasAuthenticBadge from '~/assets/img/fellas-authentic.svg'
 import { useLocale } from '~/composables/useLocale'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
+import { useSectionLink } from '~/composables/useSectionLink'
 
 /**
  * AboutSection - About Fellas Barbershop with crown badge
  */
 const sectionRef = ref<HTMLElement | null>(null)
 const { t } = useLocale()
-const { scrollTo } = useSmoothScroll()
+const { goToSection } = useSectionLink()
 
-const handleLearnMoreClick = () => {
-  scrollTo('#barbershops')
-}
+const handleLearnMoreClick = () => goToSection('barbershops')
 
 onMounted(() => {
   if (sectionRef.value) {

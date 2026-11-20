@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import FButton from '~/components/ui/FButton.vue'
 import FSectionHeading from '~/components/ui/FSectionHeading.vue'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
+import { useSectionLink } from '~/composables/useSectionLink'
 import { useLocale } from '~/composables/useLocale'
 import { useTranslatedServices } from '~/composables/useTranslatedServices'
 
@@ -17,7 +17,7 @@ const serviceImg6 = '/images/services/fellas-barbers-premium-service-06.jpeg'
 /**
  * ServicesSection - Popular services overview with images and call-to-action
  */
-const { scrollTo } = useSmoothScroll()
+const { goToSection } = useSectionLink()
 const { t } = useLocale()
 const { services } = useTranslatedServices()
 const sectionRef = ref<HTMLElement | null>(null)
@@ -25,9 +25,7 @@ const sectionRef = ref<HTMLElement | null>(null)
 // Service images
 const serviceImages = [serviceImg1, serviceImg2, serviceImg3, galleryImg, serviceImg5, serviceImg6]
 
-const handleViewServices = () => {
-  scrollTo('#expanded-services')
-}
+const handleViewServices = () => goToSection('expanded-services')
 
 onMounted(() => {
   if (sectionRef.value) {

@@ -3,24 +3,24 @@ import { ref } from 'vue'
 import FLogoFooter from '~/components/ui/FLogoFooter.vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import { useNavigation } from '~/composables/useNavigation'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
 import { useLocale } from '~/composables/useLocale'
 import { useBarbershops } from '~/composables/useBarbershops'
 
 /**
  * AppFooter - Main footer with contact information and links
  */
-const { scrollTo } = useSmoothScroll()
 const { t } = useLocale()
 const { items: navigationItems } = useNavigation()
 const { barbershops } = useBarbershops()
 const currentYear = ref(new Date().getFullYear())
 
 /**
- * Handle scroll to top
+ * Takes the visitor to the top of the page they are on. Not to the home
+ * page's first section: the footer is on every page, and on the others that
+ * would take them away from the one they are reading.
  */
 const scrollToTop = () => {
-  scrollTo('#home')
+  window.scrollTo({ top: 0 })
 }
 </script>
 

@@ -3,14 +3,12 @@ import { ref, onMounted, computed } from 'vue'
 import FIcon from '~/components/ui/FIcon.vue'
 import FSectionHeading from '~/components/ui/FSectionHeading.vue'
 import FellasLogo from '~/assets/img/logo.svg'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
 import { useLocale } from '~/composables/useLocale'
 import { useTranslatedServices } from '~/composables/useTranslatedServices'
 
 /**
  * ExpandedServicesSection - Detailed service catalog with pricing
  */
-const { scrollTo } = useSmoothScroll()
 const { t } = useLocale()
 const { services } = useTranslatedServices()
 const sectionRef = ref<HTMLElement | null>(null)
@@ -29,11 +27,18 @@ const paginatedServices = computed(() => {
 const canGoPrev = computed(() => currentPage.value > 1)
 const canGoNext = computed(() => currentPage.value < totalPages.value)
 
+// A page of the list can be shorter than the one before, which would leave
+// the visitor looking at whatever comes after it. Called once the new page is
+// in place and not on the click: WebKit abandons a glide when the page changes
+// shape under it, and on a phone that left the list 229px short.
+const backToTheTopOfTheList = () => {
+  sectionRef.value?.scrollIntoView()
+}
+
 const nextPage = () => {
   if (canGoNext.value) {
     slideDirection.value = 'right'
     currentPage.value++
-    scrollTo('#expanded-services')
   }
 }
 
@@ -41,7 +46,6 @@ const prevPage = () => {
   if (canGoPrev.value) {
     slideDirection.value = 'left'
     currentPage.value--
-    scrollTo('#expanded-services')
   }
 }
 
@@ -95,7 +99,11 @@ onMounted(() => {
       </div>
 
       <div class="expanded-services__content">
-        <transition :name="`slide-${slideDirection}`" mode="out-in">
+        <transition
+          :name="`slide-${slideDirection}`"
+          mode="out-in"
+          @after-enter="backToTheTopOfTheList"
+        >
           <div :key="currentPage" class="expanded-services__grid">
             <div
               v-for="(service, index) in paginatedServices"
