@@ -1,5 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { expectSamePlace, goToFoot, gotoAndReady, landingOf, pageHydrated } from './helpers'
+import {
+  expectSamePlace,
+  goToFoot,
+  gotoAndReady,
+  landingOf,
+  openPhoneMenu,
+  pageHydrated,
+} from './helpers'
 
 // The sections of the home page the main menu leads to, by the id each has.
 const sections = ['about', 'services', 'gallery', 'barbershops']
@@ -13,7 +20,7 @@ const sections = ['about', 'services', 'gallery', 'barbershops']
  */
 async function menuLink(page: Page, section: string): Promise<Locator> {
   const phoneMenuButton = page.locator('button.header__mobile-toggle')
-  if (await phoneMenuButton.isVisible()) await phoneMenuButton.click()
+  if (await phoneMenuButton.isVisible()) await openPhoneMenu(page)
   return page.locator(`header a[href$="#${section}"]:visible`).first()
 }
 
@@ -35,8 +42,6 @@ async function bringHeaderBack(page: Page): Promise<void> {
   await expect(page.locator('header.header')).toBeInViewport()
 
   // Then still, as a visitor's page is by the time they reach for the menu.
-  // Asked to glide while it is settling from a jump like the one above,
-  // WebKit gave up 2 times in 16.
   let previous = Number.NaN
   await expect(async () => {
     const now = await page.evaluate(() => Math.round(window.scrollY))

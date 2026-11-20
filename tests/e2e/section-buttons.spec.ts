@@ -1,5 +1,12 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import { expectSamePlace, goToFoot, gotoAndReady, landingOf, pageHydrated } from './helpers'
+import {
+  expectSamePlace,
+  goToFoot,
+  gotoAndReady,
+  landingOf,
+  openPhoneMenu,
+  pageHydrated,
+} from './helpers'
 
 // Every button on the home page that leads to one of its sections.
 const buttons = [
@@ -57,7 +64,7 @@ async function landingPlaceOf(page: Page, section: string): Promise<number> {
 /** The booking button of whichever header the screen shows, phone menu opened if need be. */
 async function headerBookingButton(page: Page): Promise<Locator> {
   const phoneMenuButton = page.locator('button.header__mobile-toggle')
-  if (await phoneMenuButton.isVisible()) await phoneMenuButton.click()
+  if (await phoneMenuButton.isVisible()) await openPhoneMenu(page)
   return page.locator('header .f-button--primary:visible').first()
 }
 

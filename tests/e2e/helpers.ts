@@ -105,3 +105,18 @@ export async function goToFoot(page: Page): Promise<void> {
 export function expectSamePlace(landing: number, other: number): void {
   expect(Math.abs(landing - other), `${landing}px against ${other}px`).toBeLessThanOrEqual(1)
 }
+
+/**
+ * Opens the phone menu and waits until it has finished sliding open.
+ *
+ * A link tapped while the menu was still on its way in sometimes did nothing
+ * in WebKit: 2 times in 24 for a second tap on the same item. Waited for, it
+ * went 60 times in 60.
+ *
+ * @param page - a hydrated page at a width that shows the phone menu's button
+ */
+export async function openPhoneMenu(page: Page): Promise<void> {
+  await page.locator('button.header__mobile-toggle').click()
+  await expect(page.locator('.header__mobile-menu')).toBeVisible()
+  await expect(page.locator('[class*="mobile-menu-enter"]')).toHaveCount(0)
+}
