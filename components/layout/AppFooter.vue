@@ -17,13 +17,6 @@ const { barbershops } = useBarbershops()
 const currentYear = ref(new Date().getFullYear())
 
 /**
- * Handle navigation click
- */
-const handleNavClick = (href: string) => {
-  scrollTo(href)
-}
-
-/**
  * Handle scroll to top
  */
 const scrollToTop = () => {
@@ -50,15 +43,14 @@ const scrollToTop = () => {
         <div class="footer__column">
           <h3 class="footer__heading text-h6">{{ t('footer.usefulLinks') }}</h3>
           <nav class="footer__links">
-            <a
+            <NuxtLink
               v-for="item in navigationItems"
-              :key="item.href"
-              :href="item.href"
+              :key="item.section"
+              :to="item.href"
               class="footer__link"
-              @click.prevent="handleNavClick(item.href)"
             >
               {{ item.label }}
-            </a>
+            </NuxtLink>
           </nav>
         </div>
 

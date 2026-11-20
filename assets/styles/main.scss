@@ -21,6 +21,12 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+// The browser and the router both read this when they go to a section, so a
+// menu click, an address typed in and a link from another page land alike.
+section[id] {
+  scroll-margin-top: variables.$section-landing;
+}
+
 body {
   min-height: 100vh;
   background-color: var(--page-background);

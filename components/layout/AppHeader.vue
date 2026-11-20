@@ -90,31 +90,6 @@ const handleScroll = () => {
 }
 
 /**
- * Handle navigation click
- */
-const handleNavClick = (href: string) => {
-  uiStore.closeMobileMenu()
-
-  // Nav targets are in-page anchors that only exist on the home page.
-  // From any other route, navigate home with the hash so Nuxt scrolls
-  // to the section on arrival instead of silently doing nothing.
-  if (!isHome.value) {
-    navigateTo(`${homePath.value}${href}`)
-    return
-  }
-
-  // Already home and clicking home at the top — nothing to do.
-  if (import.meta.client && href === '#home' && window.scrollY < 100) {
-    return
-  }
-
-  // Small delay to allow menu close animation, then scroll
-  setTimeout(() => {
-    scrollTo(href, 40)
-  }, 100)
-}
-
-/**
  * Handle booking button click
  */
 const handleBookingClick = () => {
@@ -159,28 +134,27 @@ onUnmounted(() => {
     <div class="header__container container">
       <!-- Logo and Navigation grouped together -->
       <div class="header__left">
-        <a
-          href="#home"
+        <NuxtLink
+          :to="`${homePath}#home`"
           class="header__logo"
           :aria-label="t('a11y.home')"
-          @click.prevent="handleNavClick('#home')"
+          @click="uiStore.closeMobileMenu"
         >
           <FLogo size="md" />
-        </a>
+        </NuxtLink>
 
         <!-- Desktop Navigation -->
         <nav class="header__nav">
-          <a
+          <NuxtLink
             v-for="item in navigationItems"
-            :key="item.href"
-            :href="item.href"
+            :key="item.section"
+            :to="item.href"
             class="header__nav-link"
-            :class="{ 'header__nav-link--active': activeSection === item.href.slice(1) }"
+            :class="{ 'header__nav-link--active': activeSection === item.section }"
             :data-text="item.label"
-            @click.prevent="handleNavClick(item.href)"
           >
             {{ item.label }}
-          </a>
+          </NuxtLink>
         </nav>
       </div>
 
@@ -228,16 +202,16 @@ onUnmounted(() => {
     <transition name="mobile-menu">
       <div v-if="isMobileMenuOpen" class="header__mobile-menu">
         <nav class="header__mobile-nav">
-          <a
+          <NuxtLink
             v-for="item in navigationItems"
-            :key="item.href"
-            :href="item.href"
+            :key="item.section"
+            :to="item.href"
             class="header__mobile-nav-link"
-            :class="{ 'header__mobile-nav-link--active': activeSection === item.href.slice(1) }"
-            @click.prevent="handleNavClick(item.href)"
+            :class="{ 'header__mobile-nav-link--active': activeSection === item.section }"
+            @click="uiStore.closeMobileMenu"
           >
             {{ item.label }}
-          </a>
+          </NuxtLink>
         </nav>
 
         <div class="header__mobile-actions">
