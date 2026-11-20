@@ -15,6 +15,7 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 - Menu links are real addresses. Opened in a new tab from another page they led nowhere.
 - A visitor who asked their device for less motion is taken to a section at once, without the glide.
 - The buttons that lead to a section (Book now, See more, View pricing) now behave like the menu. They land in the same place, and they put the section in the address so Back returns to where the visitor was. Before, each stopped 40 pixels from where the menu did.
+- On a phone, the page no longer jumps every five seconds while the testimonials change. A long review made that section up to 81 pixels taller than a short one, and everything below it moved each time.
 
 ### Maintenance
 

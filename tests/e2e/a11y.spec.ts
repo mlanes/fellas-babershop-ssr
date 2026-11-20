@@ -69,7 +69,7 @@ test.describe('Accessibility (axe-core)', () => {
     await stopSlowTimers(page)
     await gotoAndReady(page, '/')
     await pageSettled(page)
-    const testimonial = page.locator('.testimonials__comment')
+    const testimonial = page.locator('.testimonials__content--showing .testimonials__comment')
     const shown = await testimonial.textContent()
 
     // The testimonials change every five seconds.
