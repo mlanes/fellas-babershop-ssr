@@ -36,6 +36,10 @@ $spacing-6xl: 128px;
 // Layout
 $header-height: 80px; // Desktop header height
 $header-height-mobile: 96px; // Mobile header height
+// How far below the top of the window a section comes to rest when a link or
+// an address leads to it. 40px is what a menu click gave before every way in
+// was made to land alike; flush at the top left a heading 4px under the header.
+$section-landing: 40px;
 
 // Breakpoints
 $breakpoint-mobile: 768px;

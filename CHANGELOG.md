@@ -8,6 +8,13 @@ Each pull request adds its line under **Unreleased**. A release renames that sec
 
 ## Unreleased
 
+### Fixed
+
+- The menu takes a visitor to the same place however they arrive: from the menu, from a link someone sent, or from another page. Before, a click stopped 40 pixels short of where a link landed.
+- Choosing a menu item puts that section in the address, so it can be copied and sent, and Back returns to the section before. Before, the address never changed.
+- Menu links are real addresses. Opened in a new tab from another page they led nowhere.
+- A visitor who asked their device for less motion is taken to a section at once, without the glide.
+
 ### Maintenance
 
 - The browser tests on each pull request run in Playwright's own image, which already holds the browsers. Installing them on the test machine took from 16 seconds to 20 minutes, as fast as Ubuntu's package mirror answered, and one slow install held a pull request for 24 minutes.

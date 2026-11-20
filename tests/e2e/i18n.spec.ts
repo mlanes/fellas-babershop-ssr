@@ -372,7 +372,7 @@ test.describe('Links inside the site keep the language being read', () => {
     await clickMenuItem(page, 'About')
     await page.waitForTimeout(1000)
 
-    await expectAddress(page, '/en')
+    await expectAddress(page, '/en', '#about')
     await expectLanguage(page, 'en-US')
   })
 })
