@@ -7,7 +7,7 @@ import FButton from '~/components/ui/FButton.vue'
 import FLanguageSelector from '~/components/ui/FLanguageSelector.vue'
 import { useNavigation } from '~/composables/useNavigation'
 import { useUIStore } from '~/stores/ui'
-import { useSmoothScroll } from '~/composables/useSmoothScroll'
+import { useSectionLink } from '~/composables/useSectionLink'
 import { useTheme } from '~/composables/useTheme'
 import { useLocale } from '~/composables/useLocale'
 import { useHomeLink } from '~/composables/useHomeLink'
@@ -16,40 +16,16 @@ import { useHomeLink } from '~/composables/useHomeLink'
  * AppHeader - Main navigation header
  */
 const uiStore = useUIStore()
-const { homePath, isHome } = useHomeLink()
+const { homePath } = useHomeLink()
 const { isMobileMenuOpen, activeSection } = storeToRefs(uiStore)
-const { scrollTo } = useSmoothScroll()
+const { goToSection } = useSectionLink()
 const { isDark, toggleTheme } = useTheme()
 const { t } = useLocale()
 const { items: navigationItems } = useNavigation()
 
-const headerRef = ref<HTMLElement | null>(null)
 const isScrolled = ref(false)
 const isHeaderVisible = ref(true)
 let lastScrollY = 0
-let isProgrammaticScroll = false
-
-/**
- * Handle programmatic scroll event
- */
-const handleProgrammaticScroll = () => {
-  isProgrammaticScroll = true
-  isHeaderVisible.value = false
-
-  // Reset after scroll animation completes (smooth scroll takes ~500-1000ms)
-  setTimeout(() => {
-    isProgrammaticScroll = false
-  }, 600)
-}
-
-/**
- * Handle scrolled to home event - show navbar
- */
-const handleScrolledToHome = () => {
-  // Show header immediately when reaching home
-  isHeaderVisible.value = true
-  isProgrammaticScroll = false
-}
 
 /**
  * Handle scroll to update header background and active section
@@ -61,16 +37,13 @@ const handleScroll = () => {
 
   isScrolled.value = currentScrollY > 20
 
-  // Don't show/hide header during programmatic scroll
-  if (!isProgrammaticScroll) {
-    // Show/hide header based on scroll direction
-    if (currentScrollY < lastScrollY) {
-      // Scrolling up - show header
-      isHeaderVisible.value = true
-    } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
-      // Scrolling down - hide header (only after scrolling past 100px)
-      isHeaderVisible.value = false
-    }
+  // Show/hide header based on scroll direction
+  if (currentScrollY < lastScrollY) {
+    // Scrolling up - show header
+    isHeaderVisible.value = true
+  } else if (currentScrollY > lastScrollY && currentScrollY > 100) {
+    // Scrolling down - hide header (only after scrolling past 100px)
+    isHeaderVisible.value = false
   }
 
   lastScrollY = currentScrollY
@@ -94,20 +67,12 @@ const handleScroll = () => {
  */
 const handleBookingClick = () => {
   uiStore.closeMobileMenu()
-
-  if (!isHome.value) {
-    navigateTo(`${homePath.value}#barbershops`)
-    return
-  }
-
-  scrollTo('#barbershops')
+  return goToSection('barbershops')
 }
 
 onMounted(() => {
   if (import.meta.client) {
     window.addEventListener('scroll', handleScroll)
-    window.addEventListener('programmatic-scroll-start', handleProgrammaticScroll)
-    window.addEventListener('scrolled-to-home', handleScrolledToHome)
     handleScroll()
   }
 })
@@ -115,15 +80,12 @@ onMounted(() => {
 onUnmounted(() => {
   if (import.meta.client) {
     window.removeEventListener('scroll', handleScroll)
-    window.removeEventListener('programmatic-scroll-start', handleProgrammaticScroll)
-    window.removeEventListener('scrolled-to-home', handleScrolledToHome)
   }
 })
 </script>
 
 <template>
   <header
-    ref="headerRef"
     class="header"
     :class="{
       'header--scrolled': isScrolled,
