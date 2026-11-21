@@ -1,12 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import {
-  expectSamePlace,
-  goToFoot,
-  gotoAndReady,
-  landingOf,
-  openPhoneMenu,
-  pageHydrated,
-} from './helpers'
+import { arrivesAt, goToFoot, gotoAndReady, openPhoneMenu, pageHydrated } from './helpers'
 
 // Every button on the home page that leads to one of its sections.
 const buttons = [
@@ -47,20 +40,6 @@ async function bringIntoView(button: Locator): Promise<void> {
   }).toPass({ intervals: [150], timeout: 10_000 })
 }
 
-/**
- * Says where the stylesheet has a section come to rest: its scroll margin, in
- * pixels from the top of the window. The menu's spec holds that number to 40.
- *
- * A section's own address is not opened afresh to compare with, because on a
- * phone the page shifts for some seconds after loading and the comparison
- * would be with that.
- */
-async function landingPlaceOf(page: Page, section: string): Promise<number> {
-  return page
-    .locator(`#${section}`)
-    .evaluate((element) => Number.parseFloat(getComputedStyle(element).scrollMarginTop))
-}
-
 /** The booking button of whichever header the screen shows, phone menu opened if need be. */
 async function headerBookingButton(page: Page): Promise<Locator> {
   const phoneMenuButton = page.locator('button.header__mobile-toggle')
@@ -81,7 +60,7 @@ test.describe('A button that leads to a section lands where a link to it does', 
       await control.click({ force: neverStill })
 
       await expect(page).toHaveURL(new RegExp(`#${section}$`))
-      expectSamePlace(await landingOf(page, section), await landingPlaceOf(page, section))
+      await arrivesAt(page, section)
     })
   }
 
@@ -92,7 +71,7 @@ test.describe('A button that leads to a section lands where a link to it does', 
     await bringIntoView(control)
     await control.click()
     await expect(page).toHaveURL(/#barbershops$/)
-    await landingOf(page, 'barbershops')
+    await arrivesAt(page, 'barbershops')
 
     await page.goBack()
     await expect(page).toHaveURL((url) => url.pathname === '/' && url.hash === '')
@@ -114,10 +93,7 @@ test.describe('A button that leads to a section lands where a link to it does', 
       await expect(page).toHaveURL((url) => url.pathname === home && url.hash === '#barbershops', {
         timeout: 15_000,
       })
-      expectSamePlace(
-        await landingOf(page, 'barbershops'),
-        await landingPlaceOf(page, 'barbershops')
-      )
+      await arrivesAt(page, 'barbershops')
     })
   }
 
@@ -143,10 +119,7 @@ test.describe('A button that leads to a section lands where a link to it does', 
     await expect(page.locator('.expanded-services__pagination-current:visible')).toHaveText('2')
     await expect(page.locator('[class*="-enter-active"], [class*="-leave-active"]')).toHaveCount(0)
 
-    expectSamePlace(
-      await landingOf(page, 'expanded-services'),
-      await landingPlaceOf(page, 'expanded-services')
-    )
+    await arrivesAt(page, 'expanded-services')
     expect(page.url()).toBe(addressBefore)
   })
 
@@ -184,7 +157,7 @@ test.describe('A button that leads to a section lands where a link to it does', 
       requestAnimationFrame(note)
     })
     await page.locator('#about button').first().click()
-    await landingOf(page, 'barbershops')
+    await arrivesAt(page, 'barbershops')
 
     // Where it started and where it stopped, and nowhere between.
     await expect(page.locator('html')).toHaveAttribute('data-places-passed', /^[12]$/, {

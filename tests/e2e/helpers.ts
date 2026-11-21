@@ -50,30 +50,34 @@ export async function openLanguageMenu(page: Page): Promise<Locator> {
 }
 
 /**
- * Waits for the page to come to rest with a section at the top of the window,
- * and says where its top edge is.
+ * Waits until a section is in its landing place and staying there: its top
+ * edge at its scroll margin, which the stylesheet sets and menu.spec.ts holds
+ * to 40px.
  *
- * @param page - a page that is scrolling, or about to scroll, to the section
+ * It waits for that place, and not for the page to stop moving. The last
+ * stretch of a long glide is slow, and on a slow machine two looks 200ms apart
+ * agreed while the section was still 50px short. A helper that took that for
+ * rest reported 88, 93 and 111px on CI for sections that went on to arrive.
+ *
+ * @param page - a page that is on its way, or about to be, to the section
  * @param section - the id of the section
- * @returns the section's top edge, in pixels from the top of the window
- * @throws after 15 seconds if the section never comes to rest near the top
+ * @throws after 20 seconds if the section is not there, saying where it is
  */
-export async function landingOf(page: Page, section: string): Promise<number> {
-  let previous = Number.NaN
-  let top = Number.NaN
+export async function arrivesAt(page: Page, section: string): Promise<void> {
+  let wasThere = false
   await expect(async () => {
-    // "|| 0" because rounding a hair above the window gives -0, which is not 0
-    // to an exact comparison.
-    top = await page
-      .locator(`#${section}`)
-      .evaluate((element) => Math.round(element.getBoundingClientRect().top) || 0)
-    const atRest = top === previous
-    previous = top
-    expect(atRest, `#${section} is still moving, at ${top}px`).toBe(true)
-    expect(top, `#${section} came to rest away from the top`).toBeGreaterThanOrEqual(0)
-    expect(top, `#${section} came to rest away from the top`).toBeLessThan(250)
-  }).toPass({ intervals: [200], timeout: 15_000 })
-  return top
+    // "|| 0" because rounding a hair above the window gives -0, and the
+    // message below would print it.
+    const { top, landing } = await page.locator(`#${section}`).evaluate((element) => ({
+      top: Math.round(element.getBoundingClientRect().top) || 0,
+      landing: Math.round(Number.parseFloat(getComputedStyle(element).scrollMarginTop)),
+    }))
+    // A pixel either way: a section's edge can fall on a fraction of one.
+    const there = Math.abs(top - landing) <= 1
+    const stayed = there && wasThere
+    wasThere = there
+    expect(stayed, `#${section} is at ${top}px and lands at ${landing}px`).toBe(true)
+  }).toPass({ intervals: [250], timeout: 20_000 })
 }
 
 /**
@@ -95,15 +99,6 @@ export async function goToFoot(page: Page): Promise<void> {
       height = document.documentElement.scrollHeight
     }
   })
-}
-
-/**
- * Fails unless two landings are the same place. A pixel apart counts as the
- * same: a section's edge can fall on a fraction of a pixel, and two readings
- * of it then round to neighbours.
- */
-export function expectSamePlace(landing: number, other: number): void {
-  expect(Math.abs(landing - other), `${landing}px against ${other}px`).toBeLessThanOrEqual(1)
 }
 
 /**

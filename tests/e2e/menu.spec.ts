@@ -1,12 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
-import {
-  expectSamePlace,
-  goToFoot,
-  gotoAndReady,
-  landingOf,
-  openPhoneMenu,
-  pageHydrated,
-} from './helpers'
+import { arrivesAt, goToFoot, gotoAndReady, openPhoneMenu, pageHydrated } from './helpers'
 
 // The sections of the home page the main menu leads to, by the id each has.
 const sections = ['about', 'services', 'gallery', 'barbershops']
@@ -65,24 +58,22 @@ test.describe('The main menu takes a visitor to a section of the home page', () 
   })
 
   for (const section of sections) {
-    test(`#${section}: a click lands where the section's own address lands`, async ({ page }) => {
+    test(`#${section}: its own address and a click both land it in its place`, async ({ page }) => {
       await gotoAndReady(page, `/#${section}`)
       await pageHydrated(page)
-      const byAddress = await landingOf(page, section)
+      await arrivesAt(page, section)
 
       await gotoAndReady(page, '/')
       await pageHydrated(page)
       await (await menuLink(page, section)).click()
-      const byClick = await landingOf(page, section)
-
-      expectSamePlace(byClick, byAddress)
+      await arrivesAt(page, section)
     })
 
     test(`#${section}: its heading comes to rest below the header`, async ({ page }) => {
       await gotoAndReady(page, '/')
       await pageHydrated(page)
       await (await menuLink(page, section)).click()
-      await landingOf(page, section)
+      await arrivesAt(page, section)
 
       // The header slides away on the way down and back on the way up, so the
       // heading has to clear it whether or not it is showing at this moment.
@@ -106,18 +97,29 @@ test.describe('The main menu takes a visitor to a section of the home page', () 
 
     await (await menuLink(page, 'services')).click()
     await expect(page).toHaveURL(/#services$/)
-    await landingOf(page, 'services')
+    await arrivesAt(page, 'services')
 
     await bringHeaderBack(page)
     await (await menuLink(page, 'barbershops')).click()
     await expect(page).toHaveURL(/#barbershops$/)
-    await landingOf(page, 'barbershops')
+    await arrivesAt(page, 'barbershops')
 
     // Back is the browser's: it returns to where the visitor was when they
     // left, which is the services section with the header brought back.
     await page.goBack()
     await expect(page).toHaveURL(/#services$/)
-    await landingOf(page, 'services')
+    // Near the top again, though not in its landing place: Back puts the page
+    // where it was left, 120px on from there.
+    await expect
+      .poll(() =>
+        page.locator('#services').evaluate((section) => section.getBoundingClientRect().top)
+      )
+      .toBeLessThan(250)
+    await expect
+      .poll(() =>
+        page.locator('#services').evaluate((section) => section.getBoundingClientRect().top)
+      )
+      .toBeGreaterThan(0)
   })
 
   test('a second click on the same item brings back a visitor who scrolled away', async ({
@@ -126,25 +128,25 @@ test.describe('The main menu takes a visitor to a section of the home page', () 
     await gotoAndReady(page, '/')
     await pageHydrated(page)
     await (await menuLink(page, 'services')).click()
-    const firstTime = await landingOf(page, 'services')
+    await arrivesAt(page, 'services')
 
     await page.evaluate(() => window.scrollBy({ top: 900, behavior: 'instant' }))
     await bringHeaderBack(page)
 
     await (await menuLink(page, 'services')).click()
-    expectSamePlace(await landingOf(page, 'services'), firstTime)
+    await arrivesAt(page, 'services')
   })
 
   test("the footer's links land where the header's do", async ({ page }) => {
     await gotoAndReady(page, '/')
     await pageHydrated(page)
     await (await menuLink(page, 'services')).click()
-    const fromHeader = await landingOf(page, 'services')
+    await arrivesAt(page, 'services')
 
     await goToFoot(page)
     await page.locator('footer a[href$="#services"]').click()
     await expect(page).toHaveURL(/#services$/)
-    expectSamePlace(await landingOf(page, 'services'), fromHeader)
+    await arrivesAt(page, 'services')
   })
 
   test('from another page, a click arrives where a click on the home page does', async ({
@@ -153,13 +155,13 @@ test.describe('The main menu takes a visitor to a section of the home page', () 
     await gotoAndReady(page, '/')
     await pageHydrated(page)
     await (await menuLink(page, 'about')).click()
-    const fromHome = await landingOf(page, 'about')
+    await arrivesAt(page, 'about')
 
     await gotoAndReady(page, '/services')
     await pageHydrated(page)
     await (await menuLink(page, 'about')).click()
     await expect(page).toHaveURL(/\/#about$/)
-    expectSamePlace(await landingOf(page, 'about'), fromHome)
+    await arrivesAt(page, 'about')
   })
 
   for (const { page: from, language, home } of [
@@ -199,7 +201,7 @@ test.describe('The main menu takes a visitor to a section of the home page', () 
       requestAnimationFrame(note)
     })
     await (await menuLink(page, 'gallery')).click()
-    await landingOf(page, 'gallery')
+    await arrivesAt(page, 'gallery')
 
     // Where it started and where it stopped, and nowhere between.
     await expect(page.locator('html')).toHaveAttribute('data-places-passed', /^[12]$/, {

@@ -106,25 +106,22 @@ test.describe('The testimonials', () => {
   test('change at once for a visitor who asked for less motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' })
     const first = await shown(page)
-    await page.locator('.testimonials__nav-button--active').click()
 
-    // Well inside the half second the fade would wait: the new one is there
-    // in full, and the card was never left empty.
-    const showing = page.locator('.testimonials__content--showing')
-    await expect(showing.locator('.testimonials__comment')).not.toHaveText(first.words, {
-      timeout: 300,
-    })
-    await expect
-      .poll(() => showing.evaluate((review) => getComputedStyle(review).opacity), {
-        timeout: 300,
-        intervals: [20],
-      })
-      .toBe('1')
-    await expect
-      .poll(() => showing.evaluate((review) => getComputedStyle(review).visibility), {
-        timeout: 300,
-        intervals: [20],
-      })
-      .toBe('visible')
+    // For this visitor the fades are already cut to nothing. What would leave
+    // the card empty is a review waiting half a second before it comes in, so
+    // it is the waits that are read here. Timing the change with a clock was
+    // tried first, and a slow machine failed it for nothing.
+    const waits = await page.locator('.testimonials__content').evaluateAll((reviews) =>
+      reviews.flatMap((one) =>
+        getComputedStyle(one)
+          .transitionDelay.split(',')
+          .map((wait) => Number.parseFloat(wait))
+      )
+    )
+    expect(waits.length).toBeGreaterThan(0)
+    expect(waits.filter((wait) => wait !== 0)).toEqual([])
+
+    const now = await next(page, first.words)
+    expect(now.arrived).toBe(true)
   })
 })
